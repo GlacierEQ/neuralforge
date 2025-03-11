@@ -11,4 +11,12 @@ public class UserRoleMapper {
                 .name(role.getName())
                 .build();
     }
+
+    public UserRoleEntity mapToEntity(UserRoleResource role){
+        return UserRoleEntity.builder()
+                .description(role.getDescription())
+                .id(role.getId())
+                .name(role.getName())
+                .build();
+    }
 }

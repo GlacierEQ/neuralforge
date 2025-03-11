@@ -4,13 +4,16 @@ import com.cenfotec.p3.neuralforge_api.model.entity.UserEntity;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserResource;
 
 public class UserMapper {
+
+    private final UserRoleMapper userRoleMapper = new UserRoleMapper();
+
     public UserResource mapToResource(UserEntity user){
         return UserResource.builder()
                 .id(user.getId())
-                .role(user.getRole())
+                .role(userRoleMapper.mapToResource(user.getRole()))
                 .createdAt(user.getCreatedAt())
                 .email(user.getEmail())
-                .status(user.isStatus())
+                .status(user.getStatus())
                 .lastName(user.getLastName())
                 .name(user.getName())
                 .build();
@@ -19,10 +22,10 @@ public class UserMapper {
     public UserEntity mapToEntity(UserResource user){
         return UserEntity.builder()
                 .id(user.getId())
-                .role(user.getRole())
+                .role(userRoleMapper.mapToEntity(user.getRole()))
                 .createdAt(user.getCreatedAt())
                 .email(user.getEmail())
-                .status(user.isStatus())
+                .status(user.getStatus())
                 .lastName(user.getLastName())
                 .name(user.getName())
                 .password(user.getPassword())

@@ -7,6 +7,7 @@ import com.cenfotec.p3.neuralforge_api.model.mapper.UserMapper;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserResource;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserRoleResource;
 import com.cenfotec.p3.neuralforge_api.repository.UserRepository;
+import jakarta.persistence.EntityExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,8 @@ public class UserService {
     private final UserMapper userMapper = new UserMapper();
 
     public UserResource createUser(UserResource user){
+        if (userRepository.existsByEmail(user.getEmail())) throw new EntityExistsException("An user is already registrated with this email address.");
+
         UserRoleResource basicRole = userRoleService.getRoleByEnum(UserRoleEnum.ROLE_STUDENT);
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));

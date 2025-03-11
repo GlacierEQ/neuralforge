@@ -33,7 +33,7 @@ public class UserResource {
 
     private UserRoleResource role;
 
-    private boolean status;
+    private Boolean status;
 
     @NotBlank(message = "Password cannot be empty")
     @Size(min = 8, max = 20, message = "Password must be between 8 and 20 characters")

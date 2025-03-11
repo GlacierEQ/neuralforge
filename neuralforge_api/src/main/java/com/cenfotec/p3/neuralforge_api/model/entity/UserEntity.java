@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,7 +50,7 @@ public class UserEntity implements UserDetails {
     @JoinColumn(name = "role", referencedColumnName = "id", nullable = false)
     private UserRoleEntity role;
 
-    private boolean status = true;
+    private Boolean status;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -59,5 +60,10 @@ public class UserEntity implements UserDetails {
     @Override
     public String getUsername() {
         return this.name;
+    }
+
+    @PrePersist
+    private void setDefaultValues(){
+        this.status = Boolean.TRUE;
     }
 }
