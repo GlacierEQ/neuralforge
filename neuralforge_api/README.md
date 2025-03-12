@@ -2,7 +2,7 @@
 
 ## Guías
 
-### 📄 ¿Cómo inicializar la base de datos localmente?
+### 📄 Inicializar Base de Datos
 
 1. Abrir `MySQL Client (MariaDB 11.6 (x64))`.
 1. Inicia sesión.
@@ -13,6 +13,8 @@
 1. Para verificar que los permisos fueron concedidos, escriba los siguientes comandos:
    - `flush privileges;`
    - `show grants for 'admin'@'localhost';`
+
+---
 
 ### ⚙️ Configuración de Lombok en IntelliJ IDEA
 
@@ -27,6 +29,8 @@ Si usas **IntelliJ IDEA**, asegúrate de activar las anotaciones de **Lombok** p
 1. Reinicia IntelliJ IDEA para aplicar los cambios.
 
 Con estos pasos, las anotaciones como `@Data`, `@Builder`, `@NoArgsConstructor`, `@AllArgsConstructor`, entre otras, funcionarán correctamente en el proyecto.
+
+---
 
 ### 🛠️ Importar una colección en Insomnia
 
