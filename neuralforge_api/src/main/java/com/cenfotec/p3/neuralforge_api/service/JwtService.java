@@ -26,10 +26,10 @@ import java.util.function.Function;
 public class JwtService {
 
     @Value("${security.jwt.secret-key}")
-    private String secretKey;
+    String secretKey;
 
     @Value("${security.jwt.expiration-time}")
-    private long jwtExpiration;
+    long jwtExpiration;
 
     /**
      * Extracts the username (subject) from a given JWT token.
@@ -122,7 +122,7 @@ public class JwtService {
      * @param token The JWT token.
      * @return A {@link Claims} object containing all claims.
      */
-    private Claims extractAllClaims(String token) {
+    Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()
                 .setSigningKey(getSignInKey())

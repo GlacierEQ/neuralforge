@@ -68,6 +68,7 @@ public class UserResource {
 
     /**
      * User password.
+     * Is ignored by response only.
      * Must be between 8 and 20 characters long and contain at least:
      * - One uppercase letter
      * - One lowercase letter

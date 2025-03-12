@@ -12,7 +12,7 @@ import com.cenfotec.p3.neuralforge_api.model.resource.UserResource;
  */
 public class UserMapper {
 
-    private final UserRoleMapper userRoleMapper = new UserRoleMapper();
+    protected final UserRoleMapper userRoleMapper = new UserRoleMapper();
 
     /**
      * Converts a {@link UserEntity} into a {@link UserResource}.
