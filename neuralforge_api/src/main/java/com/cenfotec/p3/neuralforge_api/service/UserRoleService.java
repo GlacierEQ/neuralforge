@@ -10,24 +10,36 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+/**
+ * Service responsible for managing user roles.
+ * Provides methods to retrieve user roles based on enumerated values.
+ *
+ * @author Jareth Mena
+ * @version 1.0
+ */
 @Service
 public class UserRoleService {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    UserRoleRepository userRoleRepository;
+    private UserRoleRepository userRoleRepository;
 
     private final UserRoleMapper userRoleMapper = new UserRoleMapper();
 
-    public UserRoleResource getRoleByEnum(UserRoleEnum role){
+    /**
+     * Retrieves a user role based on the specified {@link UserRoleEnum}.
+     *
+     * @param role The {@link UserRoleEnum} representing the role to retrieve.
+     * @return A {@link UserRoleResource} containing role details.
+     * @throws ResponseStatusException If the role is not found in the database.
+     */
+    public UserRoleResource getRoleByEnum(UserRoleEnum role) {
         return userRoleMapper.mapToResource(
                 userRoleRepository
                         .findByName(role)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Default role not found"))
         );
-
     }
-
 }

@@ -12,12 +12,26 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+/**
+ * Main configuration class for authentication and security.
+ * Defines Spring beans related to user management and authentication.
+ *
+ * @author Jareth Mena
+ * @version 1.0
+ */
 @Configuration
 public class ApplicationConfiguration {
 
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Bean that provides the user details service.
+     * Retrieves users from the database based on their email.
+     *
+     * @return {@link UserDetailsService} that fetches users from {@link UserRepository}.
+     * @throws UsernameNotFoundException if the user is not found.
+     */
     @Bean
     UserDetailsService userDetailsService() {
         return email -> userRepository
@@ -25,16 +39,36 @@ public class ApplicationConfiguration {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
+    /**
+     * Bean for password encoding using BCrypt.
+     * Ensures secure storage of user passwords.
+     *
+     * @return An instance of {@link BCryptPasswordEncoder}.
+     */
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Bean that provides the authentication manager.
+     * Manages user authentication within the system.
+     *
+     * @param config Spring authentication configuration.
+     * @return Configured {@link AuthenticationManager}.
+     * @throws Exception if an error occurs during configuration.
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
+    /**
+     * Bean that configures the authentication provider.
+     * Uses {@link DaoAuthenticationProvider} to authenticate users with database-stored credentials.
+     *
+     * @return An instance of {@link AuthenticationProvider}.
+     */
     @Bean
     AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
