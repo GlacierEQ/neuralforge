@@ -7,7 +7,10 @@ import com.cenfotec.p3.neuralforge_api.model.enums.UserRoleEnum;
 import com.cenfotec.p3.neuralforge_api.model.mapper.UserMapper;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserResource;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserRoleResource;
+import com.cenfotec.p3.neuralforge_api.model.resource.UserValidationInputResource;
+import com.cenfotec.p3.neuralforge_api.model.resource.UserValidationResource;
 import com.cenfotec.p3.neuralforge_api.repository.UserRepository;
+import com.cenfotec.p3.neuralforge_api.util.ValidationUtil;
 import jakarta.persistence.EntityExistsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,10 +19,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -35,9 +41,14 @@ class UserServiceTest {
 
     @Mock
     private UserRoleService userRoleService;
-
+    @Mock
+    private EmailService emailService;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private ValidationUtil validationUtil;
+    @Mock
+    private UserValidationService userValidationService;
 
     @Mock
     private UserMapper userMapper;
@@ -117,6 +128,12 @@ class UserServiceTest {
 
         when(userRepository.save(any(UserEntity.class))).thenReturn(mockUserEntity);
 
+        UserValidationResource mockValidationResource = new UserValidationResource();
+        mockValidationResource.setVerificationCode(12345);
+
+        when(userValidationService.createUserValidation(any(UserEntity.class))).thenReturn(mockValidationResource);
+        doNothing().when(emailService).sendUserVerificationEmail(any(UserEntity.class), anyInt());
+
         // When
         UserResource result = userService.createUser(mockUserResource);
 
@@ -129,8 +146,85 @@ class UserServiceTest {
         verify(userRoleService, times(1)).getRoleByEnum(UserRoleEnum.ROLE_STUDENT);
         verify(passwordEncoder, times(1)).encode("plainPassword");
         verify(userRepository, times(1)).save(any(UserEntity.class));
+        verify(userValidationService, times(1)).createUserValidation(any(UserEntity.class));
+        verify(emailService, times(1)).sendUserVerificationEmail(any(UserEntity.class), anyInt());
+    }
+
+    @Test
+    void givenValidEmail_whenGetUserByEmail_thenReturnUser() {
+        // Given
+        when(userRepository.findByEmail(mockUserResource.getEmail())).thenReturn(Optional.of(mockUserEntity));
+
+        // When
+        UserResource result = userService.getUserByEmail(mockUserResource.getEmail());
+
+        // Then
+        assertNotNull(result);
+        assertEquals(mockUserResource.getEmail(), result.getEmail());
+        verify(userRepository, times(1)).findByEmail(mockUserResource.getEmail());
     }
 
 
+    @Test
+    void givenNonExistentEmail_whenGetUserByEmail_thenThrowException() {
+        // Given
+        when(userRepository.findByEmail(mockUserResource.getEmail())).thenReturn(Optional.empty());
+
+        // When & Then
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> userService.getUserByEmail(mockUserResource.getEmail()));
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        verify(userRepository, times(1)).findByEmail(mockUserResource.getEmail());
+    }
+
+    @Test
+    void givenValidUserDetails_whenHandledUserUpdate_thenReturnUpdatedUser() {
+        // Given
+        when(userRepository.existsByEmail(mockUserResource.getEmail())).thenReturn(true);
+        when(userRepository.findByEmail(mockUserResource.getEmail())).thenReturn(Optional.of(mockUserEntity));
+
+        doNothing().when(validationUtil).triggerValidations(any(), any());
+
+        // When
+        UserResource result = userService.handledUserUpdate(mockUserResource.getEmail(), mockUserResource);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(mockUserResource.getEmail(), result.getEmail());
+        verify(userRepository, times(1)).existsByEmail(mockUserResource.getEmail());
+        verify(userRepository, times(1)).updateUserIgnoringNulls(any(), any(), any(), any(), any(), any(), any());
+        verify(validationUtil, times(1)).triggerValidations(any(), eq("password"));
+    }
+
+    @Test
+    void givenInvalidEmail_whenHandledUserUpdate_thenThrowException() {
+        // Given
+        when(userRepository.existsByEmail(mockUserResource.getEmail())).thenReturn(false);
+
+        // When & Then
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> userService.handledUserUpdate(mockUserResource.getEmail(), mockUserResource));
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        verify(userRepository, times(1)).existsByEmail(mockUserResource.getEmail());
+    }
+
+    @Test
+    void givenValidValidationInput_whenValidateInitialRegister_thenUpdateUserVerification() {
+        // Given
+        UserValidationInputResource validationInput = new UserValidationInputResource();
+        validationInput.setEmail(mockUserResource.getEmail());
+        validationInput.setVerificationCode(12345);
+
+        when(userRepository.findByEmail(mockUserResource.getEmail())).thenReturn(Optional.of(mockUserEntity));
+        doNothing().when(userValidationService).validateInputCode(validationInput);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(mockUserEntity);
+
+        // When
+        userService.validateInitialRegister(validationInput);
+
+        // Then
+        verify(userValidationService, times(1)).validateInputCode(validationInput);
+        verify(userRepository, times(1)).save(any(UserEntity.class));
+    }
 
 }

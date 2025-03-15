@@ -5,6 +5,7 @@ import com.cenfotec.p3.neuralforge_api.exception.response.MultipleExceptionRespo
 import com.cenfotec.p3.neuralforge_api.exception.response.SingleExceptionResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.persistence.EntityExistsException;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -22,6 +23,8 @@ import java.util.List;
 /**
  * Global exception handler for managing application-wide exceptions.
  * Provides standardized responses for different types of exceptions.
+ *
+ * This class ensures consistency in error handling and logging throughout the application.
  *
  * @author Jareth Mena
  * @version 1.0
@@ -82,6 +85,28 @@ public class GlobalExceptionHandler {
                 : new MultipleExceptionResponse(requestId, errors);
 
         logger.error("Validation error occurred: {}", response);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    /**
+     * Handles {@link ConstraintViolationException} when validation constraints are violated.
+     *
+     * @param ex The exception containing validation errors.
+     * @return A {@link ResponseEntity} containing either a {@link SingleExceptionResponse} or {@link MultipleExceptionResponse}.
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ExceptionResponse> handleConstraintViolationExceptions(ConstraintViolationException ex) {
+        String requestId = MDC.get("requestId");
+        List<String> errors = new ArrayList<>();
+
+        ex.getConstraintViolations().forEach(violation -> errors.add(violation.getMessage()));
+
+        ExceptionResponse response = (errors.size() == 1)
+                ? new SingleExceptionResponse(requestId, errors.get(0))
+                : new MultipleExceptionResponse(requestId, errors);
+
+        logger.error("Constraint violation error occurred: {}", response);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }

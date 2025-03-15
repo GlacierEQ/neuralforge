@@ -5,6 +5,8 @@ import com.cenfotec.p3.neuralforge_api.exception.response.MultipleExceptionRespo
 import com.cenfotec.p3.neuralforge_api.exception.response.SingleExceptionResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.persistence.EntityExistsException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -20,7 +22,9 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -32,6 +36,34 @@ class GlobalExceptionHandlerTest {
     @BeforeEach
     void setUp() {
         exceptionHandler = new GlobalExceptionHandler();
+    }
+
+    @Test
+    void givenConstraintViolationException_whenHandle_thenReturnBadRequestResponse() {
+        // Given
+        ConstraintViolationException exception = mock(ConstraintViolationException.class);
+        ConstraintViolation<?> violation1 = mock(ConstraintViolation.class);
+        ConstraintViolation<?> violation2 = mock(ConstraintViolation.class);
+
+        when(violation1.getMessage()).thenReturn("Constraint violation error 1");
+        when(violation2.getMessage()).thenReturn("Constraint violation error 2");
+
+        Set<ConstraintViolation<?>> violations = Set.of(violation1, violation2);
+        when(exception.getConstraintViolations()).thenReturn(violations);
+
+        try (MockedStatic<MDC> mockedMDC = Mockito.mockStatic(MDC.class)) {
+            mockedMDC.when(() -> MDC.get("requestId")).thenReturn(requestId);
+
+            // When
+            ResponseEntity<ExceptionResponse> response = exceptionHandler.handleConstraintViolationExceptions(exception);
+
+            // Then
+            assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+            assertTrue(response.getBody() instanceof MultipleExceptionResponse);
+            assertThat(((MultipleExceptionResponse) response.getBody()).getException())
+                    .containsExactlyInAnyOrder("Constraint violation error 1", "Constraint violation error 2");
+            assertEquals(requestId, response.getBody().getId());
+        }
     }
 
     @Test

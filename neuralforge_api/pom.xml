@@ -12,7 +12,7 @@
 
     <groupId>com.cenfotec.p3</groupId>
     <artifactId>neuralforge_api</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>NeuralForge API</name>
     <description>Spring Boot REST API for NeuralForge Web App</description>
     <url>https://github.com/p3-software/neuralforge</url>

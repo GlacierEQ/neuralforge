@@ -49,6 +49,7 @@ class AuthenticationServiceTest {
         testUser = new UserEntity();
         testUser.setEmail("test@example.com");
         testUser.setPassword("password123");
+        testUser.setVerified(true);
 
         UserRoleEntity role = new UserRoleEntity();
         role.setDescription("ROLE_USER");

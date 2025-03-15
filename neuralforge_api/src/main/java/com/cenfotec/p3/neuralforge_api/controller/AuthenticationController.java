@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Controller responsible for handling authentication-related requests.
- * Provides endpoints for user login and registration.
+ * Provides endpoints for user login, registration, and validation.
  *
  * @author Jareth Mena
  * @version 1.0
@@ -56,6 +56,7 @@ public class AuthenticationController {
      *
      * @param user The {@link UserResource} containing user information.
      * @return A {@link ResponseEntity} containing the newly created {@link UserResource}.
+     * @throws NeuralForgeEmailException If there is an issue with the email address provided during registration.
      */
     @PostMapping("/register")
     public ResponseEntity<UserResource> registerUser(@Valid @RequestBody UserResource user) throws NeuralForgeEmailException {
@@ -64,6 +65,13 @@ public class AuthenticationController {
                 .body(userService.createUser(user));
     }
 
+    /**
+     * Handles user validation requests during initial registration.
+     * Validates user-provided data before completing the registration process.
+     *
+     * @param validationInput The {@link UserValidationInputResource} containing validation data.
+     * @return A {@link ResponseEntity} with HTTP status 200 (OK) upon successful validation.
+     */
     @PostMapping("/verify")
     public ResponseEntity<Void> validateInitialRegister(@Valid @RequestBody UserValidationInputResource validationInput) {
         userService.validateInitialRegister(validationInput);

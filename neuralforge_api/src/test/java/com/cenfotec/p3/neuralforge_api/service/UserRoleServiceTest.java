@@ -69,7 +69,7 @@ class UserRoleServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> userRoleService.getRoleByEnum(UserRoleEnum.ROLE_ADMINISTRATOR));
 
-        assertEquals("404 NOT_FOUND \"Default role not found\"", exception.getMessage());
+        assertEquals("404 NOT_FOUND \"Role not found\"", exception.getMessage());
 
         verify(userRoleRepository, times(1)).findByName(UserRoleEnum.ROLE_ADMINISTRATOR);
         verify(userRoleMapper, never()).mapToResource(any());

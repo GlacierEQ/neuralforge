@@ -12,15 +12,34 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Seeder class responsible for preloading validation types into the database.
+ * Ensures essential validation types exist upon application startup.
+ *
+ * This class listens for the {@link ContextRefreshedEvent} to execute the seeding process.
+ *
+ * @author Jareth Mena
+ * @version 1.0
+ */
 @Component
 public class ValidationTypeSeeder implements ApplicationListener<ContextRefreshedEvent> {
 
     @Autowired
     private ValidationTypeRepository validationTypeRepository;
+
+    /**
+     * Triggers the seeding process when the application context is refreshed.
+     *
+     * @param contextRefreshedEvent The event indicating the application context has been refreshed.
+     */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         this.loadTypes();
     }
+
+    /**
+     * Loads predefined validation types into the database if they do not already exist.
+     */
     private void loadTypes() {
         ValidationTypeEnum[] validationTypeNames = new ValidationTypeEnum[] {
                 ValidationTypeEnum.RECOVER,
@@ -29,7 +48,7 @@ public class ValidationTypeSeeder implements ApplicationListener<ContextRefreshe
 
         Map<ValidationTypeEnum, String> validationDescriptionMap = Map.of(
                 ValidationTypeEnum.RECOVER, "Validation type used when recovering an account",
-                ValidationTypeEnum.VERIFY, "Validation type used when verifying an user's identity"
+                ValidationTypeEnum.VERIFY, "Validation type used when verifying a user's identity"
         );
 
         Arrays.stream(validationTypeNames).forEach((typeName) -> {

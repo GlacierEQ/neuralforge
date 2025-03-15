@@ -2,7 +2,6 @@ package com.cenfotec.p3.neuralforge_api.controller;
 
 import com.cenfotec.p3.neuralforge_api.model.resource.UserResource;
 import com.cenfotec.p3.neuralforge_api.service.UserService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,12 +51,12 @@ public class UserController {
                 .body(userService.getUserByEmail(email));
     }
 
-    @PutMapping
+    @PutMapping("/{email}")
     @PreAuthorize("hasAnyRole('ROLE_ADMINISTRATOR')")
-    public ResponseEntity<UserResource> updateUserFullAccess(@RequestBody UserResource user) {
+    public ResponseEntity<UserResource> updateUserFullAccess(@RequestBody UserResource user, @PathVariable String email) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(userService.updateUserFullAccess(user));
+                .body(userService.handledUserUpdate(email, user));
     }
 
 }
