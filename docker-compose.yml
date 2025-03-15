@@ -1,0 +1,82 @@
+# NeuralForge - Docker Compose Configuration
+# This file defines the multi-container Docker application consisting of:
+# - A MariaDB database (10.6) for data persistence
+# - A Java Spring Boot backend API (port 10001)
+# - An Angular frontend (not yet implemented)
+
+services:
+  # Database Service
+  database:
+    image: mariadb:10.6
+    container_name: neuralforge-db
+    restart: unless-stopped # More appropriate than 'always' - won't restart if manually stopped
+    env_file:
+      - .env # External environment file for secrets
+    environment:
+      # Create a dedicated database user instead of using root
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mariadb_data:/var/lib/mysql # Persistent storage for database
+    networks:
+      - neuralforge-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "${DB_USER}",
+          "--password=${DB_PASSWORD}",
+        ]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+    # Security hardening
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - NET_RAW
+
+  # Backend API Service
+  backend:
+    build:
+      context: ./neuralforge_api
+    container_name: neuralforge-api
+    env_file:
+      - .env
+    environment:
+      # Use environment variables for application configuration
+      # Use non-root DB user
+      DB_DATASOURCE: jdbc:mariadb://database:3306/${DB_NAME}
+      DB_USERNAME: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      SPRING_PROFILES_ACTIVE: ${ENVIRONMENT:-prod}
+    ports:
+      - "127.0.0.1:10001:8080" # Bind to localhost for added security
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - neuralforge-network
+    # Security hardening
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+# Network definition
+networks:
+  neuralforge-network:
+    driver: bridge
+
+# Volume definition for persistent data
+volumes:
+  mariadb_data:
+    driver: local

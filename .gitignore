@@ -32,5 +32,10 @@ build/
 ### VS Code ###
 .vscode/
 
+### Docker Environment ###
+.env*
+!.env.example
+
+### Angular ###
 node_modules/
 .angular/
