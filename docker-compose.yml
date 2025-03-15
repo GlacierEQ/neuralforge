@@ -71,6 +71,24 @@ services:
     cap_drop:
       - ALL
 
+  # Frontend Service
+  frontend:
+    build:
+      context: ./neuralforge_ui
+    container_name: neuralforge-ui
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:10002:80" # Bind to localhost for added security
+    depends_on:
+      - backend
+    networks:
+      - neuralforge-network
+    # Security hardening
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
 # Network definition
 networks:
   neuralforge-network:

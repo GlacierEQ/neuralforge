@@ -1,13 +1,13 @@
-import { inject, Injectable } from '@angular/core';
-import { IAuthority, ILoginResponse, IResponse, IRoleType, IUser } from '../interfaces';
-import { Observable, firstValueFrom, of, tap } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient } from "@angular/common/http";
+import { inject, Injectable } from "@angular/core";
+import { Observable, tap } from "rxjs";
+import { IAuthority, ILoginResponse, IRoleType, IUser } from "../interfaces";
 
 /**
  * Authentication service for managing user login, roles, and session persistence.
  */
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class AuthService {
   /** User's access token. */
@@ -17,7 +17,7 @@ export class AuthService {
   private expiresIn!: number;
 
   /** Authenticated user details. */
-  private user: IUser = { email: '', authorities: [] };
+  private user: IUser = { email: "", authorities: [] };
 
   /** Injected HTTP client for API requests. */
   private http: HttpClient = inject(HttpClient);
@@ -30,26 +30,26 @@ export class AuthService {
    * Saves user authentication details to local storage.
    */
   public save(): void {
-    if (this.user) localStorage.setItem('auth_user', JSON.stringify(this.user));
+    if (this.user) localStorage.setItem("auth_user", JSON.stringify(this.user));
 
     if (this.accessToken)
-      localStorage.setItem('access_token', JSON.stringify(this.accessToken));
+      localStorage.setItem("access_token", JSON.stringify(this.accessToken));
 
     if (this.expiresIn)
-      localStorage.setItem('expiresIn', JSON.stringify(this.expiresIn));
+      localStorage.setItem("expiresIn", JSON.stringify(this.expiresIn));
   }
 
   /**
    * Loads user authentication details from local storage.
    */
   private load(): void {
-    let token = localStorage.getItem('access_token');
+    let token = localStorage.getItem("access_token");
     if (token) this.accessToken = token;
-    
-    let exp = localStorage.getItem('expiresIn');
+
+    let exp = localStorage.getItem("expiresIn");
     if (exp) this.expiresIn = JSON.parse(exp);
-    
-    const user = localStorage.getItem('auth_user');
+
+    const user = localStorage.getItem("auth_user");
     if (user) this.user = JSON.parse(user);
   }
 
@@ -82,16 +82,21 @@ export class AuthService {
    * @param credentials User credentials (email and password).
    * @returns An `Observable` containing the login response.
    */
-  public login(credentials: { email: string; password: string }): Observable<ILoginResponse> {
-    return this.http.post<ILoginResponse>('api/neuralforge/v1/auth/login', credentials).pipe(
-      tap((response: any) => {
-        this.accessToken = response.token;
-        this.user.email = credentials.email;
-        this.expiresIn = response.expiresIn;
-        this.user = response.authUser;
-        this.save();
-      })
-    );
+  public login(credentials: {
+    email: string;
+    password: string;
+  }): Observable<ILoginResponse> {
+    return this.http
+      .post<ILoginResponse>("api/neuralforge/v1/auth/login", credentials)
+      .pipe(
+        tap((response: any) => {
+          this.accessToken = response.token;
+          this.user.email = credentials.email;
+          this.expiresIn = response.expiresIn;
+          this.user = response.authUser;
+          this.save();
+        })
+      );
   }
 
   /**
@@ -100,7 +105,9 @@ export class AuthService {
    * @returns `true` if the user has the role, `false` otherwise.
    */
   public hasRole(role: string): boolean {
-    return this.user.authorities ? this.user.authorities.some(authority => authority.authority == role) : false;
+    return this.user.authorities
+      ? this.user.authorities.some((authority) => authority.authority == role)
+      : false;
   }
 
   /**
@@ -108,7 +115,11 @@ export class AuthService {
    * @returns `true` if the user has the admin role, `false` otherwise.
    */
   public isSuperAdmin(): boolean {
-    return this.user.authorities ? this.user.authorities.some(authority => authority.authority == IRoleType.admin) : false;
+    return this.user.authorities
+      ? this.user.authorities.some(
+          (authority) => authority.authority == IRoleType.admin
+        )
+      : false;
   }
 
   /**
@@ -117,7 +128,7 @@ export class AuthService {
    * @returns `true` if the user has at least one of the roles, `false` otherwise.
    */
   public hasAnyRole(roles: any[]): boolean {
-    return roles.some(role => this.hasRole(role));
+    return roles.some((role) => this.hasRole(role));
   }
 
   /**
@@ -143,17 +154,20 @@ export class AuthService {
    * @returns An `Observable` containing the signup response.
    */
   public signup(user: IUser): Observable<ILoginResponse> {
-    return this.http.post<ILoginResponse>('auth/signup', user);
+    return this.http.post<ILoginResponse>(
+      "api/neuralforge/v1/auth/register",
+      user
+    );
   }
 
   /**
    * Logs out the user and removes their authentication data from local storage.
    */
   public logout(): void {
-    this.accessToken = '';
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('expiresIn');
-    localStorage.removeItem('auth_user');
+    this.accessToken = "";
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("expiresIn");
+    localStorage.removeItem("auth_user");
   }
 
   /**
@@ -179,14 +193,14 @@ export class AuthService {
 
     // Check if the user is permitted for the given route
     for (const authority of routeAuthorities) {
-      if (userAuthorities?.some(item => item.authority == authority)) {
+      if (userAuthorities?.some((item) => item.authority == authority)) {
         allowedUser = true;
         break;
       }
     }
 
     // Check if the user has admin privileges
-    if (userAuthorities?.some(item => item.authority == IRoleType.admin)) {
+    if (userAuthorities?.some((item) => item.authority == IRoleType.admin)) {
       isAdmin = true;
     }
 

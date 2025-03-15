@@ -68,7 +68,7 @@ public class SecurityConfiguration {
     @Bean
     public UrlBasedCorsConfigurationSource corsConfiguration() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:8080")); // Defines allowed origins
+        config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:8080", "https://neuralforge.ealpizar.com")); // Defines allowed origins
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Defines allowed HTTP methods
         config.setAllowedHeaders(List.of("*")); // Allows all headers
         config.setAllowCredentials(true); // Allows credentials in requests
