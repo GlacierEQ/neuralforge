@@ -10,6 +10,7 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { GuestGuard } from './guards/guest.guard';
 import { IRoleType } from './interfaces';
 import { ProfileComponent } from './pages/profile/profile.component';
+import {VerificationComponent} from "./pages/auth/verification/verification.component";
 
 /**
  * Application routes configuration.
@@ -54,6 +55,14 @@ export const routes: Routes = [
     redirectTo: 'login',
     pathMatch: 'full',
   },
+  /**
+   * Redirects to the email verification page.
+   */
+  {
+    path: 'verification',
+    component: VerificationComponent,
+    canActivate: [GuestGuard],
+  },
 
   /**
    * Main application layout route.
@@ -83,7 +92,7 @@ export const routes: Routes = [
         component: UsersComponent,
         canActivate: [AdminRoleGuard],
         data: { 
-          authorities: [IRoleType.admin, IRoleType.teacher, IRoleType.student],
+          authorities: [IRoleType.admin],
           name: 'Users',
           showInSidebar: true
         }
@@ -117,7 +126,15 @@ export const routes: Routes = [
           name: 'Dashboard',
           showInSidebar: true
         }
-      }
+      },
     ],
   },
+  /**
+   * Failsafe redirect.
+   */
+  {
+    path: '**',
+    redirectTo: '/',
+    pathMatch: 'full'
+  }
 ];

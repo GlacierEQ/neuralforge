@@ -1,14 +1,13 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { BaseService } from './base-service';
 import { ISearch, IUser } from '../interfaces';
-import { Observable, catchError, tap, throwError } from 'rxjs';
 import { AlertService } from './alert.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService extends BaseService<IUser> {
-  protected override source: string = 'api/neuralforge/v1/auth/users';
+  protected override source: string = 'api/neuralforge/v1/users';
   private userListSignal = signal<IUser[]>([]);
   get users$() {
     return this.userListSignal;
@@ -25,7 +24,7 @@ export class UserService extends BaseService<IUser> {
       next: (response: any) => {
         this.search = {...this.search, ...response.meta};
         this.totalItems = Array.from({length: this.search.totalPages ? this.search.totalPages: 0}, (_, i) => i+1);
-        this.userListSignal.set(response.data);
+        this.userListSignal.set(response);
       },
       error: (err: any) => {
         console.error('error', err);

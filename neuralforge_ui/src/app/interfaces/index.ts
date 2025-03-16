@@ -27,9 +27,10 @@ export interface IUser {
   password?: string; // User's password (should be handled securely).
   active?: boolean; // Indicates if the user account is active.
   createdAt?: string; // Timestamp when the user was created.
-  updatedAt?: string; // Timestamp when the user was last updated.
   authorities?: IAuthority[]; // List of roles or permissions assigned to the user.
   role?: IRole; // The specific role of the user.
+  status?: boolean; // Indicates if the user is able to log in.
+  verified?: boolean; // Indicates if the user is verified.
 }
 
 /**
@@ -71,9 +72,8 @@ export enum IRoleType {
 export interface IRole {
   createdAt: string; // Timestamp when the role was created.
   description: string; // Description of the role.
-  id: number; // Unique identifier for the role.
+  id: string; // Unique identifier for the role.
   name: string; // The name of the role.
-  updatedAt: string; // Timestamp when the role was last updated.
 }
 
 /**
@@ -86,4 +86,22 @@ export interface ISearch {
   pageSize?: number; // Alias for the number of items per page.
   totalElements?: number; // Total number of elements in the search result.
   totalPages?: number; // Total number of available pages.
+}
+/**
+ * Represents an Exception thrown by the NeuralForge API.
+ */
+export interface IExceptionResponse {
+  error: {
+    id: string;
+    exception: [string] | string;
+  }
+  status: number;
+}
+
+/**
+ * Represents the validation request.
+ */
+export interface IValidationRequest {
+  email: string;
+  verificationCode: number | null;
 }

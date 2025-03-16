@@ -6,7 +6,7 @@
         <div class="text-center">
           <a class="logo text-center" routerLink="/">
             <img
-              width="250"
+              width="150"
               class="img-fluid mb-4"
               src="../../../../assets/icons/logo@2x.png"
               alt="Logo"
@@ -50,25 +50,28 @@
             </div>
 
             <!-- Password Input Field -->
-            <div class="form-group mb-4">
+            <div class="form-group px-1 mb-4">
               <label for="password" class="form-label mb-2">Password</label>
               <div class="form-input position-relative">
-                <input 
-                  #password="ngModel" 
-                  type="password" 
-                  class="form-control" 
-                  id="password" 
-                  name="password"
-                  placeholder="*****" 
-                  [(ngModel)]="loginForm.password" 
-                  [ngClass]="{
-                    'is-invalid': password.invalid && password.touched,
-                    'is-valid': password.valid && password.touched
-                  }" 
-                  required 
-                />
-                <!-- Error Message for Password Validation -->
-                <div *ngIf="password.invalid && password.touched" class="invalid-feedback">
+                <input
+                        #password="ngModel"
+                        [type]="showPassword ? 'text' : 'password'"
+                        class="form-control"
+                        id="password"
+                        name="password"
+                        placeholder="*****"
+                        [(ngModel)]="loginForm.password"
+                        [ngClass]="{
+                'is-invalid': password.invalid && password.touched,
+                'is-valid': password.valid && password.touched
+                }" required />
+                <button
+                        type="button"
+                        class="btn btn-primary position-absolute end-0 top-50 translate-middle-y me-2"
+                        (click)="togglePasswordVisibility()">
+                  <i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                </button>
+                <div *ngIf="password.invalid" class="invalid-feedback">
                   Please add a valid password
                 </div>
               </div>
@@ -94,3 +97,4 @@
       </div>
     </div>
   </div>
+</div>
