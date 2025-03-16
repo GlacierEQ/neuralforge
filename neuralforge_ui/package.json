@@ -1,6 +1,6 @@
 {
-  "name": "demo-angular-front",
-  "version": "0.0.0",
+  "name": "neuralforge_ui",
+  "version": "1.0.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

@@ -23,7 +23,7 @@ interface Calculator {
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title: string = 'demo-angular-front';
+  title: string = 'neuralforge_ui';
   cant: number = 0;
   operators: Operator[] = [
     {
