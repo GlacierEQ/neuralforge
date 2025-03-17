@@ -58,5 +58,4 @@ public class UserController {
                 .status(HttpStatus.CREATED)
                 .body(userService.handledUserUpdate(email, user));
     }
-
 }

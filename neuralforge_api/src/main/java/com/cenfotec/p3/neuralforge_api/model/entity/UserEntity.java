@@ -15,7 +15,7 @@ import java.util.Collection;
 /**
  * Entity representing a user in the system.
  * Implements {@link UserDetails} to integrate with Spring Security authentication.
- *
+ * 
  * @author Jareth Mena
  * @version 1.0
  */
@@ -67,6 +67,13 @@ public class UserEntity implements UserDetails {
     private LocalDateTime createdAt;
 
     /**
+     * Timestamp indicating when the user's password was last changed.
+     * Can be null if password has never been changed or if the user is 
+     * using external authentication methods.
+     */
+    private LocalDateTime lastPasswordChangeAt;
+
+    /**
      * User role associated with the user.
      * Defines the user's permissions and access levels.
      */
@@ -88,7 +95,7 @@ public class UserEntity implements UserDetails {
 
     /**
      * Retrieves the authorities granted to the user.
-     *
+     * 
      * @return A collection of {@link GrantedAuthority} representing the user's permissions.
      */
     @Override
@@ -98,7 +105,7 @@ public class UserEntity implements UserDetails {
 
     /**
      * Retrieves the username, which is the user's email.
-     *
+     * 
      * @return The email address of the user.
      */
     @Override

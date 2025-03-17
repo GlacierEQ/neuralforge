@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -156,4 +157,15 @@ public class UserService {
         rawUserUpdate(user);
     }
 
+    /**
+     * Retrieves the currently authenticated user's information.
+     *
+     * @return The {@link UserResource} containing the current user's details.
+     */
+    public UserResource getCurrentUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserEntity user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return userMapper.mapToResource(user);
+    }
 }

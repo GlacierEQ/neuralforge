@@ -46,6 +46,8 @@ class UserMapperTest {
         mockUserRoleResource = new UserRoleResource();
         mockUserRoleResource.setName(UserRoleEnum.ROLE_STUDENT);
 
+        LocalDateTime now = LocalDateTime.now();
+
         mockUserEntity = UserEntity.builder()
                 .id("123")
                 .name("John")
@@ -55,6 +57,7 @@ class UserMapperTest {
                 .status(true)
                 .createdAt(LocalDateTime.now())
                 .role(mockUserRoleEntity)
+                .lastPasswordChangeAt(now)
                 .build();
 
         mockUserResource = UserResource.builder()
@@ -66,6 +69,7 @@ class UserMapperTest {
                 .status(true)
                 .createdAt(LocalDateTime.now())
                 .role(mockUserRoleResource)
+                .lastPasswordChangeAt(now)
                 .build();
     }
 
@@ -86,6 +90,7 @@ class UserMapperTest {
         assertEquals(mockUserEntity.getStatus(), result.getStatus());
         assertEquals(mockUserEntity.getCreatedAt(), result.getCreatedAt());
         assertEquals(mockUserRoleResource, result.getRole());
+        assertEquals(mockUserEntity.getLastPasswordChangeAt(), result.getLastPasswordChangeAt());
     }
 
     @Test
@@ -106,5 +111,6 @@ class UserMapperTest {
         assertEquals(mockUserResource.getCreatedAt(), result.getCreatedAt());
         assertEquals(mockUserResource.getPassword(), result.getPassword());
         assertEquals(mockUserRoleEntity, result.getRole());
+        assertEquals(mockUserResource.getLastPasswordChangeAt(), result.getLastPasswordChangeAt());
     }
 }

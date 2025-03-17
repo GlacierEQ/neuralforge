@@ -22,6 +22,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -225,6 +229,41 @@ class UserServiceTest {
         // Then
         verify(userValidationService, times(1)).validateInputCode(validationInput);
         verify(userRepository, times(1)).save(any(UserEntity.class));
+    }
+
+    @Test
+    void whenGetCurrentUser_thenReturnAuthenticatedUserDetails() {
+        // Given
+        String authenticatedEmail = "test@example.com";
+        
+        // Mock SecurityContext and Authentication
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(authenticatedEmail);
+        SecurityContextHolder.setContext(securityContext);
+        
+        // Create a new UserService with a real UserMapper (not mocked)
+        UserService realUserService = new UserService();
+        ReflectionTestUtils.setField(realUserService, "userRepository", userRepository);
+        
+        // Mock repository response
+        when(userRepository.findByEmail(authenticatedEmail))
+            .thenReturn(Optional.of(mockUserEntity));
+
+        // When
+        UserResource result = realUserService.getCurrentUser();
+
+        // Then
+        assertNotNull(result);
+        assertEquals(authenticatedEmail, result.getEmail());
+        verify(userRepository).findByEmail(authenticatedEmail);
+        
+        // No need to verify userMapper.mapToResource as we're using a real mapper
+        
+        // Clean up security context
+        SecurityContextHolder.clearContext();
     }
 
 }
