@@ -8,6 +8,7 @@ import { UserService } from '../../services/user.service';
 import { ModalService } from '../../services/modal.service';
 import { FormBuilder, Validators } from '@angular/forms';
 import { IUser } from '../../interfaces';
+import {Observable} from "rxjs";
 
 @Component({
   selector: 'app-users',
@@ -23,7 +24,7 @@ import { IUser } from '../../interfaces';
   styleUrl: './users.component.scss'
 })
 export class UsersComponent {
-  public userService: UserService = inject(UserService);
+  // public userService: UserService = inject(UserService);
   public modalService: ModalService = inject(ModalService);
   @ViewChild('addUsersModal') public addUsersModal: any;
   public fb: FormBuilder = inject(FormBuilder);
@@ -32,13 +33,15 @@ export class UsersComponent {
     email: ['', Validators.required, Validators.email],
     name: ['', Validators.required],
     lastname: ['', Validators.required],
-    password: ['', Validators.required],
-    updatedAt: ['', Validators.required],
+    password: ['', Validators.required]
   })
 
-  constructor() {
+  users$: IUser[];
+
+  constructor(public userService: UserService) {
     this.userService.search.page = 1;
     this.userService.getAll();
+    this.users$ = this.userService.users$();
   }
 
   saveUser(user: IUser) {

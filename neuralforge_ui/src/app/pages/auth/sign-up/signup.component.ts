@@ -3,7 +3,7 @@ import { Component, ViewChild } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import { IUser } from '../../../interfaces';
+import {IExceptionResponse, IUser} from '../../../interfaces';
 
 @Component({
   selector: 'app-signup',
@@ -13,26 +13,31 @@ import { IUser } from '../../../interfaces';
   styleUrl: './signup.component.scss'
 })
 export class SigUpComponent {
-  public signUpError!: String;
-  public validSignup!: boolean;
+  public signUpError!: [String?];
   @ViewChild('name') nameModel!: NgModel;
   @ViewChild('lastname') lastnameModel!: NgModel;
   @ViewChild('email') emailModel!: NgModel;
   @ViewChild('password') passwordModel!: NgModel;
 
   public user: IUser = {};
-
-  constructor(private router: Router, 
+  public showPassword: boolean = false;
+  constructor(private router: Router,
     private authService: AuthService
   ) {}
 
+  public get isSignUpDisabled(): boolean {
+    return !this.nameModel?.valid || !this.emailModel?.valid || !this.passwordModel?.valid;
+  }
+
+  public togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
   public handleSignup(event: Event) {
     event.preventDefault();
+    this.signUpError = [];
     if (!this.nameModel.valid) {
       this.nameModel.control.markAsTouched();
-    }
-    if (!this.lastnameModel.valid) {
-      this.lastnameModel.control.markAsTouched();
     }
     if (!this.emailModel.valid) {
       this.emailModel.control.markAsTouched();
@@ -42,9 +47,16 @@ export class SigUpComponent {
     }
     if (this.emailModel.valid && this.passwordModel.valid) {
       this.authService.signup(this.user).subscribe({
-        next: () => this.validSignup = true,
-        error: (err: any) => (this.signUpError = err.description),
+        next: () => {
+          this.router.navigate(['/verification'], { queryParams: { email: this.user.email } });
+        },
+        error: (err: IExceptionResponse) => {
+          this.signUpError = Array.isArray(err.error.exception)
+              ? err.error.exception
+              : [err.error.exception];
+        },
       });
     }
   }
+
 }

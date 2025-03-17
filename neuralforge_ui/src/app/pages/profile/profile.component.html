@@ -17,10 +17,6 @@
         <label>email:</label>
         <p>{{profileService.user$().email}}</p>
       </div>
-      <div class=" my-3">
-        <label>Last update:</label>
-        <p>{{profileService.user$().updatedAt | date:'dd/MM/YYYY'}}</p>
-      </div>
     </div>
   </div>
   <div class="col-6">
@@ -34,10 +30,6 @@
         <div class="border-bottom my-3">
           <label>Description:</label>
           <p>{{profileService.user$().role?.description}}</p>
-        </div>
-        <div class=" my-3">
-          <label>Last update:</label>
-          <p>{{profileService.user$().role?.updatedAt | date:'dd/MM/YYYY'}}</p>
         </div>
       </div>
       <div class="col-12 shadow-sm bg-body rounded px-4 py-4">

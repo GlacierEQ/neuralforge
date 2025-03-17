@@ -44,7 +44,7 @@ public class AuthenticationService {
     public AuthenticationResource authenticate(UserResource input) {
         UserEntity user = userRepository
                 .findByEmail(input.getEmail())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid email or password"));
 
         if (!user.getVerified()) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Account verification pending");
 

@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { Observable, tap } from "rxjs";
-import { IAuthority, ILoginResponse, IRoleType, IUser } from "../interfaces";
+import {IAuthority, ILoginResponse, IRole, IRoleType, IUser, IValidationRequest} from "../interfaces";
 
 /**
  * Authentication service for managing user login, roles, and session persistence.
@@ -17,7 +17,8 @@ export class AuthService {
   private expiresIn!: number;
 
   /** Authenticated user details. */
-  private user: IUser = { email: "", authorities: [] };
+  private userRole: IRole = { name: "", createdAt: "", id: "", description: "" }
+  private user: IUser = { email: "", role: this.userRole };
 
   /** Injected HTTP client for API requests. */
   private http: HttpClient = inject(HttpClient);
@@ -105,9 +106,7 @@ export class AuthService {
    * @returns `true` if the user has the role, `false` otherwise.
    */
   public hasRole(role: string): boolean {
-    return this.user.authorities
-      ? this.user.authorities.some((authority) => authority.authority == role)
-      : false;
+    return this.user.role?.name === role;
   }
 
   /**
@@ -115,11 +114,7 @@ export class AuthService {
    * @returns `true` if the user has the admin role, `false` otherwise.
    */
   public isSuperAdmin(): boolean {
-    return this.user.authorities
-      ? this.user.authorities.some(
-          (authority) => authority.authority == IRoleType.admin
-        )
-      : false;
+    return this.user.role?.name === IRoleType.admin;
   }
 
   /**
@@ -159,6 +154,17 @@ export class AuthService {
       user
     );
   }
+  /**
+   * Verifies a user's identity by providing an email and a validation code.
+   * @param validationRequest Data required for validation.
+   * @returns An `Observable` containing the validation response.
+   */
+  public verify(validationRequest: IValidationRequest) {
+    return this.http.post<ILoginResponse>(
+        "api/neuralforge/v1/auth/verify",
+        validationRequest
+    );
+  }
 
   /**
    * Logs out the user and removes their authentication data from local storage.
@@ -174,8 +180,8 @@ export class AuthService {
    * Retrieves the user's authorities (permissions).
    * @returns An array of `IAuthority` objects or `undefined` if no authorities are available.
    */
-  public getUserAuthorities(): IAuthority[] | undefined {
-    return this.getUser()?.authorities || [];
+  public getUserAuthorities(): IRole | undefined {
+    return this.getUser()?.role;
   }
 
   /**
@@ -189,18 +195,18 @@ export class AuthService {
     let isAdmin: boolean = false;
 
     // Retrieve user authorities
-    let userAuthorities = this.getUserAuthorities();
+    let userRole = this.getUserAuthorities();
 
     // Check if the user is permitted for the given route
     for (const authority of routeAuthorities) {
-      if (userAuthorities?.some((item) => item.authority == authority)) {
+      if (userRole?.name == authority){
         allowedUser = true;
         break;
       }
     }
 
     // Check if the user has admin privileges
-    if (userAuthorities?.some((item) => item.authority == IRoleType.admin)) {
+    if (userRole?.name == IRoleType.admin) {
       isAdmin = true;
     }
 

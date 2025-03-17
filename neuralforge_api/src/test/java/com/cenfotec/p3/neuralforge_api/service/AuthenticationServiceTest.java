@@ -93,7 +93,7 @@ class AuthenticationServiceTest {
         });
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        assertEquals("User not found", exception.getReason());
+        assertEquals("Invalid email or password", exception.getReason());
 
         verify(userRepository, times(1)).findByEmail(testUserResource.getEmail());
         verifyNoInteractions(authenticationManager, jwtService, userMapper);

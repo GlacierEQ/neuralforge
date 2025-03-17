@@ -3,7 +3,7 @@
     <div class="col-12">
       <div class="d-flex justify-content-between align-items-center">
         <h2>Users</h2>
-        
+
       </div>
     </div>
     <div class="col-12">
@@ -12,9 +12,6 @@
         (callDeleteAction)="userService.delete($event)"
         [users]="userService.users$()"
       />
-      @if (userService.users$()?.length) {
-        <app-pagination [service]="userService" />
-      }
     </div>
   </div>
 } @loading (minimum 1.5s) {

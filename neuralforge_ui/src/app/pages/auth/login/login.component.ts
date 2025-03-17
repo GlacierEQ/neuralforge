@@ -15,6 +15,8 @@ import { AuthService } from '../../../services/auth.service';
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
+  public showPassword: boolean = false;
+
   /** Error message displayed when login fails. */
   public loginError!: string;
 
@@ -39,6 +41,12 @@ export class LoginComponent {
     private router: Router, 
     private authService: AuthService
   ) {}
+  /**
+   * Toggles visibility for the password input.
+   */
+  public togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   /**
    * Handles user login process, including form validation and API authentication.
