@@ -1,5 +1,10 @@
 <div class="profile-container">
-  <div>
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Cargando información del perfil...</p>
+  </div>
+
+  <div *ngIf="!isLoading">
     <!-- Header with user info -->
     <div class="profile-header">
       <div class="user-info">

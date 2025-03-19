@@ -12,8 +12,12 @@ import { MatCardModule } from "@angular/material/card";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSelectModule } from "@angular/material/select";
+import { of } from "rxjs";
+import { catchError, finalize } from "rxjs/operators";
 import { AlertService } from "../../services/alert.service";
+import { AuthService } from "../../services/auth.service";
 
 interface UserProfile {
   firstName: string;
@@ -35,6 +39,7 @@ interface UserProfile {
     MatInputModule,
     MatSelectModule,
     MatIconModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: "./profile.component.html",
   styleUrls: ["./profile.component.scss"],
@@ -43,14 +48,17 @@ export class ProfileComponent implements OnInit {
   userProfileForm!: FormGroup;
   isEditing = false;
   isDirty = false;
+  isLoading = true;
   userProfile: UserProfile = {
-    firstName: "Enrique",
-    lastName: "Alpízar",
-    email: "ealpizarp@ucenfotec.ac.cr",
-    registrationDate: "10/01/2025",
-    lastPasswordChange: "16/03/2025",
+    firstName: "",
+    lastName: "",
+    email: "",
+    registrationDate: "",
+    lastPasswordChange: "",
   };
+
   private alertService = inject(AlertService);
+  private authService = inject(AuthService);
 
   registrationDateControl = new FormControl({ value: "", disabled: true });
   lastPasswordChangeControl = new FormControl({
@@ -63,12 +71,61 @@ export class ProfileComponent implements OnInit {
   ngOnInit(): void {
     this.initForm();
     this.disableForm();
+    this.loadUserProfile();
+  }
 
-    // Set the date values
-    this.registrationDateControl.setValue(this.userProfile.registrationDate);
-    this.lastPasswordChangeControl.setValue(
-      this.userProfile.lastPasswordChange
-    );
+  loadUserProfile(): void {
+    this.isLoading = true;
+    this.authService
+      .getCurrentUser()
+      .pipe(
+        catchError((error) => {
+          console.error("Error loading user profile:", error);
+          this.alertService.displayAlert(
+            "error",
+            "No se pudo cargar la información del perfil",
+            "right",
+            "top",
+            ["error-snackbar"]
+          );
+          return of(null);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe((userData) => {
+        if (userData) {
+          this.userProfile = {
+            firstName: userData.name || "",
+            lastName: userData.lastName || "",
+            email: userData.email || "",
+            registrationDate: this.formatDate(userData.createdAt),
+            lastPasswordChange:
+              this.formatDate(userData.passwordLastChanged) || "Nunca",
+          };
+
+          // Update form with fetched data
+          this.userProfileForm.patchValue({
+            firstName: this.userProfile.firstName,
+            lastName: this.userProfile.lastName,
+          });
+
+          // Update date controls
+          this.registrationDateControl.setValue(
+            this.userProfile.registrationDate
+          );
+          this.lastPasswordChangeControl.setValue(
+            this.userProfile.lastPasswordChange
+          );
+        }
+      });
+  }
+
+  formatDate(dateString: string | undefined): string {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
   }
 
   initForm(): void {

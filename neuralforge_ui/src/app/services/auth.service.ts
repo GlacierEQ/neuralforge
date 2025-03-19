@@ -45,7 +45,7 @@ export class AuthService {
     if (this.user) localStorage.setItem("auth_user", JSON.stringify(this.user));
 
     if (this.accessToken)
-      localStorage.setItem("access_token", JSON.stringify(this.accessToken));
+      localStorage.setItem("access_token", this.accessToken);
 
     if (this.expiresIn)
       localStorage.setItem("expiresIn", JSON.stringify(this.expiresIn));
@@ -280,5 +280,14 @@ export class AuthService {
     }
 
     return allowedUser && isAdmin;
+  }
+
+  /**
+   * Retrieves the current authenticated user's information from the API.
+   *
+   * @returns An Observable containing the user data.
+   */
+  public getCurrentUser(): Observable<any> {
+    return this.http.get<any>("api/neuralforge/v1/auth/me");
   }
 }
