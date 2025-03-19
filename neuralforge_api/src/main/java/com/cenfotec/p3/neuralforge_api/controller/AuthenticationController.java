@@ -5,6 +5,8 @@ import com.cenfotec.p3.neuralforge_api.model.resource.*;
 import com.cenfotec.p3.neuralforge_api.service.AuthenticationService;
 import com.cenfotec.p3.neuralforge_api.service.UserService;
 import com.cenfotec.p3.neuralforge_api.service.UserValidationService;
+import com.cenfotec.p3.neuralforge_api.service.PasswordResetService;
+import com.cenfotec.p3.neuralforge_api.service.GoogleOAuth2Service;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.cenfotec.p3.neuralforge_api.service.PasswordResetService;
 
 /**
  * Controller responsible for handling authentication-related requests.
@@ -34,6 +35,12 @@ public class AuthenticationController {
 
     @Autowired
     private UserValidationService userValidationService;
+
+    @Autowired
+    private PasswordResetService passwordResetService;
+
+    @Autowired
+    private GoogleOAuth2Service googleOAuth2Service;
 
     /**
      * Handles user login requests.
@@ -84,9 +91,6 @@ public class AuthenticationController {
      * @param request The {@link PasswordResetRequestResource} containing the user's email.
      * @return A {@link ResponseEntity} with a success message.
      */
-    @Autowired
-    private PasswordResetService passwordResetService;
-
     @PostMapping("/request")
     public ResponseEntity<String> requestPasswordReset(@RequestBody PasswordResetRequestResource request) {
         try {
@@ -114,4 +118,16 @@ public class AuthenticationController {
         }
     }
 
+    /**
+     * Handles authentication via Google OAuth.
+     * Receives an authentication token from Google and validates the user.
+     *
+     * @param token The authentication token provided by Google OAuth.
+     * @return A {@link ResponseEntity} containing an {@link AuthenticationResource} with the authentication details.
+     */
+    @PostMapping("/google-auth")
+    public ResponseEntity<AuthenticationResource> authenticateWithGoogle(@RequestBody String token) {
+        AuthenticationResource response = googleOAuth2Service.authenticate(token);
+        return ResponseEntity.ok(response);
+    }
 }

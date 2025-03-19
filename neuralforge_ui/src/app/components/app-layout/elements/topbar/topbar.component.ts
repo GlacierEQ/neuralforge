@@ -38,7 +38,12 @@ export class TopbarComponent implements OnInit {
    * Lifecycle hook: Initializes the component by fetching the authenticated user.
    */
   ngOnInit(): void {
-    this.user = this.authService.getUser();
+    new Promise<void>((resolve) => {
+      setTimeout(() => {
+        this.user = this.authService.getUser();
+        resolve();
+      }, 100);
+    });
   }
 
   /**

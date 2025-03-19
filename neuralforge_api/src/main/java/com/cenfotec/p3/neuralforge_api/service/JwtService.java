@@ -164,10 +164,17 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    /**
+     * Generates a password reset JWT token with a short expiration time.
+     *
+     * @param userId The ID of the user requesting a password reset.
+     * @return A JWT token that can be used for password reset.
+     */
     public String generatePasswordResetToken(String userId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
 
+        // Set expiration time to 15 minutes (900,000 milliseconds)
         long expirationTime = 15 * 60 * 1000;
 
         return Jwts.builder()
@@ -177,5 +184,4 @@ public class JwtService {
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
-
 }

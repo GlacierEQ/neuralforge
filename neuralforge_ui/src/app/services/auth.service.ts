@@ -1,6 +1,6 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { Observable, tap } from "rxjs";
+import { catchError, Observable, tap, throwError } from "rxjs";
 import {IAuthority, ILoginResponse, IRole, IRoleType, IUser, IValidationRequest} from "../interfaces";
 
 /**
@@ -54,6 +54,8 @@ export class AuthService {
     if (user) this.user = JSON.parse(user);
   }
 
+  
+
   /**
    * Retrieves the authenticated user.
    * @returns The user object or `undefined` if no user is authenticated.
@@ -98,6 +100,29 @@ export class AuthService {
           this.save();
         })
       );
+  }
+  public sendGoogleTokenToApi(token: string): Observable<ILoginResponse> {
+    return this.http.post<ILoginResponse>('api/neuralforge/v1/auth/google-auth', token, {
+      headers: { 'Content-Type': 'text/plain' }
+    }).pipe(
+      tap((response: any) => {
+        this.accessToken = response.token;
+        this.user.email = response.authUser.email;
+        this.expiresIn = response.expiresIn;
+        this.user = response.authUser;
+        this.save();
+      }),
+      catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'An error occurred during authentication.';
+  
+        if (error.status === 401 && error.error?.exception) {
+          errorMessage = error.error.exception; 
+        }
+  
+        console.error('Authentication error:', error);
+        return throwError(() => new Error(errorMessage));
+      })
+    );
   }
 
   /**
@@ -195,10 +220,7 @@ export class AuthService {
  * @param token The Google ID token.
  * @returns An `Observable` containing the API response.
  */
-public sendGoogleTokenToApi(token: string): Observable<any> {
-  console.log('Sending Google Token to API:', token); // Log the token for debugging
-  return this.http.post('api/neuralforge/v1/auth/google-login', { token });
-}
+  
 
   /**
    * Logs out the user and removes their authentication data from local storage.

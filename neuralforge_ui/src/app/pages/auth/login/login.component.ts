@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 
+declare const google: any; // Avoid TypeScript errors for Google API
+
 /**
- * Login component for handling user authentication.
+ * LoginComponent - Handles user authentication through email/password and Google Sign-In.
  */
 @Component({
   selector: 'app-login',
@@ -14,66 +16,83 @@ import { AuthService } from '../../../services/auth.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, AfterViewInit {
+  /** Flag to toggle password visibility */
   public showPassword: boolean = false;
 
-  /** Error message displayed when login fails. */
+  /** Stores any login error message */
   public loginError!: string;
 
-  /** Reference to the email input field for validation. */
+  /** Reference to the email input field */
   @ViewChild('email') emailModel!: NgModel;
 
-  /** Reference to the password input field for validation. */
+  /** Reference to the password input field */
   @ViewChild('password') passwordModel!: NgModel;
 
-  /** Form model for user login credentials. */
+  /** Model for login form */
   public loginForm: { email: string; password: string } = {
     email: '',
     password: '',
   };
 
   /**
-   * Constructor injecting necessary services.
-   * @param router Router service for navigation.
-   * @param authService Authentication service for handling login.
+   * Constructor - Injects required services.
+   * @param router Angular Router for navigation
+   * @param authService Service for authentication API calls
    */
-  constructor(
-    private router: Router, 
-    private authService: AuthService
-  ) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
+  /**
+   * Initializes Google login callback handler.
+   */
   ngOnInit(): void {
-    // Define the callback function for Google Sign-In
     (window as any).handleCredentialResponse = (response: any) => {
       this.handleGoogleLogin(response.credential);
     };
   }
 
   /**
-   * Toggles visibility for the password input.
+   * Loads Google Sign-In functionality after view initialization.
+   */
+  ngAfterViewInit(): void {
+    this.loadGoogleSignIn();
+  }
+
+  /**
+   * Loads Google Sign-In API and initializes login button.
+   */
+  private loadGoogleSignIn(): void {
+    setTimeout(() => {
+      if (google && google.accounts) {
+        google.accounts.id.initialize({
+          client_id: "YOUR_GOOGLE_CLIENT_ID",
+          callback: (response: any) => this.handleGoogleLogin(response.credential)
+        });
+
+        google.accounts.id.prompt();
+      } else {
+        console.error("Google API not loaded yet.");
+      }
+    }, 500);
+  }
+
+  /**
+   * Toggles the visibility of the password input field.
    */
   public togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
 
   /**
-   * Handles user login process, including form validation and API authentication.
-   * @param event The form submit event.
+   * Handles user login via email and password.
+   * @param event Form submit event
    */
   public handleLogin(event: Event): void {
     event.preventDefault();
-    
-    // Validate email input
-    if (!this.emailModel.valid) {
-      this.emailModel.control.markAsTouched();
-    }
 
-    // Validate password input
-    if (!this.passwordModel.valid) {
-      this.passwordModel.control.markAsTouched();
-    }
+    if (!this.emailModel.valid) this.emailModel.control.markAsTouched();
+    if (!this.passwordModel.valid) this.passwordModel.control.markAsTouched();
 
-    // Proceed with authentication if form inputs are valid
     if (this.emailModel.valid && this.passwordModel.valid) {
       this.authService.login(this.loginForm).subscribe({
         next: () => this.router.navigateByUrl('/app/dashboard'),
@@ -85,19 +104,23 @@ export class LoginComponent implements OnInit {
   }
 
   /**
-   * Handles Google login by sending the token to the AuthService.
-   * @param token The Google ID token.
+   * Handles authentication using Google login.
+   * @param token Google authentication token
    */
   private handleGoogleLogin(token: string): void {
-    console.log('Google Token:', token); // Log the token to the console
     this.authService.sendGoogleTokenToApi(token).subscribe({
-      next: (response) => {
-        console.log('API Response:', response);
-        this.router.navigateByUrl('/app/dashboard');
+      next: () => {
+        window.location.reload();
       },
-      error: (err) => {
-        console.error('Error sending token to API:', err);
-        this.loginError = 'Failed to authenticate with Google.';
+      error: (err: any) => {
+  
+        if (err.status === 404) {
+          this.loginError = 'This account is not registered. Please create an account first.';
+        } else if (err?.error?.exception?.includes('Account verification pending')) {
+          this.loginError = 'Your account is not verified. Please check your email for verification.';
+        } else {
+          this.loginError = err?.error?.message || err?.message || 'An error occurred during authentication.';
+        }
       }
     });
   }
