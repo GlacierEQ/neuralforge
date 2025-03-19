@@ -1,8 +1,8 @@
 <div class="profile-container">
-  <div *ngIf="isLoading" class="loading-spinner">
-    <mat-spinner diameter="40"></mat-spinner>
-    <p>Cargando información del perfil...</p>
-  </div>
+  <app-spinner
+    *ngIf="isLoading"
+    [message]="'Cargando información del perfil...'"
+  ></app-spinner>
 
   <div *ngIf="!isLoading">
     <!-- Header with user info -->

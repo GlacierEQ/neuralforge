@@ -16,6 +16,7 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSelectModule } from "@angular/material/select";
 import { of } from "rxjs";
 import { catchError, finalize } from "rxjs/operators";
+import { SpinnerComponent } from "../../components/spinner/spinner.component";
 import { AlertService } from "../../services/alert.service";
 import { AuthService } from "../../services/auth.service";
 
@@ -40,6 +41,7 @@ interface UserProfile {
     MatSelectModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    SpinnerComponent,
   ],
   templateUrl: "./profile.component.html",
   styleUrls: ["./profile.component.scss"],
