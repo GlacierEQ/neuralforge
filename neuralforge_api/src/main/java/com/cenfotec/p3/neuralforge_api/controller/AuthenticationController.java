@@ -111,7 +111,7 @@ public class AuthenticationController {
     @PostMapping("/reset")
     public ResponseEntity<String> resetPassword(@RequestBody PasswordResetResource request) {
         try {
-            passwordResetService.resetPassword(request.getToken(), request.getNewPassword()); // Ahora usamos el token
+            passwordResetService.resetPassword(request.getToken(), request.getNewPassword());
             return ResponseEntity.ok("Contraseña restablecida con éxito.");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
