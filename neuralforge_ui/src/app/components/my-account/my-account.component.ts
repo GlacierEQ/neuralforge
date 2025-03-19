@@ -1,30 +1,40 @@
 import { Component, OnInit, inject } from "@angular/core";
 import { Router, RouterLink } from "@angular/router";
+import { IUser } from "../../interfaces";
 import { AuthService } from "../../services/auth.service";
+import { ProfileService } from "../../services/profile.service";
 
 @Component({
   selector: "app-my-account",
   standalone: true,
-  imports: [
-    RouterLink
-  ],
+  imports: [RouterLink],
   templateUrl: "./my-account.component.html",
 })
 export class MyAccountComponent implements OnInit {
-  public userName: string = '';
-  private service = inject(AuthService);
+  private authService = inject(AuthService);
+  private profileService = inject(ProfileService);
 
-  constructor(public router: Router) {
-    let user = localStorage.getItem('auth_user');
-    if(user) {
-      this.userName = JSON.parse(user)?.name;
-    } 
+  userName = this.profileService.userName;
+
+  constructor(public router: Router) {}
+
+  ngOnInit() {
+    this.loadCurrentUser();
   }
 
-  ngOnInit() {}
+  loadCurrentUser() {
+    this.authService.getCurrentUser().subscribe({
+      next: (user: IUser) => {
+        this.profileService.refreshFromApi(user);
+      },
+      error: (error) => {
+        console.error("Error fetching current user:", error);
+      },
+    });
+  }
 
   logout() {
-    this.service.logout();
-    this.router.navigateByUrl('/login');
+    this.authService.logout();
+    this.router.navigateByUrl("/login");
   }
 }

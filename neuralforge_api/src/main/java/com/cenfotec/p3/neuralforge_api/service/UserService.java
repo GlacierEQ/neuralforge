@@ -168,4 +168,25 @@ public class UserService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         return userMapper.mapToResource(user);
     }
+
+    /**
+     * Updates the current user's profile information.
+     * Only allows updating non-sensitive fields like first name and last name.
+     *
+     * @param inputUser The {@link UserResource} containing updated profile information.
+     * @return The updated {@link UserResource}.
+     */
+    public UserResource updateCurrentUserProfile(UserResource inputUser) {
+        // Get the current authenticated user's email
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        
+        // Create a limited user resource with only the fields we want to update
+        UserResource limitedUser = new UserResource();
+        limitedUser.setName(inputUser.getName());
+        limitedUser.setLastName(inputUser.getLastName());
+        
+        // Use the existing handledUserUpdate method to perform the update
+        // This will handle validation, error checking, and the actual update
+        return handledUserUpdate(email, limitedUser);
+    }
 }

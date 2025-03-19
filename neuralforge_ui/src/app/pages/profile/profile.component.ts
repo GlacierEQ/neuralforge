@@ -19,6 +19,7 @@ import { catchError, finalize } from "rxjs/operators";
 import { SpinnerComponent } from "../../components/spinner/spinner.component";
 import { AlertService } from "../../services/alert.service";
 import { AuthService } from "../../services/auth.service";
+import { ProfileService } from "../../services/profile.service";
 
 interface UserProfile {
   firstName: string;
@@ -61,6 +62,7 @@ export class ProfileComponent implements OnInit {
 
   private alertService = inject(AlertService);
   private authService = inject(AuthService);
+  private profileService = inject(ProfileService);
 
   registrationDateControl = new FormControl({ value: "", disabled: true });
   lastPasswordChangeControl = new FormControl({
@@ -186,21 +188,49 @@ export class ProfileComponent implements OnInit {
     if (this.userProfileForm.valid) {
       const formValues = this.userProfileForm.getRawValue();
 
-      // Update the user profile
-      this.userProfile = {
-        ...this.userProfile,
-        firstName: formValues.firstName,
+      const userData = {
+        name: formValues.firstName,
         lastName: formValues.lastName,
       };
 
-      this.toggleEdit();
-      this.alertService.displayAlert(
-        "success",
-        "Perfil modificado correctamente",
-        "right",
-        "top",
-        ["success-snackbar"]
-      );
+      this.isLoading = true;
+      this.profileService
+        .updateUserProfile(userData)
+        .pipe(
+          catchError((error) => {
+            console.error("Error updating profile:", error);
+            this.alertService.displayAlert(
+              "error",
+              "No se pudo actualizar el perfil",
+              "right",
+              "top",
+              ["error-snackbar"]
+            );
+            return of(null);
+          }),
+          finalize(() => {
+            this.isLoading = false;
+          })
+        )
+        .subscribe((response) => {
+          if (response) {
+            // Update the user profile with the response data
+            this.userProfile = {
+              ...this.userProfile,
+              firstName: response.name || "",
+              lastName: response.lastName || "",
+            };
+
+            this.toggleEdit();
+            this.alertService.displayAlert(
+              "success",
+              "Perfil modificado correctamente",
+              "right",
+              "top",
+              ["success-snackbar"]
+            );
+          }
+        });
     }
   }
 
