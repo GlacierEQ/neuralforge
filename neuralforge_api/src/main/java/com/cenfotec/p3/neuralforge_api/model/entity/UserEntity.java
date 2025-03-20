@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Entity representing a user in the system.
@@ -92,6 +93,13 @@ public class UserEntity implements UserDetails {
      * Defaults to {@code false} when a new user is created.
      */
     private Boolean verified;
+
+    /**
+     * List of validation records associated with this user.
+     * When this user is deleted, all validation records will be automatically removed.
+     */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserValidationEntity> validations;
 
     /**
      * Retrieves the authorities granted to the user.

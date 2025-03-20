@@ -1,5 +1,5 @@
 import { Injectable, signal } from "@angular/core";
-import { Observable, tap } from "rxjs";
+import { Observable, tap, catchError, throwError } from "rxjs";
 import { IUser } from "../interfaces";
 import { BaseService } from "./base-service";
 
@@ -7,7 +7,7 @@ import { BaseService } from "./base-service";
   providedIn: "root",
 })
 export class ProfileService extends BaseService<IUser> {
-  protected override source: string = "api/neuralforge/v1/users";
+  protected override source: string = "api/neuralforge/v1/users/profile";
   private userNameSignal = signal<string>("");
   public userName = this.userNameSignal.asReadonly();
 
@@ -38,7 +38,7 @@ export class ProfileService extends BaseService<IUser> {
     name: string;
     lastName: string;
   }): Observable<any> {
-    return this.http.put<any>(`${this.source}/profile`, userData).pipe(
+    return this.http.put<any>(this.source, userData).pipe(
       tap((updatedUser) => {
         const currentUser = localStorage.getItem("auth_user");
         if (currentUser) {
@@ -51,6 +51,15 @@ export class ProfileService extends BaseService<IUser> {
 
           this.updateUserName(updatedUser.name);
         }
+      })
+    );
+  }
+
+  deleteAccount(): Observable<any> {
+    return this.http.delete(this.source).pipe(
+      catchError((error) => {
+        console.error("Error deleting account", error);
+        return throwError(() => error);
       })
     );
   }

@@ -9,6 +9,7 @@ import com.cenfotec.p3.neuralforge_api.model.resource.UserRoleResource;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserValidationInputResource;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserValidationResource;
 import com.cenfotec.p3.neuralforge_api.repository.UserRepository;
+import com.cenfotec.p3.neuralforge_api.repository.UserValidationRepository;
 import com.cenfotec.p3.neuralforge_api.util.ValidationUtil;
 import jakarta.persistence.EntityExistsException;
 import org.apache.logging.log4j.util.Strings;
@@ -188,5 +189,21 @@ public class UserService {
         // Use the existing handledUserUpdate method to perform the update
         // This will handle validation, error checking, and the actual update
         return handledUserUpdate(email, limitedUser);
+    }
+
+    /**
+     * Deletes the currently authenticated user's account.
+     * Retrieves the current user from the security context and removes them from the database.
+     *
+     * @throws ResponseStatusException if the user is not found.
+     */
+    public void deleteCurrentUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserEntity user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        
+        userRepository.delete(user);
+        // After deletion, the user will still be authenticated for the current request
+        // The client-side should handle logging out and redirecting after successful deletion
     }
 }

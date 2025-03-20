@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.List;
 
@@ -72,5 +73,20 @@ public class UserController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(userService.updateCurrentUserProfile(user));
+    }
+
+    /**
+     * Deletes the current user's account.
+     * This endpoint allows users to delete their own account.
+     *
+     * @return A {@link ResponseEntity} with a success message.
+     */
+    @DeleteMapping("/profile")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_TEACHER', 'ROLE_ADMINISTRATOR')")
+    public ResponseEntity<Void> deleteCurrentUserAccount() {
+        userService.deleteCurrentUser();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(null);
     }
 }

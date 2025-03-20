@@ -20,6 +20,10 @@ import { SpinnerComponent } from "../../components/spinner/spinner.component";
 import { AlertService } from "../../services/alert.service";
 import { AuthService } from "../../services/auth.service";
 import { ProfileService } from "../../services/profile.service";
+import { MatDialog } from "@angular/material/dialog";
+import { Router } from "@angular/router";
+import { DeleteAccountDialogComponent } from "../../components/dialogs/delete-account-dialog/delete-account-dialog.component";
+import { switchMap } from "rxjs/operators";
 
 interface UserProfile {
   firstName: string;
@@ -70,7 +74,11 @@ export class ProfileComponent implements OnInit {
     disabled: true,
   });
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private dialog: MatDialog,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.initForm();
@@ -242,5 +250,51 @@ export class ProfileComponent implements OnInit {
   changePassword(): void {
     console.log("Change password clicked");
     alert("Not implemented yet");
+  }
+
+  deleteAccount(): void {
+    const dialogRef = this.dialog.open(DeleteAccountDialogComponent, {
+      width: "400px",
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(
+        switchMap((result) => {
+          if (result) {
+            this.isLoading = true;
+            return this.profileService.deleteAccount();
+          }
+          return of(null);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe(
+        (result) => {
+          this.alertService.displayAlert(
+            "success",
+            "Cuenta eliminada correctamente",
+            "center",
+            "top",
+            ["success-snackbar"]
+          );
+
+          // Logout and redirect to login page
+          this.authService.logout();
+          this.router.navigate(["/login"]);
+        },
+        (error) => {
+          this.alertService.displayAlert(
+            "error",
+            "Error al eliminar la cuenta",
+            "center",
+            "top",
+            ["error-snackbar"]
+          );
+          console.error("Error deleting account:", error);
+        }
+      );
   }
 }

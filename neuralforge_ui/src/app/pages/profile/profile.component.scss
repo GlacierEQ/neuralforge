@@ -135,20 +135,15 @@ mat-form-field {
       background-color: darken(#4054b4, 5%);
     }
   }
-
-  .cancel-button {
-    background-color: #dc3545;
-    color: white;
-
-    &:hover {
-      background-color: darken(#dc3545, 5%);
-    }
-  }
 }
 
 .cancel-button {
-  background-color: #ff4444;
-  color: white;
+  background-color: #dc3545 !important;
+  color: white !important;
+
+  &:hover {
+    background-color: darken(#dc3545, 5%);
+  }
 }
 
 .save-button {
