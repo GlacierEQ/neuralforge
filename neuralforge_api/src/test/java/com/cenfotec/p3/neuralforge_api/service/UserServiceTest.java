@@ -266,4 +266,59 @@ class UserServiceTest {
         SecurityContextHolder.clearContext();
     }
 
+    @Test
+    void whenDeleteCurrentUser_thenUserIsDeleted() {
+        // Given
+        String authenticatedEmail = "test@example.com";
+
+        // Mock SecurityContext and Authentication
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(authenticatedEmail);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(userRepository.findByEmail(authenticatedEmail)).thenReturn(Optional.of(mockUserEntity));
+        doNothing().when(userRepository).delete(mockUserEntity);
+
+        // When
+        userService.deleteCurrentUser();
+
+        // Then
+        verify(userRepository, times(1)).findByEmail(authenticatedEmail);
+        verify(userRepository, times(1)).delete(mockUserEntity);
+
+        // Clean up security context
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void givenNonExistentUser_whenDeleteCurrentUser_thenThrowException() {
+        // Given
+        String authenticatedEmail = "nonexistent@example.com";
+
+        // Mock SecurityContext and Authentication
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(authenticatedEmail);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(userRepository.findByEmail(authenticatedEmail)).thenReturn(Optional.empty());
+
+        // When & Then
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> userService.deleteCurrentUser());
+
+        // Verify
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertEquals("User not found", exception.getReason());
+        verify(userRepository, times(1)).findByEmail(authenticatedEmail);
+        verify(userRepository, never()).delete(any());
+
+        // Clean up security context
+        SecurityContextHolder.clearContext();
+    }
 }
