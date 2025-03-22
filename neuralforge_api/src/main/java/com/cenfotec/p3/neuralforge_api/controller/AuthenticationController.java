@@ -12,15 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Controller responsible for handling authentication-related requests.
  * Provides endpoints for user login, registration, and validation.
- *
+ * 
  * @author Jareth Mena
  * @version 1.0
  */
@@ -46,7 +43,7 @@ public class AuthenticationController {
     /**
      * Handles user login requests.
      * Authenticates the user and returns a JWT token upon successful authentication.
-     *
+     * 
      * @param user The {@link UserResource} containing user credentials.
      * @return A {@link ResponseEntity} containing an {@link AuthenticationResource} with the authentication token.
      */
@@ -60,7 +57,7 @@ public class AuthenticationController {
     /**
      * Handles user registration requests.
      * Creates a new user account and returns the registered user details.
-     *
+     * 
      * @param user The {@link UserResource} containing user information.
      * @return A {@link ResponseEntity} containing the newly created {@link UserResource}.
      * @throws NeuralForgeEmailException If there is an issue with the email address provided during registration.
@@ -75,7 +72,7 @@ public class AuthenticationController {
     /**
      * Handles user validation requests during initial registration.
      * Validates user-provided data before completing the registration process.
-     *
+     * 
      * @param validationInput The {@link UserValidationInputResource} containing validation data.
      * @return A {@link ResponseEntity} with HTTP status 200 (OK) upon successful validation.
      */
@@ -126,5 +123,19 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResource> authenticateWithGoogle(@RequestBody String token) {
         AuthenticationResource response = googleOAuth2Service.authenticate(token);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Retrieves the currently authenticated user's profile information.
+     * Returns details including first name, last name, email, registration date,
+     * and last password change date.
+     *
+     * @return A {@link ResponseEntity} containing the {@link UserResource} with current user's details.
+     */
+    @GetMapping("/me")
+    public ResponseEntity<UserResource> getCurrentUser() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userService.getCurrentUser());
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.List;
 
@@ -58,5 +59,34 @@ public class UserController {
                 .status(HttpStatus.CREATED)
                 .body(userService.handledUserUpdate(email, user));
     }
+    
+    /**
+     * Updates the current user's profile information.
+     * This endpoint allows users to update their own profile.
+     *
+     * @param user The {@link UserResource} containing updated profile information.
+     * @return A {@link ResponseEntity} containing the updated {@link UserResource}.
+     */
+    @PutMapping("/profile")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_TEACHER', 'ROLE_ADMINISTRATOR')")
+    public ResponseEntity<UserResource> updateCurrentUserProfile(@RequestBody UserResource user) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userService.updateCurrentUserProfile(user));
+    }
 
+    /**
+     * Deletes the current user's account.
+     * This endpoint allows users to delete their own account.
+     *
+     * @return A {@link ResponseEntity} with a success message.
+     */
+    @DeleteMapping("/profile")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_TEACHER', 'ROLE_ADMINISTRATOR')")
+    public ResponseEntity<Void> deleteCurrentUserAccount() {
+        userService.deleteCurrentUser();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(null);
+    }
 }

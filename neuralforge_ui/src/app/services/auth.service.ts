@@ -1,7 +1,13 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { catchError, Observable, tap, throwError } from "rxjs";
-import {IAuthority, ILoginResponse, IRole, IRoleType, IUser, IValidationRequest} from "../interfaces";
+import {
+  ILoginResponse,
+  IRole,
+  IRoleType,
+  IUser,
+  IValidationRequest,
+} from "../interfaces";
 
 
 @Injectable({
@@ -15,7 +21,12 @@ export class AuthService {
   private expiresIn!: number;
 
 
-  private userRole: IRole = { name: "", createdAt: "", id: "", description: "" }
+  private userRole: IRole = {
+    name: "",
+    createdAt: "",
+    id: "",
+    description: "",
+  };
   private user: IUser = { email: "", role: this.userRole };
 
 
@@ -30,7 +41,7 @@ export class AuthService {
     if (this.user) localStorage.setItem("auth_user", JSON.stringify(this.user));
 
     if (this.accessToken)
-      localStorage.setItem("access_token", JSON.stringify(this.accessToken));
+      localStorage.setItem("access_token", this.accessToken);
 
     if (this.expiresIn)
       localStorage.setItem("expiresIn", JSON.stringify(this.expiresIn));
@@ -81,27 +92,29 @@ export class AuthService {
       );
   }
   public sendGoogleTokenToApi(token: string): Observable<ILoginResponse> {
-    return this.http.post<ILoginResponse>('api/neuralforge/v1/auth/google-auth', token, {
-      headers: { 'Content-Type': 'text/plain' }
-    }).pipe(
-      tap((response: any) => {
-        this.accessToken = response.token;
-        this.user.email = response.authUser.email;
-        this.expiresIn = response.expiresIn;
-        this.user = response.authUser;
-        this.save();
-      }),
-      catchError((error: HttpErrorResponse) => {
-        let errorMessage = 'An error occurred during authentication.';
-
-        if (error.status === 401 && error.error?.exception) {
-          errorMessage = error.error.exception;
-        }
-
-        console.error('Authentication error:', error);
-        return throwError(() => new Error(errorMessage));
+    return this.http
+      .post<ILoginResponse>("api/neuralforge/v1/auth/google-auth", token, {
+        headers: { "Content-Type": "text/plain" },
       })
-    );
+      .pipe(
+        tap((response: any) => {
+          this.accessToken = response.token;
+          this.user.email = response.authUser.email;
+          this.expiresIn = response.expiresIn;
+          this.user = response.authUser;
+          this.save();
+        }),
+        catchError((error: HttpErrorResponse) => {
+          let errorMessage = "An error occurred during authentication.";
+
+          if (error.status === 401 && error.error?.exception) {
+            errorMessage = error.error.exception;
+          }
+
+          console.error("Authentication error:", error);
+          return throwError(() => new Error(errorMessage));
+        })
+      );
   }
 
 
@@ -142,17 +155,25 @@ export class AuthService {
 
   public verify(validationRequest: IValidationRequest) {
     return this.http.post<ILoginResponse>(
-        "api/neuralforge/v1/auth/verify",
-        validationRequest
+      "api/neuralforge/v1/auth/verify",
+      validationRequest
     );
   }
 
   public requestPasswordReset(email: string): Observable<string> {
-    return this.http.post("api/neuralforge/v1/auth/request", { email }, { responseType: 'text' });
+    return this.http.post(
+      "api/neuralforge/v1/auth/request",
+      { email },
+      { responseType: "text" }
+    );
   }
 
-  public resetPassword(token: string, newPassword: string) {
-    return this.http.post("api/neuralforge/v1/auth/reset", { token, newPassword });
+  public resetPassword(token: string, newPassword: string): Observable<string> {
+    return this.http.post(
+      "api/neuralforge/v1/auth/reset",
+      { token, newPassword },
+      { responseType: "text" }
+    );
   }
 
   public logout(): void {
@@ -178,7 +199,7 @@ export class AuthService {
 
 
     for (const authority of routeAuthorities) {
-      if (userRole?.name == authority){
+      if (userRole?.name == authority) {
         allowedUser = true;
         break;
       }
@@ -190,5 +211,9 @@ export class AuthService {
     }
 
     return allowedUser && isAdmin;
+  }
+
+  public getCurrentUser(): Observable<any> {
+    return this.http.get<any>("api/neuralforge/v1/auth/me");
   }
 }

@@ -11,8 +11,11 @@ import { MatIconModule } from "@angular/material/icon";
 declare const google: any; // Avoid TypeScript errors for Google API
 
 @Component({
-  selector: 'app-login',
+  selector: "app-login",
   standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink],
+  templateUrl: "./login.component.html",
+  styleUrl: "./login.component.scss",
   imports: [
     CommonModule,
     FormsModule,
@@ -34,8 +37,8 @@ export class LoginComponent implements OnInit, AfterViewInit {
   @ViewChild('password') passwordModel!: NgModel;
 
   public loginForm: { email: string; password: string } = {
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   };
 
   constructor(private router: Router, private authService: AuthService) {}
@@ -105,10 +108,10 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
     if (this.emailModel.valid && this.passwordModel.valid) {
       this.authService.login(this.loginForm).subscribe({
-        next: () => this.router.navigateByUrl('/app/dashboard'),
+        next: () => this.router.navigateByUrl("/app/dashboard"),
         error: (err: any) => {
-          this.loginError = err.error?.exception || 'An error occurred';
-        }
+          this.loginError = err.error?.exception || "An error occurred";
+        },
       });
     }
   }
@@ -121,13 +124,20 @@ export class LoginComponent implements OnInit, AfterViewInit {
       error: (err: any) => {
 
         if (err.status === 404) {
-          this.loginError = 'This account is not registered. Please create an account first.';
-        } else if (err?.error?.exception?.includes('Account verification pending')) {
-          this.loginError = 'Your account is not verified. Please check your email for verification.';
+          this.loginError =
+            "This account is not registered. Please create an account first.";
+        } else if (
+          err?.error?.exception?.includes("Account verification pending")
+        ) {
+          this.loginError =
+            "Your account is not verified. Please check your email for verification.";
         } else {
-          this.loginError = err?.error?.message || err?.message || 'An error occurred during authentication.';
+          this.loginError =
+            err?.error?.message ||
+            err?.message ||
+            "An error occurred during authentication.";
         }
-      }
+      },
     });
   }
 }

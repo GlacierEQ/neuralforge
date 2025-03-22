@@ -11,11 +11,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Entity representing a user in the system.
  * Implements {@link UserDetails} to integrate with Spring Security authentication.
- *
+ * 
  * @author Jareth Mena
  * @version 1.0
  */
@@ -67,6 +68,13 @@ public class UserEntity implements UserDetails {
     private LocalDateTime createdAt;
 
     /**
+     * Timestamp indicating when the user's password was last changed.
+     * Can be null if password has never been changed or if the user is 
+     * using external authentication methods.
+     */
+    private LocalDateTime lastPasswordChangeAt;
+
+    /**
      * User role associated with the user.
      * Defines the user's permissions and access levels.
      */
@@ -87,8 +95,15 @@ public class UserEntity implements UserDetails {
     private Boolean verified;
 
     /**
+     * List of validation records associated with this user.
+     * When this user is deleted, all validation records will be automatically removed.
+     */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserValidationEntity> validations;
+
+    /**
      * Retrieves the authorities granted to the user.
-     *
+     * 
      * @return A collection of {@link GrantedAuthority} representing the user's permissions.
      */
     @Override
@@ -98,7 +113,7 @@ public class UserEntity implements UserDetails {
 
     /**
      * Retrieves the username, which is the user's email.
-     *
+     * 
      * @return The email address of the user.
      */
     @Override

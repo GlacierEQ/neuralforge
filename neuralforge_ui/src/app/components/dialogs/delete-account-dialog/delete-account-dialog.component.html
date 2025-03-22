@@ -1,0 +1,33 @@
+<h2 mat-dialog-title>Eliminar cuenta</h2>
+<mat-dialog-content>
+  <p>
+    Esta acción eliminará permanentemente su cuenta y todos los datos asociados.
+    Esta acción no se puede deshacer.
+  </p>
+  <p>
+    Para confirmar, escriba <strong>Eliminar</strong> en el campo a
+    continuación:
+  </p>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <input
+      matInput
+      [formControl]="confirmationControl"
+      placeholder="Escriba 'Eliminar'"
+    />
+    <mat-error *ngIf="confirmationControl.invalid"
+      >Debe escribir 'Eliminar' exactamente</mat-error
+    >
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button
+    mat-raised-button
+    color="warn"
+    [disabled]="confirmationControl.invalid"
+    [mat-dialog-close]="true"
+  >
+    Eliminar cuenta
+  </button>
+</mat-dialog-actions>
