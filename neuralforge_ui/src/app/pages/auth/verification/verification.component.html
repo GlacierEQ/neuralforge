@@ -1,62 +1,83 @@
 <div class="login-container">
-    <div class="d-flex align-items-center justify-content-center h-100">
-        <div class="login-card">
-            <div class="w-100">
-
-                <!-- Success Message -->
-                <div *ngIf="successMessage" class="alert alert-success text-center">
-                    {{ successMessage }}
-                </div>
-
-                <form (ngSubmit)="submitForm($event)" autocomplete="off" #frm="ngForm">
-                    <div class="mb-3">
-                        <h1 class="mb-0">Verify your email</h1>
-                        <small style="color: #4f4f4f">
-                            Check your inbox and enter the verification code.
-                        </small>
-                    </div>
-
-                    <div>
-                        @if (validationErrors && validationErrors.length > 0) {
-                        <ul class="text-danger">
-                          <li *ngFor="let error of validationErrors">{{ error }}</li>
-                            </ul>
-                        }
-                    </div>
-                    <div class="form-group px-1 mb-4">
-                        <label for="email" class="form-label mb-2">
-                            Email Address
-                        </label>
-                        <input [disabled]="hasEmailParam"  #email="ngModel" type="text" class="form-control" id="email" name="email"
-                               placeholder="name@email.com" [(ngModel)]="validationRequest.email" [ngClass]="{
-                  'is-invalid': email.invalid && email.touched,
-                  'is-valid': email.valid && email.touched
-                }" required />
-                        <div *ngIf="email.invalid" class="invalid-feedback">
-                            Please add a valid email
-                        </div>
-                    </div>
-
-                    <!-- Verification Code Field -->
-                    <div class="form-group px-1 mb-4">
-                        <label for="verificationCode" class="form-label mb-2">
-                            Verification Code
-                        </label>
-                        <input #verificationCode="ngModel" type="number" class="form-control" id="verificationCode"
-                               name="verificationCode" placeholder="Enter code"
-                               [(ngModel)]="validationRequest.verificationCode" [ngClass]="{
-                          'is-invalid': verificationCode.invalid && verificationCode.touched,
-                          'is-valid': verificationCode.valid && verificationCode.touched
-                        }" required />
-                        <div *ngIf="verificationCode.invalid" class="invalid-feedback">
-                            Please enter a valid verification code
-                        </div>
-                    </div>
-
-                    <button [disabled]="isSubmitDisabled()" type="submit" class="btn btn-primary">Submit</button>
-                </form>
-            </div>
+  <div class="d-flex align-items-center justify-content-center h-100">
+    <div class="login-card">
+      <div class="w-100">
+        <!-- Success Message -->
+        <div *ngIf="successMessage" class="alert alert-success text-center">
+          {{ successMessage }}
         </div>
-    </div>
-</div>
 
+        <form (ngSubmit)="submitForm($event)" autocomplete="off" #frm="ngForm">
+          <div class="mb-3">
+            <h1 class="mb-0">Verify your email</h1>
+            <small style="color: #4f4f4f">
+              Check your inbox and enter the verification code.
+            </small>
+          </div>
+
+          <div>
+            @if (validationErrors && validationErrors.length > 0) {
+            <ul class="text-danger">
+              <li *ngFor="let error of validationErrors">{{ error }}</li>
+            </ul>
+            }
+          </div>
+          <div class="form-group px-1 mb-4">
+            <label for="email" class="form-label mb-2"> Email Address </label>
+            <input
+              [disabled]="hasEmailParam"
+              #email="ngModel"
+              type="text"
+              class="form-control"
+              id="email"
+              name="email"
+              placeholder="name@email.com"
+              [(ngModel)]="validationRequest.email"
+              [ngClass]="{
+                'is-invalid': email.invalid && email.touched,
+                'is-valid': email.valid && email.touched
+              }"
+              required
+            />
+            <div *ngIf="email.invalid" class="invalid-feedback">
+              Please add a valid email
+            </div>
+          </div>
+
+          <!-- Verification Code Field -->
+          <div class="form-group px-1 mb-4">
+            <label for="verificationCode" class="form-label mb-2">
+              Verification Code
+            </label>
+            <input
+              #verificationCode="ngModel"
+              type="number"
+              class="form-control"
+              id="verificationCode"
+              name="verificationCode"
+              placeholder="Enter code"
+              [(ngModel)]="validationRequest.verificationCode"
+              [ngClass]="{
+                'is-invalid':
+                  verificationCode.invalid && verificationCode.touched,
+                'is-valid': verificationCode.valid && verificationCode.touched
+              }"
+              required
+            />
+            <div *ngIf="verificationCode.invalid" class="invalid-feedback">
+              Please enter a valid verification code
+            </div>
+          </div>
+
+          <button
+            [disabled]="isSubmitDisabled()"
+            type="submit"
+            class="btn btn-primary"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

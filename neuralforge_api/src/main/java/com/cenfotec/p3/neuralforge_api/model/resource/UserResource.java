@@ -88,4 +88,9 @@ public class UserResource {
             message = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (.,/?@#$%^&+=!)"
     )
     private String password;
+
+    /**
+     * Timestamp indicating when the user's password was last changed.
+     */
+    private LocalDateTime lastPasswordChangeAt;
 }

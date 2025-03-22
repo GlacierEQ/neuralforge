@@ -1,8 +1,8 @@
-import { CommonModule } from '@angular/common';
-import { Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
-import { FormsModule, NgModel } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../../services/auth.service';
+import { CommonModule } from "@angular/common";
+import { AfterViewInit, Component, OnInit, ViewChild } from "@angular/core";
+import { FormsModule, NgModel } from "@angular/forms";
+import { Router, RouterLink } from "@angular/router";
+import { AuthService } from "../../../services/auth.service";
 
 declare const google: any; // Avoid TypeScript errors for Google API
 
@@ -10,11 +10,11 @@ declare const google: any; // Avoid TypeScript errors for Google API
  * LoginComponent - Handles user authentication through email/password and Google Sign-In.
  */
 @Component({
-  selector: 'app-login',
+  selector: "app-login",
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  templateUrl: "./login.component.html",
+  styleUrl: "./login.component.scss",
 })
 export class LoginComponent implements OnInit, AfterViewInit {
   /** Flag to toggle password visibility */
@@ -24,15 +24,15 @@ export class LoginComponent implements OnInit, AfterViewInit {
   public loginError!: string;
 
   /** Reference to the email input field */
-  @ViewChild('email') emailModel!: NgModel;
+  @ViewChild("email") emailModel!: NgModel;
 
   /** Reference to the password input field */
-  @ViewChild('password') passwordModel!: NgModel;
+  @ViewChild("password") passwordModel!: NgModel;
 
   /** Model for login form */
   public loginForm: { email: string; password: string } = {
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   };
 
   /**
@@ -41,6 +41,12 @@ export class LoginComponent implements OnInit, AfterViewInit {
    * @param authService Service for authentication API calls
    */
   constructor(private router: Router, private authService: AuthService) {}
+  /**
+   * Toggles visibility for the password input.
+   */
+  public togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   /**
    * Initializes Google login callback handler.
@@ -66,7 +72,8 @@ export class LoginComponent implements OnInit, AfterViewInit {
       if (google && google.accounts) {
         google.accounts.id.initialize({
           client_id: "YOUR_GOOGLE_CLIENT_ID",
-          callback: (response: any) => this.handleGoogleLogin(response.credential)
+          callback: (response: any) =>
+            this.handleGoogleLogin(response.credential),
         });
 
         google.accounts.id.prompt();
@@ -74,13 +81,6 @@ export class LoginComponent implements OnInit, AfterViewInit {
         console.error("Google API not loaded yet.");
       }
     }, 500);
-  }
-
-  /**
-   * Toggles the visibility of the password input field.
-   */
-  public togglePasswordVisibility(): void {
-    this.showPassword = !this.showPassword;
   }
 
   /**
@@ -95,10 +95,10 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
     if (this.emailModel.valid && this.passwordModel.valid) {
       this.authService.login(this.loginForm).subscribe({
-        next: () => this.router.navigateByUrl('/app/dashboard'),
+        next: () => this.router.navigateByUrl("/app/dashboard"),
         error: (err: any) => {
-          this.loginError = err.error?.exception || 'An error occurred';
-        }
+          this.loginError = err.error?.exception || "An error occurred";
+        },
       });
     }
   }
@@ -113,15 +113,21 @@ export class LoginComponent implements OnInit, AfterViewInit {
         window.location.reload();
       },
       error: (err: any) => {
-  
         if (err.status === 404) {
-          this.loginError = 'This account is not registered. Please create an account first.';
-        } else if (err?.error?.exception?.includes('Account verification pending')) {
-          this.loginError = 'Your account is not verified. Please check your email for verification.';
+          this.loginError =
+            "This account is not registered. Please create an account first.";
+        } else if (
+          err?.error?.exception?.includes("Account verification pending")
+        ) {
+          this.loginError =
+            "Your account is not verified. Please check your email for verification.";
         } else {
-          this.loginError = err?.error?.message || err?.message || 'An error occurred during authentication.';
+          this.loginError =
+            err?.error?.message ||
+            err?.message ||
+            "An error occurred during authentication.";
         }
-      }
+      },
     });
   }
 }
