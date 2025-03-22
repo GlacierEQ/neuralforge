@@ -18,11 +18,6 @@ export class LayoutService {
   public sidebarOpen: boolean = true;
 
   constructor() {
-
-
-
-
-
   }
 
   public setTitle(title: string) {

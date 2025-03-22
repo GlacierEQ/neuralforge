@@ -1,101 +1,51 @@
-<div class="logo-wrapper">
-  <a routerLink="/" class="logo-container">
-    <img
-      class="img-fluid"
-      src="../../../../../assets/icons/logo@2x.png"
-      width="50"
-      alt="Logo"
-    />
-    <span class="logo-text">NeuralForge</span>
-  </a>
+<mat-sidenav-container class="sidebar-container">
+  <mat-sidenav
+          #sidenav
+          [opened]="isSidebarOpen"
+          mode="over"
+          class="sidebar"
+          [@slideInOut]="isSidebarOpen ? 'open' : 'closed'">
 
-  <div class="back-btn" (click)="layoutService.toggleSidebar()">
-    <i class="fa-solid fa-arrow-left"></i>
-  </div>
-
-  <div class="toggle-sidebar" (click)="layoutService.toggleSidebar()">
-    <i class="fa-solid fa fa-thumb-tack"></i>
-  </div>
-</div>
-
-<div class="logo-icon-wrapper">
-  <a href="javascript:void(0)">
-    <img
-      class="img-fluid"
-      src="../../../../../assets/icons/logo@2x.png"
-      width="35"
-      alt=""
-    />
-  </a>
-</div>
-
-<nav class="sidebar-main">
-  <div
-    id="left-arrow"
-    class="left-arrow"
-    [ngClass]="{ 'd-none': !showLeftArrow }"
-  >
-   
-  </div>
-
-  <div id="sidebar-menu" style="margin-left: 0px">
-    <ul class="sidebar-links custom-scrollbar">
-      <div class="simplebar-wrapper">
-        <div class="simplebar-mask">
-          <div class="simplebar-offset">
-            <div class="simplebar-content-wrapper">
-              <div class="simplebar-content">
-                <li class="back-btn">
-                  <a href="javascript:void(0)">
-                    <img
-                      class="img-fluid"
-                      src="../../../../../assets/img/login/login-bg.jpg"
-                      alt="Logo"
-                    />
-                  </a>
-
-                  <div
-                    class="mobile-back text-end"
-                    (click)="layoutService.toggleSidebar()"
-                  >
-                    <span>Atrás</span>
-                    <i class="fa fa-angle-right ps-2" ></i>
-                  </div>
-                </li>
-
-                <li class="sidebar-main-title">
-                  <div>
-                    <h6>General</h6>
-                  </div>
-                </li>
-
-                @for (route of permittedRoutes; track $index) {
-                  @if (route.data && route.data['showInSidebar']) {
-                  <li class="sidebar-list">
-                    <a
-                      routerLink="{{route.path}}"
-                      routerLinkActive="active"
-                      class="sidebar-link sidebar-title"
-                    >
-                        <span>{{route.data['name']}}</span>
-                      </a>
-                    </li>
-                  }
-                }
-
-              </div>
-            </div>
-          </div>
+    <div class="sidebar-header">
+      <a routerLink="/" class="logo-container" (click)="closeSidebar()">
+        <div class="logo-wrapper">
+          <img src="../../../../../assets/icons/logo@2x.png" width="80" alt="Logo" />
+          <span class="logo-text">NeuralForge</span>
         </div>
-      </div>
-    </ul>
-  </div>
+      </a>
+      <div class="sidebar-divider"></div> <!-- Stylish Divider -->
+    </div>
 
-  <div
-    class="right-arrow"
-    id="right-arrow"
-    [ngClass]="{ 'd-none': !showRigthArrow }"
-  >
-    <!-- <app-feather-icon icon="arrow-right"></app-feather-icon> -->
-  </div>
-</nav>
+    <mat-nav-list>
+      <ng-container *ngFor="let route of permittedRoutes">
+        <ng-container *ngIf="route.data?.showInSidebar">
+          <a mat-list-item routerLink="{{ route.path }}" (click)="closeSidebar()" routerLinkActive="active">
+            <span>{{ route.data?.name }}</span>
+          </a>
+        </ng-container>
+      </ng-container>
+    </mat-nav-list>
+
+    <!-- 🔹 New Section for Profile and Logout -->
+    <div class="sidebar-footer">
+      <button mat-button routerLink="/profile" (click)="closeSidebar()" class="sidebar-button">
+        <mat-icon>person</mat-icon>
+        <span>{{this.userName}}</span>
+      </button>
+      <button mat-button (click)="logout()" class="sidebar-button">
+        <mat-icon>exit_to_app</mat-icon>
+        <span>Logout</span>
+      </button>
+    </div>
+
+  </mat-sidenav>
+
+  <!-- 🔹 Dark Overlay -->
+  <div class="overlay" *ngIf="isSidebarOpen" (click)="toggleSidebar()"></div>
+
+</mat-sidenav-container>
+
+<!-- 🔹 Fixed button always visible -->
+<button class="toggle-button" [ngClass]="{ 'open': isSidebarOpen, 'closed': !isSidebarOpen }" (click)="toggleSidebar()">
+  <mat-icon>{{ isSidebarOpen ? 'chevron_left' : 'chevron_right' }}</mat-icon>
+</button>

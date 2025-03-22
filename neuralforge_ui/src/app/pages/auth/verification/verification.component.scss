@@ -6,7 +6,6 @@
   align-items: center;
   height: 100vh;
   background-image: url("../../../../assets/img/login/Login-background.png");
-  padding: 20px;
   position: relative;
 }
 
@@ -32,7 +31,7 @@
 }
 
 .login-card {
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 1);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   padding: 2rem;

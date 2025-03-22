@@ -1,0 +1,51 @@
+.user-list-container {
+}
+
+.user-list-header {
+  background-color: #456ae6; /* Blue background */
+  color: white;
+  padding: 5px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 6px 15px rgba(10, 0, 0, 0.9);
+}
+
+h2 {
+  margin-bottom: 10px;
+}
+
+.filter-field {
+  width: 50%;
+
+}
+
+/* Smaller and Centered Search Bar */
+.small-filter {
+  width: 50%;
+  max-width: 300px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+mat-chip {
+  font-weight: 500;
+}
+
+.mat-header-row {
+  background-color: #273875; /* Dark blue header background */
+  color: white !important;
+  font-weight: bold;
+}
+
+.small-filter {
+  width: 50%;
+  max-width: 300px;
+}
+
+
+
+
