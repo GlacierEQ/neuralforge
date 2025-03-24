@@ -1,0 +1,13 @@
+.wrapper {
+  min-width: 500px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  padding-top: 5px;
+}
+
+.description-field {
+  min-height: 200px;
+}
