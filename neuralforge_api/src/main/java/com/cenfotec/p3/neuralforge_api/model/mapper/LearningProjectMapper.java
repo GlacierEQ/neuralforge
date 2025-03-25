@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 /**
  * Mapper class responsible for converting between {@link LearningProjectEntity} 
  * and {@link LearningProjectResource}.
- * 
  * Extends the base {@link ProjectMapper} to provide specific mapping for 
  * learning-focused projects while maintaining the common project mapping logic.
  * 
@@ -26,13 +25,12 @@ public class LearningProjectMapper extends ProjectMapper<LearningProjectEntity, 
      */
     @Override
     public LearningProjectResource mapToResource(LearningProjectEntity learningProject) {
-        LearningProjectResource resource = LearningProjectResource.builder()
+        return LearningProjectResource.builder()
                 .id(learningProject.getId())
                 .name(learningProject.getName())
                 .description(learningProject.getDescription())
                 .projectType(ProjectTypeEnum.LEARNING)
                 .build();
-        return resource;
     }
 
     /**
@@ -43,11 +41,10 @@ public class LearningProjectMapper extends ProjectMapper<LearningProjectEntity, 
      */
     @Override
     public LearningProjectEntity mapToEntity(LearningProjectResource learningProject) {
-        LearningProjectEntity entity = LearningProjectEntity.builder()
+        return LearningProjectEntity.builder()
                 .id(learningProject.getId())
                 .name(learningProject.getName())
                 .description(learningProject.getDescription())
-                .build(); 
-        return entity;
+                .build();
     }
 }
