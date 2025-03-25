@@ -1,85 +1,93 @@
-@use '@angular/material' as mat;
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rubik+Mono+One&display=swap');
+@use "@angular/material" as mat;
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rubik+Mono+One&display=swap");
 
-$my-primary: mat.define-palette((
-        50: #e3eafc,
-        100: #bacaf6,
-        200: #8ea8f0,
-        300: #6385ea,
-        400: #456ae6,
-        500: #4a62bd,
-        600: #3d54a7,
-        700: #32468e,
-        800: #273875,
-        900: #192757,
-        contrast: (
-                50: #000000,
-                100: #000000,
-                200: #000000,
-                300: #ffffff,
-                400: #ffffff,
-                500: #ffffff,
-                600: #ffffff,
-                700: #ffffff,
-                800: #ffffff,
-                900: #ffffff,
-        )
-), 500);
+$my-primary: mat.define-palette(
+  (
+    50: #e3eafc,
+    100: #bacaf6,
+    200: #8ea8f0,
+    300: #6385ea,
+    400: #456ae6,
+    500: #4a62bd,
+    600: #3d54a7,
+    700: #32468e,
+    800: #273875,
+    900: #192757,
+    contrast: (
+      50: #000000,
+      100: #000000,
+      200: #000000,
+      300: #ffffff,
+      400: #ffffff,
+      500: #ffffff,
+      600: #ffffff,
+      700: #ffffff,
+      800: #ffffff,
+      900: #ffffff,
+    ),
+  ),
+  500
+);
 
-$my-accent: mat.define-palette((
-        50: #e7f9ef,
-        100: #c3f0d5,
-        200: #9de7ba,
-        300: #77dd9f,
-        400: #5dd58c,
-        500: #28C76F,
-        600: #24b966,
-        700: #1fa75a,
-        800: #1a944e,
-        900: #117335,
-        contrast: (
-                50: #000000,
-                100: #000000,
-                200: #000000,
-                300: #000000,
-                400: #000000,
-                500: #ffffff,
-                600: #ffffff,
-                700: #ffffff,
-                800: #ffffff,
-                900: #ffffff,
-        )
-), 500);
+$my-accent: mat.define-palette(
+  (
+    50: #e7f9ef,
+    100: #c3f0d5,
+    200: #9de7ba,
+    300: #77dd9f,
+    400: #5dd58c,
+    500: #28c76f,
+    600: #24b966,
+    700: #1fa75a,
+    800: #1a944e,
+    900: #117335,
+    contrast: (
+      50: #000000,
+      100: #000000,
+      200: #000000,
+      300: #000000,
+      400: #000000,
+      500: #ffffff,
+      600: #ffffff,
+      700: #ffffff,
+      800: #ffffff,
+      900: #ffffff,
+    ),
+  ),
+  500
+);
 
 $my-secondary: mat.define-palette($my-accent);
 $my-tertiary: mat.define-palette(mat.$blue-palette);
 $my-error: mat.define-palette(mat.$red-palette);
 
 $my-typography: mat.define-typography-config(
-        $font-family: 'Poppins',
-        $headline-1: mat.define-typography-level(32px, 48px, 700),
-        $headline-2: mat.define-typography-level(24px, 36px, 700),
-        $subtitle-1: mat.define-typography-level(18px, 28px, 500),
-        $body-1: mat.define-typography-level(14px, 24px, 400),
-        $caption: mat.define-typography-level(12px, 20px, 400)
+  $font-family: "Poppins",
+  $headline-1: mat.define-typography-level(32px, 48px, 700),
+  $headline-2: mat.define-typography-level(24px, 36px, 700),
+  $subtitle-1: mat.define-typography-level(18px, 28px, 500),
+  $body-1: mat.define-typography-level(14px, 24px, 400),
+  $caption: mat.define-typography-level(12px, 20px, 400),
 );
 
-$my-theme: mat.define-light-theme((
-        color: (
-                primary: $my-primary,
-                secondary: $my-secondary,
-                tertiary: $my-tertiary,
-                accent: $my-accent,
-                error: $my-error
-        ),
-        typography: $my-typography,
-        density: 0
-));
+$my-theme: mat.define-light-theme(
+  (
+    color: (
+      primary: $my-primary,
+      secondary: $my-secondary,
+      tertiary: $my-tertiary,
+      accent: $my-accent,
+      error: $my-error,
+    ),
+    typography: $my-typography,
+    density: 0,
+  )
+);
 
 @include mat.all-component-themes($my-theme);
 
 p {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 
 body {

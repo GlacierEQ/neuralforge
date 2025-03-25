@@ -1,107 +1,128 @@
-@use '@angular/material' as mat;
-@use 'sass:map';
-@use '../../../styles.scss' as theme;
+@use "@angular/material" as mat;
+@use "sass:map";
+@use "../../../styles.scss" as theme;
 
 $primary-color: mat.get-color-from-palette(theme.$my-primary, 500);
 $accent-color: mat.get-color-from-palette(theme.$my-accent, 500);
 $primary-contrast: map.get(map.get(theme.$my-primary, contrast), 500);
 
 .welcome-banner {
-    display: flex;
-    margin: 10px;
-    align-items: center;
-    gap: 1rem;
-    background: linear-gradient(to right, $primary-color, $accent-color);
+  display: flex;
+  margin: 10px;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(to right, $primary-color, $accent-color);
+  color: $primary-contrast;
+  padding: 1.2rem 2rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  font-family: "Poppins";
+  font-size: 1rem;
+  font-weight: 500;
+  animation: fadeIn 0.4s ease;
+
+  .welcome-icon {
+    font-size: 1.8rem;
     color: $primary-contrast;
-    padding: 1.2rem 2rem;
-    border-radius: 1.5rem;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
-    font-family: 'Poppins';
-    font-size: 1rem;
-    font-weight: 500;
-    animation: fadeIn 0.4s ease;
+  }
 
-    .welcome-icon {
-        font-size: 1.8rem;
-        color: $primary-contrast;
-    }
-
-    .welcome-text {
-        flex: 1;
-    }
+  .welcome-text {
+    flex: 1;
+  }
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-8px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .section {
-    background: #f9f9fc;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    border-radius: 1rem;
+  background: #f9f9fc;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border-radius: 1rem;
 
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
 
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
+    h2 {
+      margin: 0;
+      font-family: "Poppins";
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
 
-        h2 {
-            margin: 0;
-            font-family: 'Poppins';
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
+    button {
+      font-weight: 500;
+      font-family: "Poppins";
+    }
+  }
 
+  .card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+
+    mat-card.custom-card {
+      flex: 1 1 250px;
+      max-width: 300px;
+      padding: 1rem;
+      border-radius: 1rem;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+
+      mat-card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        font-family: "Poppins";
+        margin-bottom: 0.5rem;
+      }
+
+      mat-card-content p {
+        font-size: 0.95rem;
+        font-family: "Poppins";
+        margin: 0.3rem 0;
+        color: #444;
+      }
+
+      mat-card-actions {
+        margin-top: 0.75rem;
         button {
-            font-weight: 500;
-            font-family: 'Poppins';
+          font-weight: 500;
+          font-family: "Poppins";
         }
+      }
     }
-
-    .card-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1.5rem;
-
-        mat-card.custom-card {
-            flex: 1 1 250px;
-            max-width: 300px;
-            padding: 1rem;
-            border-radius: 1rem;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
-
-            mat-card-title {
-                font-size: 1.1rem;
-                font-weight: 600;
-                font-family: 'Poppins';
-                margin-bottom: 0.5rem;
-            }
-
-            mat-card-content p {
-                font-size: 0.95rem;
-                font-family: 'Poppins';
-                margin: 0.3rem 0;
-                color: #444;
-            }
-
-            mat-card-actions {
-                margin-top: 0.75rem;
-                button {
-                    font-weight: 500;
-                    font-family: 'Poppins';
-                }
-            }
-        }
-    }
+  }
 }
 
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: $primary-color;
+  font-family: "Poppins";
+  gap: 0.5rem;
+
+  .spin {
+    animation: spin 1.5s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

@@ -20,7 +20,12 @@
     </button>
   </div>
 
-  <div class="card-container">
+  <div class="loading-indicator" *ngIf="section.isLoading">
+    <mat-icon class="spin">refresh</mat-icon>
+    <span>Loading {{ section.title }}...</span>
+  </div>
+
+  <div class="card-container" *ngIf="!section.isLoading">
     <mat-card class="custom-card" *ngFor="let card of section.cards">
       <mat-card-title>{{ card.title }}</mat-card-title>
       <mat-card-content>

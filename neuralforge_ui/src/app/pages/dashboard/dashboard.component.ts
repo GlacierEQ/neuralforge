@@ -1,15 +1,18 @@
 import { CommonModule } from "@angular/common";
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
 import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { CreateProjectDialogComponent } from "../../components/dialogs/create-project-dialog/create-project-dialog.component";
+import { ILearningProject } from "../../interfaces";
+import { LearningProjectService } from "../../services/learning-project.service";
 
 interface DashboardCard {
   title: string;
   content: string;
   count?: number;
+  id?: string | number;
 }
 
 interface DashboardSection {
@@ -17,6 +20,7 @@ interface DashboardSection {
   buttonText: string;
   buttonAction?: () => void;
   cards: DashboardCard[];
+  isLoading?: boolean;
 }
 
 @Component({
@@ -26,11 +30,16 @@ interface DashboardSection {
   templateUrl: "./dashboard.component.html",
   styleUrls: ["./dashboard.component.scss"],
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   private dialog: MatDialog;
+  private learningProjectService: LearningProjectService;
 
-  constructor(dialog: MatDialog) {
+  constructor(
+    dialog: MatDialog,
+    learningProjectService: LearningProjectService
+  ) {
     this.dialog = dialog;
+    this.learningProjectService = learningProjectService;
   }
 
   openCreateLearningProjectDialog() {
@@ -51,17 +60,11 @@ export class DashboardComponent {
 
   currentMessageIndex = 0;
 
-  ngOnInit() {
-    setInterval(() => {
-      this.currentMessageIndex =
-        (this.currentMessageIndex + 1) % this.welcomeMessages.length;
-    }, 5000); // change message every 5 seconds
-  }
-
   sections: DashboardSection[] = [
     {
       title: "Study Plans",
       buttonText: "Create New Study Plan",
+      isLoading: false,
       cards: [
         {
           title: "Study Plan 1",
@@ -84,24 +87,13 @@ export class DashboardComponent {
       title: "Learning Projects",
       buttonText: "Create New Learning Project",
       buttonAction: this.openCreateLearningProjectDialog.bind(this),
-      cards: [
-        {
-          title: "Learning Project 1",
-          content: "Lorem ipsum dolor sit amet...",
-        },
-        {
-          title: "Learning Project 2",
-          content: "Lorem ipsum dolor sit amet...",
-        },
-        {
-          title: "Learning Project 3",
-          content: "Lorem ipsum dolor sit amet...",
-        },
-      ],
+      isLoading: true,
+      cards: [],
     },
     {
       title: "Programmed Goal Projects",
       buttonText: "Create New Programmed Goal Project",
+      isLoading: false,
       cards: [
         {
           title: "Goal Project 1",
@@ -121,4 +113,67 @@ export class DashboardComponent {
       ],
     },
   ];
+
+  ngOnInit() {
+    setInterval(() => {
+      this.currentMessageIndex =
+        (this.currentMessageIndex + 1) % this.welcomeMessages.length;
+    }, 5000); // change message every 5 seconds
+
+    this.fetchLearningProjects();
+  }
+
+  fetchLearningProjects() {
+    const learningProjectSection = this.sections.find(
+      (section) => section.title === "Learning Projects"
+    );
+    if (!learningProjectSection) return;
+
+    // Set loading state
+    learningProjectSection.isLoading = true;
+
+    // Call the API to get user's learning projects
+    this.learningProjectService
+      .findAllWithParamsAndCustomSource("mine")
+      .subscribe({
+        next: (response) => {
+          console.log({ response });
+          // Convert the learning projects to dashboard cards
+          if (response && Array.isArray(response)) {
+            learningProjectSection.cards = response.map(
+              (project: ILearningProject) => ({
+                id: project.id,
+                title: project.name,
+                content: project.description || "No description available.",
+              })
+            );
+          }
+
+          // If no projects were found, show a placeholder message
+          if (learningProjectSection.cards.length === 0) {
+            learningProjectSection.cards = [
+              {
+                title: "No learning projects yet",
+                content:
+                  "Click the 'Create New Learning Project' button to get started!",
+              },
+            ];
+          }
+
+          // Set loading state to false
+          learningProjectSection.isLoading = false;
+        },
+        error: (error) => {
+          console.error("Error fetching learning projects:", error);
+          learningProjectSection.cards = [
+            {
+              title: "Error loading projects",
+              content:
+                "There was a problem loading your learning projects. Please try again later.",
+            },
+          ];
+          learningProjectSection.isLoading = false;
+        },
+      });
+  }
 }
