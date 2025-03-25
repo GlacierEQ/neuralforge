@@ -28,29 +28,4 @@ public abstract class ProjectMapper<E extends ProjectEntity, R extends ProjectRe
      * @return An entity containing the mapped project data.
      */
     public abstract E mapToEntity(R resource);
-    
-    /**
-     * Copies common project fields from entity to resource.
-     * 
-     * @param entity The source entity
-     * @param resource The target resource
-     */
-    protected void copyEntityToResource(ProjectEntity entity, ProjectResource resource) {
-        resource.setId(entity.getId());
-        resource.setName(entity.getName());
-        resource.setDescription(entity.getDescription());
-        resource.setProjectType(entity.getProjectType());
-    }
-    
-    /**
-     * Copies common project fields from resource to entity.
-     * 
-     * @param resource The source resource
-     * @param entity The target entity
-     */
-    protected void copyResourceToEntity(ProjectResource resource, ProjectEntity entity) {
-        entity.setId(resource.getId());
-        entity.setName(resource.getName());
-        entity.setDescription(resource.getDescription());
-    }
 }
