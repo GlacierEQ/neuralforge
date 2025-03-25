@@ -26,6 +26,11 @@ public abstract class ProjectResource {
      * Unique identifier for the project.
      */
     private String id;
+
+    /**
+     * ID of the user who created this learning project.
+     */
+    private String creatorUserId;
     
     /**
      * Name of the project.

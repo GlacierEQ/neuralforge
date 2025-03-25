@@ -27,6 +27,7 @@ public class LearningProjectMapper extends ProjectMapper<LearningProjectEntity, 
     public LearningProjectResource mapToResource(LearningProjectEntity learningProject) {
         return LearningProjectResource.builder()
                 .id(learningProject.getId())
+                .creatorUserId(learningProject.getCreatorUserId())
                 .name(learningProject.getName())
                 .description(learningProject.getDescription())
                 .projectType(ProjectTypeEnum.LEARNING)
@@ -43,6 +44,7 @@ public class LearningProjectMapper extends ProjectMapper<LearningProjectEntity, 
     public LearningProjectEntity mapToEntity(LearningProjectResource learningProject) {
         return LearningProjectEntity.builder()
                 .id(learningProject.getId())
+                .creatorUserId(learningProject.getCreatorUserId())
                 .name(learningProject.getName())
                 .description(learningProject.getDescription())
                 .build();

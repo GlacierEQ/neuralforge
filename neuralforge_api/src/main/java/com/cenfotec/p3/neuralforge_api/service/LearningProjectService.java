@@ -1,11 +1,13 @@
 package com.cenfotec.p3.neuralforge_api.service;
 
 import com.cenfotec.p3.neuralforge_api.model.entity.LearningProjectEntity;
+import com.cenfotec.p3.neuralforge_api.model.entity.UserEntity;
 import com.cenfotec.p3.neuralforge_api.model.mapper.LearningProjectMapper;
 import com.cenfotec.p3.neuralforge_api.model.resource.LearningProjectResource;
 import com.cenfotec.p3.neuralforge_api.repository.LearningProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -40,8 +42,12 @@ public class LearningProjectService {
      * @throws ResponseStatusException if a project with the same name already exists.
      */
     public LearningProjectResource createLearningProject(LearningProjectResource projectResource) {
+        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        projectResource.setCreatorUserId(user.getId());
+
         LearningProjectEntity entity = learningProjectMapper.mapToEntity(projectResource);
         LearningProjectEntity savedEntity = learningProjectRepository.save(entity);
+
         return learningProjectMapper.mapToResource(savedEntity);
     }
 

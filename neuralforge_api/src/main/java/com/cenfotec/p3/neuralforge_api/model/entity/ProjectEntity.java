@@ -34,6 +34,13 @@ public abstract class ProjectEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
+    /**
+     * ID of the user who created this learning project.
+     * This field establishes ownership of the project.
+     */
+    @Column(nullable = false)
+    private String creatorUserId;
     
     /**
      * Name of the project.
