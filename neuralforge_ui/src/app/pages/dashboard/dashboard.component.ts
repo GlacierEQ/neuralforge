@@ -43,7 +43,23 @@ export class DashboardComponent implements OnInit {
   }
 
   openCreateLearningProjectDialog() {
-    this.dialog.open(CreateProjectDialogComponent);
+    const dialogRef = this.dialog.open(CreateProjectDialogComponent);
+
+    dialogRef.afterClosed().subscribe((result: ILearningProject) => {
+      if (result) {
+        const learningProjectSection = this.sections.find(
+          (section) => section.title === "Learning Projects"
+        );
+
+        if (learningProjectSection) {
+          learningProjectSection.cards.push({
+            id: result.id,
+            title: result.name,
+            content: result.description || "No description available.",
+          });
+        }
+      }
+    });
   }
 
   welcomeMessages = [
