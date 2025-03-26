@@ -26,6 +26,16 @@ export interface IUser {
   verified?: boolean;
 }
 
+export interface INotification {
+  id?: number;
+  userId?: number;
+  title?: string;
+  description?: string;
+  actionLabel?: string;
+  redirectTo?: string;
+  dismissed?: boolean;
+}
+
 
 export interface IAuthority {
   authority: string;

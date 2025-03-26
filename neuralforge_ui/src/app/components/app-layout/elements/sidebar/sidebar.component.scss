@@ -125,3 +125,29 @@
   margin-right: 10px;
   color: #4a62bd;
 }
+.sidebar-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  &.has-notifications mat-icon {
+    color: #ff5252;
+  }
+
+  .notification-badge {
+    background-color: #ff5252;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 12px;
+    padding: 2px 6px;
+    margin-left: 8px;
+    line-height: 1;
+  }
+}
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+

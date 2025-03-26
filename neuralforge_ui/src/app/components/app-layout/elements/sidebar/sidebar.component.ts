@@ -1,16 +1,17 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {Router, RouterLink, RouterLinkActive} from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { LayoutService } from '../../../../services/layout.service';
 import { AuthService } from '../../../../services/auth.service';
+// import { NotificationService } from '../../../../services/notification.service';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { routes } from '../../../../app.routes';
-
-// 🚀 Import Angular Animations
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { NotificationOverlayComponent} from "../notification-overlay/notification-overlay.component";
+import {INotification} from "../../../../interfaces";
 
 @Component({
   selector: 'app-sidebar',
@@ -22,10 +23,11 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
     MatSidenavModule,
     MatListModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    NotificationOverlayComponent
   ],
   templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss'],  // ✅ Fix incorrect property name
+  styleUrls: ['./sidebar.component.scss'],
   animations: [
     trigger('slideInOut', [
       state('open', style({ transform: 'translateX(0)' })),
@@ -34,18 +36,36 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
     ])
   ]
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit, OnDestroy {
   public layoutService = inject(LayoutService);
   public authService = inject(AuthService);
-  public permittedRoutes = this.authService.getPermittedRoutes(routes.find(route => route.path === 'app')?.children || []);
+  public permittedRoutes = this.authService.getPermittedRoutes(
+      routes.find(route => route.path === 'app')?.children || []
+  );
   public isSidebarOpen = false;
-  public userName = "default";
+  public userName = 'default';
+  public notificationCount: number = 0;
+  private pollIntervalId: any;
+  allNotifications: INotification[] = [];
 
-  constructor(public router: Router) {
-    let user = localStorage.getItem('auth_user');
+
+  constructor(
+      public router: Router,
+      // private notificationService: NotificationService
+  ) {
+    const user = localStorage.getItem('auth_user');
     if (user) {
       this.userName = JSON.parse(user)?.name;
     }
+  }
+
+  ngOnInit(): void {
+    this.fetchNotifications();
+    this.pollIntervalId = setInterval(() => this.fetchNotifications(), 30000); // Poll every 30s
+  }
+
+  ngOnDestroy(): void {
+    if (this.pollIntervalId) clearInterval(this.pollIntervalId);
   }
 
   toggleSidebar() {
@@ -56,16 +76,62 @@ export class SidebarComponent {
     this.isSidebarOpen = false;
   }
 
-  navigateToProfile() {
-    this.router.navigate(['/profile']).then(() => {
-      this.closeSidebar();
-    });
-  }
-
   logout() {
     this.authService.logout();
     this.closeSidebar();
     window.location.reload();
   }
-}
+  public showNotifications: boolean = false;
+  notifications: INotification[] = [];
 
+  toggleNotifications() {
+    this.showNotifications = !this.showNotifications;
+  }
+
+  dismissNotification(id: number) {
+    this.notifications = this.notifications.filter(n => n.id !== id);
+    this.updateNotificationCount();
+    if (this.notifications.length === 0) {
+      this.showNotifications = false;
+    }
+  }
+
+
+  updateNotificationCount(){
+    this.notificationCount = this.notifications.length;
+  }
+
+
+  fetchNotifications() {
+    const user = localStorage.getItem('auth_user');
+    const email = user ? JSON.parse(user)?.email : null;
+
+    if (email) {
+      const response: INotification[] = [
+        {
+          id: 1,
+          userId: 123,
+          title: 'New Message',
+          description: 'Go to Users.',
+          actionLabel: 'View',
+          redirectTo: '/app/users',
+          dismissed: false
+        },
+        {
+          id: 2,
+          userId: 123,
+          title: 'Reminder',
+          description: 'Know your profile.',
+          actionLabel: 'Open',
+          redirectTo: '/app/profile',
+          dismissed: false
+        }
+      ];
+      this.allNotifications = response;
+      this.notifications = response.filter(n => !n.dismissed);
+
+      this.updateNotificationCount();
+    }
+  }
+
+}

@@ -13,7 +13,7 @@
           <span class="logo-text">NeuralForge</span>
         </div>
       </a>
-      <div class="sidebar-divider"></div> <!-- Stylish Divider -->
+      <div class="sidebar-divider"></div>
     </div>
 
     <mat-nav-list>
@@ -26,26 +26,42 @@
       </ng-container>
     </mat-nav-list>
 
-    <!-- 🔹 New Section for Profile and Logout -->
     <div class="sidebar-footer">
+      <button mat-button class="sidebar-button"
+              [ngClass]="{ 'has-notifications': notificationCount > 0 }"
+              (click)="toggleNotifications()">
+        <mat-icon>notifications</mat-icon>
+        <span>Notifications</span>
+        <span *ngIf="notificationCount > 0" class="notification-badge">
+    {{ notificationCount > 99 ? '99+' : notificationCount }}
+  </span>
+      </button>
+
+
       <button mat-button routerLink="/app/profile" (click)="closeSidebar()" class="sidebar-button">
         <mat-icon>person</mat-icon>
-        <span>{{this.userName}}</span>
+        <span>{{ this.userName }}</span>
       </button>
+
       <button mat-button (click)="logout()" class="sidebar-button">
         <mat-icon>exit_to_app</mat-icon>
         <span>Logout</span>
       </button>
     </div>
-
   </mat-sidenav>
 
-  <!-- 🔹 Dark Overlay -->
   <div class="overlay" *ngIf="isSidebarOpen" (click)="toggleSidebar()"></div>
-
 </mat-sidenav-container>
 
-<!-- 🔹 Fixed button always visible -->
 <button class="toggle-button" [ngClass]="{ 'open': isSidebarOpen, 'closed': !isSidebarOpen }" (click)="toggleSidebar()">
   <mat-icon>{{ isSidebarOpen ? 'chevron_left' : 'chevron_right' }}</mat-icon>
 </button>
+
+<app-notification-overlay
+        *ngIf="showNotifications"
+        [notifications]="notifications"
+        [allNotifications]="allNotifications"
+        (dismiss)="dismissNotification($event)"
+        (close)="showNotifications = false"
+></app-notification-overlay>
+
