@@ -1,0 +1,13 @@
+<mat-card class="empty-state-card">
+  <mat-icon class="empty-state-icon">{{ icon }}</mat-icon>
+  <h2 class="empty-state-title">{{ title }}</h2>
+  <p class="empty-state-message">{{ message }}</p>
+  <button
+    *ngIf="buttonText"
+    mat-raised-button
+    color="primary"
+    (click)="onButtonClick.emit()"
+  >
+    {{ buttonText }}
+  </button>
+</mat-card>

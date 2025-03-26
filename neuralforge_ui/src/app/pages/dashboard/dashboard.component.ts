@@ -5,6 +5,7 @@ import { MatCardModule } from "@angular/material/card";
 import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { CreateProjectDialogComponent } from "../../components/dialogs/create-project-dialog/create-project-dialog.component";
+import { EmptyStateComponent } from "../../components/empty-state/empty-state.component";
 import { ILearningProject } from "../../interfaces";
 import { LearningProjectService } from "../../services/learning-project.service";
 
@@ -26,7 +27,13 @@ interface DashboardSection {
 @Component({
   selector: "app-dashboard",
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIcon],
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIcon,
+    EmptyStateComponent,
+  ],
   templateUrl: "./dashboard.component.html",
   styleUrls: ["./dashboard.component.scss"],
 })
@@ -145,7 +152,6 @@ export class DashboardComponent implements OnInit {
     );
     if (!learningProjectSection) return;
 
-    // Set loading state
     learningProjectSection.isLoading = true;
 
     // Call the API to get user's learning projects
@@ -165,29 +171,11 @@ export class DashboardComponent implements OnInit {
             );
           }
 
-          // If no projects were found, show a placeholder message
-          if (learningProjectSection.cards.length === 0) {
-            learningProjectSection.cards = [
-              {
-                title: "No learning projects yet",
-                content:
-                  "Click the 'Create New Learning Project' button to get started!",
-              },
-            ];
-          }
-
-          // Set loading state to false
           learningProjectSection.isLoading = false;
         },
         error: (error) => {
           console.error("Error fetching learning projects:", error);
-          learningProjectSection.cards = [
-            {
-              title: "Error loading projects",
-              content:
-                "There was a problem loading your learning projects. Please try again later.",
-            },
-          ];
+          learningProjectSection.cards = [];
           learningProjectSection.isLoading = false;
         },
       });

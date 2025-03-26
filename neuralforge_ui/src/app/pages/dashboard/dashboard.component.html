@@ -25,18 +25,33 @@
     <span>Loading {{ section.title }}...</span>
   </div>
 
-  <div class="card-container" *ngIf="!section.isLoading">
-    <mat-card class="custom-card" *ngFor="let card of section.cards">
-      <mat-card-title>{{ card.title }}</mat-card-title>
-      <mat-card-content>
-        <p>{{ card.content }}</p>
-        <p *ngIf="card.count !== undefined">
-          <strong>{{ card.count }} students</strong>
-        </p>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-button color="primary">Enter</button>
-      </mat-card-actions>
-    </mat-card>
+  <div *ngIf="!section.isLoading">
+    <!-- Show empty state when no cards are available -->
+    <app-empty-state
+      *ngIf="section.cards.length === 0"
+      icon="folder_open"
+      [title]="'No ' + section.title + ' yet'"
+      [message]="
+        'Click the \'' + section.buttonText + '\' button to get started!'
+      "
+      [buttonText]="section.buttonText"
+      (onButtonClick)="section.buttonAction && section.buttonAction()"
+    ></app-empty-state>
+
+    <!-- Show cards when available -->
+    <div class="card-container" *ngIf="section.cards.length > 0">
+      <mat-card class="custom-card" *ngFor="let card of section.cards">
+        <mat-card-title>{{ card.title }}</mat-card-title>
+        <mat-card-content>
+          <p>{{ card.content }}</p>
+          <p *ngIf="card.count !== undefined">
+            <strong>{{ card.count }} students</strong>
+          </p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button color="primary">Enter</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
   </div>
 </div>
