@@ -126,3 +126,43 @@ $primary-contrast: map.get(map.get(theme.$my-primary, contrast), 500);
     transform: rotate(360deg);
   }
 }
+
+.error-state {
+  .error-card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem;
+    background-color: #fff5f5;
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid #f56565;
+  }
+
+  .error-icon {
+    font-size: 3rem;
+    height: 3rem;
+    width: 3rem;
+    margin-bottom: 1rem;
+    color: #e53e3e;
+  }
+
+  .error-title {
+    font-family: "Poppins";
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+
+  .error-message {
+    font-family: "Poppins";
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    color: #666;
+    max-width: 500px;
+  }
+}

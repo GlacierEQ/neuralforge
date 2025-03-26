@@ -22,6 +22,8 @@ interface DashboardSection {
   buttonAction?: () => void;
   cards: DashboardCard[];
   isLoading?: boolean;
+  hasError?: boolean;
+  errorMessage?: string;
 }
 
 @Component({
@@ -152,7 +154,10 @@ export class DashboardComponent implements OnInit {
     );
     if (!learningProjectSection) return;
 
+    // Reset section state
     learningProjectSection.isLoading = true;
+    learningProjectSection.hasError = false;
+    learningProjectSection.errorMessage = "";
 
     // Call the API to get user's learning projects
     this.learningProjectService
@@ -177,6 +182,9 @@ export class DashboardComponent implements OnInit {
           console.error("Error fetching learning projects:", error);
           learningProjectSection.cards = [];
           learningProjectSection.isLoading = false;
+          learningProjectSection.hasError = true;
+          learningProjectSection.errorMessage =
+            "Unable to load projects. Please try again later.";
         },
       });
   }

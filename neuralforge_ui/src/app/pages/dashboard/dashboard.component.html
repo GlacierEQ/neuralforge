@@ -26,9 +26,25 @@
   </div>
 
   <div *ngIf="!section.isLoading">
-    <!-- Show empty state when no cards are available -->
+    <!-- Show error state when an error occurred -->
+    <div *ngIf="section.hasError" class="error-state">
+      <mat-card class="error-card">
+        <mat-icon class="error-icon">error_outline</mat-icon>
+        <h3 class="error-title">Oops! Something went wrong</h3>
+        <p class="error-message">{{ section.errorMessage }}</p>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="fetchLearningProjects()"
+        >
+          Try Again
+        </button>
+      </mat-card>
+    </div>
+
+    <!-- Show empty state when no cards are available and no error -->
     <app-empty-state
-      *ngIf="section.cards.length === 0"
+      *ngIf="section.cards.length === 0 && !section.hasError"
       icon="folder_open"
       [title]="'No ' + section.title + ' yet'"
       [message]="
