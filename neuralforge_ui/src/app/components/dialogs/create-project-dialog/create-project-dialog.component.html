@@ -1,45 +1,13 @@
 <div class="wrapper">
   <h2 mat-dialog-title>Create Learning Project</h2>
   <mat-dialog-content>
-    <form #createProjectForm="ngForm" class="form">
-      <!-- Project Name -->
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Name</mat-label>
-        <input
-          matInput
-          name="name"
-          #name="ngModel"
-          [(ngModel)]="project.name"
-          required
-        />
-        <mat-error *ngIf="name.invalid && name.touched">
-          Name is required
-        </mat-error>
-      </mat-form-field>
-
-      <!-- Description -->
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Description</mat-label>
-        <textarea
-          matInput
-          name="description"
-          #description="ngModel"
-          [(ngModel)]="project.description"
-          class="description-field"
-        ></textarea>
-      </mat-form-field>
-    </form>
-  </mat-dialog-content>
-
-  <mat-dialog-actions align="end">
-    <button mat-button color="warn" (click)="onClose()">Close</button>
-    <button
-      mat-raised-button
-      color="primary"
-      [disabled]="createProjectForm.invalid"
-      (click)="onSubmit()"
+    <app-project-form
+      [projectData]="project"
+      submitButtonText="Create"
+      cancelButtonText="Close"
+      (formSubmit)="onSubmit($event)"
+      (formCancel)="onClose()"
     >
-      Create
-    </button>
-  </mat-dialog-actions>
+    </app-project-form>
+  </mat-dialog-content>
 </div>
