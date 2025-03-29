@@ -1,0 +1,562 @@
+type: collection.insomnia.rest/5.0
+name: NeuralForge API
+meta:
+  id: wrk_8039ebec071d41bdb1af1ea35090b979
+  created: 1743213233900
+  modified: 1743213233900
+collection:
+  - name: NeuralForge API Project
+    meta:
+      id: fld_2e79a67da3ad48ca9fad5b2486390614
+      created: 1741754466318
+      modified: 1743213415136
+      sortKey: -1741754466318
+    children:
+      - name: Authentication
+        meta:
+          id: fld_0ee7c02180574e5482ad9fae7b4bb0c9
+          created: 1741753770046
+          modified: 1741754595576
+          sortKey: -1741754481678
+        children:
+          - url: "{{ _.host }}{{ _.root }}{{ _.api_version }}{{ _.controller }}/login"
+            name: Login
+            meta:
+              id: req_cc1aeb19169344d3a6279cc6b03d33f0
+              created: 1741753774736
+              modified: 1743213396998
+              isPrivate: false
+              sortKey: -1741753774736
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                    "email":"menaleitonj@gmail.com",
+                    "password":"Taco1234."
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.3.1
+            authentication:
+              type: none
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.host }}{{ _.root }}{{ _.api_version }}{{ _.controller }}/register"
+            name: Register
+            meta:
+              id: req_117f327a9a8543f482bc061edd9689e8
+              created: 1741754768982
+              modified: 1742873642213
+              isPrivate: false
+              sortKey: -1740284072241
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                    "name":"Juana",
+                    "lastName":"Venegas",
+                    "email":"menaleitonj@gmail.com",
+                    "password":"Taco.1234"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.3.1
+            authentication:
+              type: none
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.host }}{{ _.root }}{{ _.api_version }}{{ _.controller }}/verify"
+            name: Verify
+            meta:
+              id: req_bc66ac245d024c6fadcda3ffac01e476
+              created: 1741927880922
+              modified: 1742009402282
+              isPrivate: false
+              sortKey: -1739549220993.5
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                    "email":"menaleitonj@gmail.com",
+                		"verificationCode":561188
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.3.1
+            authentication:
+              type: none
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+        authentication:
+          type: none
+        environment:
+          controller: /auth
+      - name: User
+        meta:
+          id: fld_ce828bc473ff4dfd818d7c76cd1a437c
+          created: 1741754107068
+          modified: 1741754484387
+          sortKey: -1741754481778
+        children:
+          - url: "{{ _.host }}{{ _.root }}{{ _.api_version }}{{ _.controller }}"
+            name: Retrieve All Users
+            meta:
+              id: req_90200559f84341139186efe674ba2125
+              created: 1741754135811
+              modified: 1741754512199
+              isPrivate: false
+              sortKey: -1741754135811
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/10.3.1
+            authentication:
+              type: bearer
+              prefix: Bearer
+              token: "{% response 'body', 'req_9647344582784b34a65ccb3c1bad7443',
+                'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.host }}{{ _.root }}{{ _.api_version }}{{ _.controller
+              }}/menaleitonj@gmail.com"
+            name: Retrieve User by Email
+            meta:
+              id: req_7c3cce631f52443699dda5c1f6f49556
+              created: 1741930676516
+              modified: 1742010023314
+              isPrivate: false
+              sortKey: -1741753955273.5
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/10.3.1
+            authentication:
+              type: bearer
+              prefix: Bearer
+              token: "{% response 'body', 'req_9647344582784b34a65ccb3c1bad7443',
+                'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.host }}{{ _.root }}{{ _.api_version }}{{ _.controller
+              }}/menaleitonj@gmail.com"
+            name: Update User
+            meta:
+              id: req_0f66f673354c40ab8e86e6e69328007a
+              created: 1741930845103
+              modified: 1742010051979
+              isPrivate: false
+              sortKey: -1741754135911
+            method: PUT
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                	"name": "Juanito",
+                	"lastName": "Mena"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.3.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+        environment:
+          controller: /users
+      - name: Learning Project
+        meta:
+          id: fld_667f5220a4f043ec9525723cb9b5bdb1
+          created: 1742873509121
+          modified: 1742873595101
+          sortKey: -1741754481728
+        children:
+          - url: "{{ _.host }}{{ _.root }}{{ _.api_version }}{{ _.controller }}"
+            name: Retrieve All Learning Projects
+            meta:
+              id: req_3d745d69de044dc79c138ce9687cc907
+              created: 1742873509122
+              modified: 1742873602462
+              isPrivate: false
+              sortKey: -1741754135811
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/10.3.1
+            authentication:
+              type: bearer
+              prefix: Bearer
+              token: "{% response 'body', 'req_4c5b6e37be7444e39efc54623208a3ee',
+                'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.host }}{{ _.root }}{{ _.api_version }}{{ _.controller }}"
+            name: Create Learning Project
+            meta:
+              id: req_5e0545150144412398ef127d4015cb08
+              created: 1742873617974
+              modified: 1742874189901
+              isPrivate: false
+              sortKey: -1741754135911
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                	"name": "First project!"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.3.1
+            authentication:
+              type: bearer
+              prefix: Bearer
+              token: "{% response 'body', 'req_4c5b6e37be7444e39efc54623208a3ee',
+                'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.host }}{{ _.root }}{{ _.api_version }}{{ _.controller
+              }}/5ad01204-984d-448a-b76c-b908cb12c9fe"
+            name: Retrieve Learning Project by Id
+            meta:
+              id: req_c8fd18a91020474d9f6b8e8238eebe53
+              created: 1742873970314
+              modified: 1742874597965
+              isPrivate: false
+              sortKey: -1741754090676.625
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/10.3.1
+            authentication:
+              type: bearer
+              prefix: Bearer
+              token: "{% response 'body', 'req_4c5b6e37be7444e39efc54623208a3ee',
+                'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.host }}{{ _.root }}{{ _.api_version }}{{ _.controller
+              }}/cf86b735-4ff5-4614-b63b-504cad3b1371"
+            name: Update Learning Project
+            meta:
+              id: req_2af74437c49e4c699b164be4a241fa5c
+              created: 1742874149656
+              modified: 1742874243660
+              isPrivate: false
+              sortKey: -1741754068109.4375
+            method: PUT
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                	"name": "test"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.3.1
+            authentication:
+              type: bearer
+              prefix: Bearer
+              token: "{% response 'body', 'req_4c5b6e37be7444e39efc54623208a3ee',
+                'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.host }}{{ _.root }}{{ _.api_version }}{{ _.controller
+              }}/cf86b735-4ff5-4614-b63b-504cad3b1371"
+            name: Delete Learning Project
+            meta:
+              id: req_4eb50e555a194e858b2283a091d033d6
+              created: 1742874197951
+              modified: 1742874250153
+              isPrivate: false
+              sortKey: -1741754011691.4688
+            method: DELETE
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                	"name": "test"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.3.1
+            authentication:
+              type: bearer
+              prefix: Bearer
+              token: "{% response 'body', 'req_4c5b6e37be7444e39efc54623208a3ee',
+                'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.host }}{{ _.root }}{{ _.api_version }}{{ _.controller }}/mine"
+            name: Retrieve User's Learning Projects
+            meta:
+              id: req_933e0175bcf34f248beb6fe2a1d2e8c4
+              created: 1742875547486
+              modified: 1742875549840
+              isPrivate: false
+              sortKey: -1741754113243.8125
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/10.3.1
+            authentication:
+              type: bearer
+              prefix: Bearer
+              token: "{% response 'body', 'req_4c5b6e37be7444e39efc54623208a3ee',
+                'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+        environment:
+          controller: /learning-projects
+      - name: Notification
+        meta:
+          id: fld_35ef62f7362247fbbddf21db34f82891
+          created: 1743178231735
+          modified: 1743213306280
+          sortKey: -1741754481878
+        children:
+          - url: "{{ _.host }}{{ _.root }}{{ _.api_version }}{{ _.controller }}"
+            name: Create Notification
+            meta:
+              id: req_35f6d64834a741fcaafc5fd3c54ee75d
+              created: 1743178271948
+              modified: 1743213317696
+              isPrivate: false
+              sortKey: -1743178271948
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "userId": "51a13e61-1d52-4f61-92f1-9ebd1e4fd7d6",
+                  "title": "Welcome to NeuralForge!",
+                  "description": "Explore your profile.",
+                  "actionLabel": "Go",
+                  "redirectTo": "/app/profile",
+                  "dismissed": false
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.3.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.host }}{{ _.root }}{{ _.api_version }}{{ _.controller
+              }}/email/menaleitonj@gmail.com"
+            name: Retrieve Notification by Email
+            meta:
+              id: req_c1b9a3e296624880adb33be1b20146a3
+              created: 1743178492542
+              modified: 1743178527539
+              isPrivate: false
+              sortKey: -1742466203929.5
+            method: GET
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "userId": "51a13e61-1d52-4f61-92f1-9ebd1e4fd7d6",
+                  "title": "Welcome to NeuralForge!",
+                  "description": "Click below to explore your dashboard.",
+                  "actionLabel": "Go",
+                  "redirectTo": "/app/dashboard",
+                  "dismissed": false
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.3.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.host }}{{ _.root }}{{ _.api_version }}{{ _.controller
+              }}/user/51a13e61-1d52-4f61-92f1-9ebd1e4fd7d6"
+            name: Retrieve Notification by User ID
+            meta:
+              id: req_91503cdf626347d58d5de8cbeaee2331
+              created: 1743178537970
+              modified: 1743178575594
+              isPrivate: false
+              sortKey: -1742110169920.25
+            method: GET
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "userId": "51a13e61-1d52-4f61-92f1-9ebd1e4fd7d6",
+                  "title": "Welcome to NeuralForge!",
+                  "description": "Click below to explore your dashboard.",
+                  "actionLabel": "Go",
+                  "redirectTo": "/app/dashboard",
+                  "dismissed": false
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.3.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.host }}{{ _.root }}{{ _.api_version }}{{ _.controller
+              }}/02a1cff4-5bd8-42fd-bb37-b138f7300a85/dismiss"
+            name: Dismiss Notification
+            meta:
+              id: req_1a291c4a84494b3eae3eba0138c48dba
+              created: 1743178718688
+              modified: 1743178749646
+              isPrivate: false
+              sortKey: -1741932152915.625
+            method: PUT
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "userId": "51a13e61-1d52-4f61-92f1-9ebd1e4fd7d6",
+                  "title": "Welcome to NeuralForge!",
+                  "description": "Click below to explore your dashboard.",
+                  "actionLabel": "Go",
+                  "redirectTo": "/app/dashboard",
+                  "dismissed": false
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.3.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+        environment:
+          controller: /notifications
+    authentication:
+      type: bearer
+      prefix: Bearer
+      token: "{% response 'body', 'req_9647344582784b34a65ccb3c1bad7443',
+        'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_5a333ce46e004025a4b113ed8f6c7d52
+    created: 1741753741362
+    modified: 1741753741362
+environments:
+  name: Base Environment
+  meta:
+    id: env_72a666ec1b044690835488585379a580
+    created: 1741753741361
+    modified: 1741831495057
+    isPrivate: false
+  data:
+    host: localhost:8080
+    root: /api/neuralforge
+    api_version: /v1
