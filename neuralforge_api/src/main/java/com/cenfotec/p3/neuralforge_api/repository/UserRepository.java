@@ -60,6 +60,7 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
             "u.role.id = CASE WHEN :role IS NOT NULL AND :role <> '' THEN :role ELSE u.role.id END, " +
             "u.status = CASE WHEN :status IS NOT NULL THEN :status ELSE u.status END " +
             "WHERE u.email = :email")
+
     void updateUserIgnoringNulls(
             @Param("email") String email,
             @Param("name") String name,

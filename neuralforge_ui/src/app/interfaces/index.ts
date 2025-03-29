@@ -1,16 +1,13 @@
-
 export interface ILoginResponse {
   accessToken: string;
   expiresIn: number;
 }
-
 
 export interface IResponse<T> {
   data: T;
   message: string;
   meta: T;
 }
-
 
 export interface IUser {
   id?: number;
@@ -41,26 +38,22 @@ export interface IAuthority {
   authority: string;
 }
 
-
 export interface IFeedBackMessage {
   type?: IFeedbackStatus;
   message?: string;
 }
 
-
 export enum IFeedbackStatus {
   success = "SUCCESS",
   error = "ERROR",
-  default = ''
+  default = "",
 }
-
 
 export enum IRoleType {
   teacher = "ROLE_TEACHER",
   student = "ROLE_STUDENT",
-  admin = "ROLE_ADMINISTRATOR"
+  admin = "ROLE_ADMINISTRATOR",
 }
-
 
 export interface IRole {
   createdAt: string;
@@ -68,7 +61,6 @@ export interface IRole {
   id: string;
   name: string;
 }
-
 
 export interface ISearch {
   page?: number;
@@ -83,12 +75,23 @@ export interface IExceptionResponse {
   error: {
     id: string;
     exception: [string] | string;
-  }
+  };
   status: number;
 }
-
 
 export interface IValidationRequest {
   email: string;
   verificationCode: number | null;
+}
+
+export enum IProjectType {
+  Learning = "LEARNING",
+}
+
+export interface ILearningProject {
+  id: string;
+  creatorUserId: string;
+  name: string;
+  description?: string;
+  projectType: IProjectType;
 }
