@@ -1,0 +1,118 @@
+.overlay-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.notification-card {
+  width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+.notification-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+
+.notification-item {
+  background-color: #f4f4f4;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.notification-content h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+}
+
+.notification-content p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.notification-actions {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.empty-message {
+  text-align: center;
+  color: #888;
+  font-size: 0.95rem;
+  padding: 2rem 0;
+}
+.notification-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 0.5rem 0;
+
+  h2 {
+    margin: 0;
+    flex: 0 1 auto;
+  }
+
+  button {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+.mat-divider {
+  margin: 0.5rem 0;
+}
+
+
+.notification-toggle {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+
+  ::ng-deep .mat-button-toggle-group {
+    width: 100%;
+    display: flex;
+  }
+
+  ::ng-deep .mat-button-toggle {
+    flex: 1 1 50%;
+    text-transform: none;
+    font-weight: 500;
+    border-radius: 0 !important; // remove rounded edges if needed
+  }
+}
+
+.notification-section {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; // more vertical space between notifications
+}
+
+
+.section-title {
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.notification-section {
+  margin-bottom: 1.5rem;
+}
+

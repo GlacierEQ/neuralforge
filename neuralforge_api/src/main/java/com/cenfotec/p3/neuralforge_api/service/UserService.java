@@ -4,6 +4,7 @@ import com.cenfotec.p3.neuralforge_api.exception.customTypes.NeuralForgeEmailExc
 import com.cenfotec.p3.neuralforge_api.model.entity.UserEntity;
 import com.cenfotec.p3.neuralforge_api.model.enums.UserRoleEnum;
 import com.cenfotec.p3.neuralforge_api.model.mapper.UserMapper;
+import com.cenfotec.p3.neuralforge_api.model.resource.NotificationResource;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserResource;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserRoleResource;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserValidationInputResource;
@@ -50,6 +51,9 @@ public class UserService {
 
     @Autowired
     protected ValidationUtil validationUtil;
+
+    @Autowired
+    protected NotificationService notificationService;
 
     /**
      * Mapper instance for handling user entity transformations.
@@ -156,7 +160,38 @@ public class UserService {
         userValidationService.validateInputCode(validationInput);
         user.setVerified(true);
         rawUserUpdate(user);
+        createPostVerificationNotifications(user);
     }
+
+    /**
+     * Sends onboarding notifications to a newly verified user.
+     *
+     * @param user The {@link UserResource} that was verified.
+     */
+    private void createPostVerificationNotifications(UserResource user) {
+        NotificationResource welcomeNotification = NotificationResource.builder()
+                .userId(user.getId())
+                .title("Welcome to NeuralForge!")
+                .description("We’re excited to have you onboard. Let’s get learning.")
+                .actionLabel("Start Exploring")
+                .redirectTo("/app/dashboard")
+                .dismissed(false)
+                .build();
+
+        NotificationResource profileReminder = NotificationResource.builder()
+                .userId(user.getId())
+                .title("Complete Your Profile")
+                .description("Update your profile to get personalized content.")
+                .actionLabel("Go to Profile")
+                .redirectTo("/app/profile")
+                .dismissed(false)
+                .build();
+
+        notificationService.createNotification(welcomeNotification);
+        notificationService.createNotification(profileReminder);
+    }
+
+
 
     /**
      * Retrieves the currently authenticated user's information.

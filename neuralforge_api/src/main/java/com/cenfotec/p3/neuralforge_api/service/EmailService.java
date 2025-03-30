@@ -101,4 +101,29 @@ public class EmailService {
             throw new NeuralForgeEmailException("An error occurred while sending an email: " + ex.getMessage(), ex);
         }
     }
+
+    /**
+     * Sends an email to notify the user about a new in-app notification.
+     *
+     * @param user The {@link UserEntity} recipient of the email.
+     * @param notificationTitle The title of the notification received.
+     * @param redirectTo The redirect path (e.g. "/profile") to build the full URL.
+     * @throws NeuralForgeEmailException If sending the email fails.
+     */
+    public void sendNotificationAlertEmail(UserEntity user, String notificationTitle, String redirectTo, String notificationDescription) throws NeuralForgeEmailException {
+        String subject = "[ NeuralForge ] - "+notificationTitle;
+        String redirectUrl = "http://localhost:4200" + (redirectTo != null ? redirectTo : "");
+
+        String body = "Hello " + user.getName() + ",\n\n"
+                + "You’ve received a new notification:\n"
+                + "\"" + notificationDescription + "\"\n\n"
+                + "You can view it here:\n" + redirectUrl + "\n\n"
+                + "— NeuralForge Team";
+
+        Email to = new Email(user.getEmail());
+        Content content = new Content("text/plain", body);
+        Mail mail = new Mail(from, subject, to, content);
+        sendEmail(mail);
+    }
+
 }

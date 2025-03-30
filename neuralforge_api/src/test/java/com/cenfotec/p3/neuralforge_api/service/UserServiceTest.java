@@ -53,6 +53,8 @@ class UserServiceTest {
     private ValidationUtil validationUtil;
     @Mock
     private UserValidationService userValidationService;
+    @Mock
+    private NotificationService notificationService;
 
     @Mock
     private UserMapper userMapper;
