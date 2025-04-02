@@ -1,0 +1,305 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+// HERO SECTION: Landing introduction area with background image and headline
+.hero-section {
+  background: url('/assets/img/TeamBackground.png') no-repeat center center/cover;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #22c55e;
+
+  .hero-content {
+      max-width: 600px;
+
+      h1 {
+          font-size: 42px;
+          font-weight: 700;
+      }
+
+      p {
+          font-size: 15px;
+          color: black;
+          font-weight: 400;
+          font-family: 'Poppins', sans-serif;
+      }
+  }
+}
+
+// SECTION CONTAINER: Shared padding between sections
+.section-container {
+  padding: 80px 0;
+}
+
+// ABOUT SECTION: Team description and logo
+.about-section {
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 50px 10%;
+  padding: 80px 10% 50px;
+  margin-top: 50px;
+
+  .about-content {
+      max-width: 50%;
+
+      h2 {
+          font-size: 28px;
+          font-weight: 700;
+          font-family: 'Poppins', sans-serif;
+
+          span {
+              color: #22c55e;
+          }
+      }
+
+      p {
+          font-size: 16px;
+          color: #555;
+          font-weight: 400;
+      }
+  }
+
+  .about-logo {
+      width: 400px;
+      height: auto;
+  }
+}
+
+// PROJECTS SECTION: Highlights a developed project
+.projects-section {
+  text-align: center;
+  padding: 50px 20px 80px;
+  background: #f9f9f9;
+
+  h2 {
+      font-size: 32px;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+
+      span {
+          color: #22c55e;
+      }
+  }
+
+  .project-card {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 300px;
+      margin: auto;
+      text-align: center;
+
+      img {
+          width: 100%;
+          border-radius: 10px;
+      }
+
+      h3 {
+          font-size: 20px;
+          font-weight: 700;
+          font-family: 'Poppins', sans-serif;
+      }
+
+      p {
+          font-size: 14px;
+          color: #555;
+          font-weight: 400;
+      }
+
+      &:hover {
+          transform: scale(1.05);
+          box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .project-btn {
+          background: #22c55e;
+          color: white;
+          border: none;
+          padding: 10px 15px;
+          border-radius: 5px;
+          font-weight: 600;
+          cursor: pointer;
+
+          &:hover {
+              background: #1a8d4f;
+          }
+      }
+  }
+}
+
+// MISSION AND VISION SECTION: Two cards side-by-side for company vision and mission
+.mission-vision-section {
+  background: #f9f9f9;
+  padding: 50px 10%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mission-vision-container {
+  display: flex;
+  gap: 30px;
+  max-width: 1200px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.mission-card,
+.vision-card {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  flex: 1;
+  min-width: 300px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  h2 {
+      font-size: 24px;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      margin-bottom: 10px;
+
+      span {
+          color: #22c55e;
+      }
+  }
+
+  p {
+      font-size: 16px;
+      color: #555;
+      font-weight: 400;
+  }
+
+  &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+  }
+}
+
+// TEAM SECTION: Grid of team member profiles with hover effect
+.team-section {
+  text-align: center;
+  padding: 50px 20px;
+
+  h2 {
+      font-size: 32px;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+
+      span {
+          color: #22c55e;
+      }
+  }
+
+  .team-grid {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 30px;
+  }
+
+  .team-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+      img {
+          width: 100px;
+          height: 100px;
+          border-radius: 50%;
+          object-fit: cover;
+      }
+
+      h3 {
+          font-size: 18px;
+          font-weight: 600;
+          font-family: 'Poppins', sans-serif;
+          margin-top: 10px;
+      }
+
+      p {
+          font-size: 14px;
+          color: #666;
+          font-weight: 400;
+      }
+
+      a {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 5px;
+          text-decoration: none;
+          color: #0e76a8;
+          font-weight: 600;
+          margin-top: 10px;
+
+          img {
+              width: 16px;
+              height: 16px;
+          }
+      }
+
+      &:hover {
+          transform: scale(1.05);
+          box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      }
+  }
+}
+
+// FOOTER SECTION: Brand and copyright
+.footer {
+  background: #f9f9f9;
+  padding: 20px;
+  text-align: center;
+
+  .footer-content {
+      img {
+          width: 80px;
+          margin-bottom: 10px;
+      }
+
+      p {
+          font-size: 14px;
+          color: #555;
+          font-weight: 400;
+      }
+
+      .footer-links {
+          display: flex;
+          justify-content: center;
+          gap: 20px;
+          margin-top: 10px;
+
+          a {
+              text-decoration: none;
+              color: #22c55e;
+              font-weight: 600;
+
+              &:hover {
+                  text-decoration: underline;
+              }
+          }
+      }
+  }
+
+  html {
+      scroll-behavior: smooth;
+  }
+}
+
+// GLOBAL FONT FAMILY: Ensures all text uses Poppins
+body,
+html {
+  font-family: 'Poppins', sans-serif;
+}
