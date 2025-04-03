@@ -12,7 +12,11 @@ import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from "@angular/material/icon";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatTabsModule } from "@angular/material/tabs";
-import { IProject } from "../../interfaces";
+import {
+  IProgrammedGoalProject,
+  IProject,
+  IProjectType,
+} from "../../interfaces";
 
 @Component({
   selector: "app-project-details",
@@ -33,13 +37,29 @@ export class ProjectDetailsComponent {
   @Input() isLoading = false;
   @Input() hasError = false;
   @Input() errorMessage = "";
-  @Input() showNotificationsToggle = false;
-  @Input() notificationsEnabled = false;
+
   @ContentChild("overviewContent") overviewContent!: TemplateRef<any>;
   @ContentChild("generatedContent") generatedContent!: TemplateRef<any>;
   @ContentChild("configurationContent") configurationContent!: TemplateRef<any>;
 
-  @Output() notificationsToggle = new EventEmitter<void>();
+  @Output() notificationsToggle = new EventEmitter<boolean>();
   @Output() editProject = new EventEmitter<void>();
   @Output() deleteProject = new EventEmitter<void>();
+
+  get isProgrammedGoalProject(): boolean {
+    return this.project?.projectType === IProjectType.ProgrammedGoal;
+  }
+
+  get notificationsEnabled(): boolean {
+    if (this.isProgrammedGoalProject) {
+      return (this.project as IProgrammedGoalProject).notify;
+    }
+    return false;
+  }
+
+  onToggleNotify() {
+    if (this.isProgrammedGoalProject) {
+      this.notificationsToggle.emit(!this.notificationsEnabled);
+    }
+  }
 }
