@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Resource class representing the base data transfer object for all projects.
@@ -54,4 +55,5 @@ public abstract class ProjectResource {
     private ProjectTypeEnum projectType;
 
     private Date createdAt;
+    private List<ProjectMaterialResource> materials;
 }

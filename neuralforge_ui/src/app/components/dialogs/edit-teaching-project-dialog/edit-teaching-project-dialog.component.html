@@ -1,0 +1,124 @@
+<h2 mat-dialog-title>Edit Teaching Project</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <mat-dialog-content>
+    <div class="form-container">
+      <mat-form-field appearance="outline">
+        <mat-label>Project Name</mat-label>
+        <input
+          matInput
+          formControlName="name"
+          placeholder="Enter project name"
+        />
+        <mat-error *ngIf="form.get('name')?.hasError('required')">
+          Name is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Description</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          placeholder="Enter project description"
+          rows="3"
+        ></textarea>
+        <mat-error *ngIf="form.get('description')?.hasError('required')">
+          Description is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Daily Hours</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="dailyHours"
+          placeholder="Enter daily hours"
+        />
+        <mat-error *ngIf="form.get('dailyHours')?.hasError('required')">
+          Daily hours is required
+        </mat-error>
+        <mat-error *ngIf="form.get('dailyHours')?.hasError('min')">
+          Daily hours must be at least 1
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Weeks Count</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="weeksCount"
+          placeholder="Enter number of weeks"
+        />
+        <mat-error *ngIf="form.get('weeksCount')?.hasError('required')">
+          Weeks count is required
+        </mat-error>
+        <mat-error *ngIf="form.get('weeksCount')?.hasError('min')">
+          Weeks count must be at least 1
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Selected Days</mat-label>
+        <mat-select formControlName="selectedDays" multiple>
+          <mat-option *ngFor="let day of selectedDays" [value]="day">
+            {{ day }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('selectedDays')?.hasError('required')">
+          Please select at least one day
+        </mat-error>
+      </mat-form-field>
+
+      <div class="materials-section">
+        <div class="materials-header">
+          <h3>Materials</h3>
+          <button
+            type="button"
+            mat-icon-button
+            color="primary"
+            (click)="addMaterial()"
+          >
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+
+        <div
+          *ngFor="let material of form.get('materials')?.value; let i = index"
+          class="material-item"
+        >
+          <mat-form-field appearance="outline">
+            <mat-label>Material {{ i + 1 }}</mat-label>
+            <input
+              matInput
+              [formControlName]="'materials.' + i"
+              placeholder="Enter material name"
+            />
+          </mat-form-field>
+          <button
+            type="button"
+            mat-icon-button
+            color="warn"
+            (click)="removeMaterial(i)"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="onCancel()">Cancel</button>
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      [disabled]="!form.valid"
+    >
+      Save Changes
+    </button>
+  </mat-dialog-actions>
+</form>

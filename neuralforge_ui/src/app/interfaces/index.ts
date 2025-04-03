@@ -33,7 +33,6 @@ export interface INotification {
   dismissed?: boolean;
 }
 
-
 export interface IAuthority {
   authority: string;
 }
@@ -86,6 +85,8 @@ export interface IValidationRequest {
 
 export enum IProjectType {
   Learning = "LEARNING",
+  Teaching = "TEACHING",
+  ProgrammedGoal = "PROGRAMMED_GOAL",
 }
 
 export interface ILearningProject {
@@ -115,15 +116,9 @@ export interface IDashboardSection {
   errorMessage?: string;
 }
 
-export enum ProjectTypeEnum {
-  PROGRAMMED_GOAL,
-  LEARNING,
-}
-
-
 export interface IProgrammedGoalProject {
   id?: string;
-  projectType: ProjectTypeEnum;
+  projectType: IProjectType;
   creatorUserId?: string;
   name: string;
   description: string;
@@ -163,4 +158,27 @@ export interface IDynamicContentSection {
   cards: IDynamicContent[];
   hasError?: boolean;
   errorMessage?: string;
+}
+
+export interface ITeachingMaterial {
+  id?: string;
+  type: "PDF" | "TEXT" | "HYPERLINK";
+  fileName?: string;
+  fileUrl?: string;
+  description: string;
+  hyperlink?: string;
+}
+
+export interface ITeachingProject {
+  id?: string;
+  projectType: IProjectType;
+  creatorUserId?: string;
+  name: string;
+  description: string;
+  createdAt: Date | null;
+  selectedDays: ISelectedDays;
+  dailyHours: number;
+  weeksCount: number;
+  hoursPerClass: number;
+  materials?: ITeachingMaterial[];
 }

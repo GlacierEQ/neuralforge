@@ -18,5 +18,17 @@ public enum ProjectTypeEnum {
      * in a structured environment with specific learning objectives.
      */
     LEARNING,
-    PROGRAMMED_GOAL
+    
+    /**
+     * Represents a goal-oriented project with specific deadlines and practice schedules.
+     * Programmed goal projects help users achieve specific objectives within a defined timeframe.
+     */
+    PROGRAMMED_GOAL,
+
+    /**
+     * Represents a teaching project designed for educators.
+     * Teaching projects allow teachers to create structured teaching plans
+     * with uploaded materials, schedules, and course duration information.
+     */
+    TEACHING
 }

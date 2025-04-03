@@ -1,22 +1,20 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject } from "@angular/core";
+import { FormsModule } from "@angular/forms";
+import { MatNativeDateModule } from "@angular/material/core";
+import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MatDialogModule, MatDialogRef } from "@angular/material/dialog";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
+import { MatSelectModule } from "@angular/material/select";
+import { IProgrammedGoalProject, IProjectType } from "../../../interfaces";
 import { AlertService } from "../../../services/alert.service";
+import { ProgrammedGoalProjectService } from "../../../services/programmed-goal-project.service";
 import {
   ProjectFormComponent,
   ProjectFormData,
 } from "../../project-form/project-form.component";
 import { WeekdayPickerComponent } from "../../weekday-picker/weekday-picker.component";
-import { FormsModule } from "@angular/forms";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatInputModule } from "@angular/material/input";
-import { MatDatepickerModule } from "@angular/material/datepicker";
-import { MatNativeDateModule } from "@angular/material/core";
-import { MatSelectModule } from "@angular/material/select";
-import {ProgrammedGoalProjectService} from "../../../services/programmed-goal-project.service";
-import {IProgrammedGoalProject, ProjectTypeEnum} from "../../../interfaces";
-
-
 
 @Component({
   selector: "app-create-goal-project-dialog",
@@ -33,18 +31,18 @@ import {IProgrammedGoalProject, ProjectTypeEnum} from "../../../interfaces";
     MatInputModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatSelectModule
+    MatSelectModule,
   ],
 })
 export class CreateGoalProjectDialogComponent {
   private alertService = inject(AlertService);
-  private programmedGoalProjectService = inject(ProgrammedGoalProjectService)
-  public frequency:number = 3;
+  private programmedGoalProjectService = inject(ProgrammedGoalProjectService);
+  public frequency: number = 3;
 
   goalProject: IProgrammedGoalProject = {
     createdAt: null,
     notify: false,
-    projectType: ProjectTypeEnum.PROGRAMMED_GOAL,
+    projectType: IProjectType.ProgrammedGoal,
     name: "",
     description: "",
     deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default to 30 days from now
@@ -55,25 +53,24 @@ export class CreateGoalProjectDialogComponent {
       thursday: false,
       friday: false,
       saturday: false,
-      sunday: false
-    }
-
+      sunday: false,
+    },
   };
 
   frequencies = [1, 2, 3, 4, 5, 6, 7];
 
-  constructor(private dialogRef: MatDialogRef<CreateGoalProjectDialogComponent>) {}
+  constructor(
+    private dialogRef: MatDialogRef<CreateGoalProjectDialogComponent>
+  ) {}
 
   onSubmit(projectData: ProjectFormData) {
-
     const goalData: IProgrammedGoalProject = {
       createdAt: null,
       notify: false,
-      projectType: ProjectTypeEnum.PROGRAMMED_GOAL,
+      projectType: IProjectType.ProgrammedGoal,
       ...projectData, // This includes name and description from the form
       deadline: this.goalProject.deadline,
-      selectedDays: this.goalProject.selectedDays
-
+      selectedDays: this.goalProject.selectedDays,
     };
 
     console.log(goalData);
@@ -81,22 +78,22 @@ export class CreateGoalProjectDialogComponent {
     this.programmedGoalProjectService.add(goalData).subscribe({
       next: (response: any) => {
         this.alertService.displayAlert(
-            "success",
-            "Programmed goal project created successfully",
-            "center",
-            "top",
-            ["success-snackbar"]
+          "success",
+          "Programmed goal project created successfully",
+          "center",
+          "top",
+          ["success-snackbar"]
         );
 
         this.dialogRef.close(response);
       },
       error: (error: any) => {
         this.alertService.displayAlert(
-            "error",
-            error.error?.exception || "Failed to create programmed goal project",
-            "center",
-            "top",
-            ["error-snackbar"]
+          "error",
+          error.error?.exception || "Failed to create programmed goal project",
+          "center",
+          "top",
+          ["error-snackbar"]
         );
 
         console.error("Error creating project:", error);
@@ -112,24 +109,26 @@ export class CreateGoalProjectDialogComponent {
       thursday: false,
       friday: false,
       saturday: false,
-      sunday: false
+      sunday: false,
     };
 
     if (this.frequency === 7) {
-      Object.keys(this.goalProject.selectedDays).forEach(day => {
+      Object.keys(this.goalProject.selectedDays).forEach((day) => {
         this.goalProject.selectedDays[day] = true;
       });
     }
   }
 
   isFrequencyValid(): boolean {
-    return this.frequency === 7 || this.getSelectedDaysCount() === this.frequency;
+    return (
+      this.frequency === 7 || this.getSelectedDaysCount() === this.frequency
+    );
   }
 
   getSelectedDaysCount(): number {
-    return Object.values(this.goalProject.selectedDays).filter(day => day).length;
+    return Object.values(this.goalProject.selectedDays).filter((day) => day)
+      .length;
   }
-
 
   onClose() {
     this.dialogRef.close();

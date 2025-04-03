@@ -15,6 +15,7 @@ import { DashboardComponent } from "./pages/dashboard/dashboard.component";
 import { ProfileComponent } from "./pages/profile/profile.component";
 import { LearningProjectComponent } from "./pages/projects/learning/learning-project.component";
 import { ProgrammedGoalProjectComponent } from "./pages/projects/programmed-goal/programmed-goal-project.component";
+import { TeachingProjectComponent } from "./pages/projects/teaching/teaching-project.component";
 import { UsersComponent } from "./pages/users/users.component";
 
 /**
@@ -90,6 +91,15 @@ export const routes: Routes = [
         data: {
           authorities: [IRoleType.admin, IRoleType.teacher, IRoleType.student],
           name: "Learning Project",
+          showInSidebar: false,
+        },
+      },
+      {
+        path: "project/teaching/:projectId",
+        component: TeachingProjectComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.teacher, IRoleType.student],
+          name: "Teaching Project",
           showInSidebar: false,
         },
       },

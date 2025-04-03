@@ -1,0 +1,90 @@
+<div class="wrapper">
+  <h2 mat-dialog-title>Create Teaching Project</h2>
+  <mat-dialog-content>
+    <app-project-form
+      [projectData]="teachingProject"
+      submitButtonText="Create"
+      cancelButtonText="Close"
+      [isExtraValid]="isFormValid()"
+      (formSubmit)="onSubmit($event)"
+      (formCancel)="onClose()"
+    >
+      <!-- Teaching Project specific fields -->
+      <div class="teaching-project-fields">
+        <h3>Course Schedule</h3>
+
+        <!-- Weekday Picker -->
+        <app-weekday-picker
+          [(selectedDays)]="teachingProject.selectedDays"
+        ></app-weekday-picker>
+
+        <div class="validation-warning" *ngIf="getSelectedDaysCount() === 0">
+          Please select at least one day of the week
+        </div>
+
+        <!-- Daily Hours -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Daily Teaching Hours</mat-label>
+          <input
+            matInput
+            type="number"
+            min="1"
+            max="24"
+            name="dailyHours"
+            [(ngModel)]="teachingProject.dailyHours"
+            required
+          />
+          <mat-hint>How many hours will you teach each day?</mat-hint>
+        </mat-form-field>
+
+        <!-- Start Date -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Start Date</mat-label>
+          <input
+            matInput
+            [matDatepicker]="startPicker"
+            [(ngModel)]="teachingProject.startDate"
+            name="startDate"
+            required
+          />
+          <mat-hint>When will the course start?</mat-hint>
+          <mat-datepicker-toggle
+            matIconSuffix
+            [for]="startPicker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+        </mat-form-field>
+
+        <!-- End Date -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>End Date</mat-label>
+          <input
+            matInput
+            [matDatepicker]="endPicker"
+            [(ngModel)]="teachingProject.endDate"
+            name="endDate"
+            required
+          />
+          <mat-hint>When will the course end?</mat-hint>
+          <mat-datepicker-toggle
+            matIconSuffix
+            [for]="endPicker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+        </mat-form-field>
+
+        <div class="summary">
+          <p>
+            Total teaching hours: <strong>{{ getTotalHours() }}</strong>
+          </p>
+          <p>
+            Days selected: <strong>{{ getSelectedDaysCount() }}</strong>
+          </p>
+          <p>
+            Course duration: <strong>{{ getWeeksCount() }} weeks</strong>
+          </p>
+        </div>
+      </div>
+    </app-project-form>
+  </mat-dialog-content>
+</div>
