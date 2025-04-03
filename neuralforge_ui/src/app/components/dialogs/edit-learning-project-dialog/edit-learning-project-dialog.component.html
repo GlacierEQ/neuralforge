@@ -1,0 +1,12 @@
+<h2 mat-dialog-title>Edit Learning Project</h2>
+
+<mat-dialog-content>
+  <app-project-form
+    [projectData]="projectFormData"
+    [submitButtonText]="'Save'"
+    [cancelButtonText]="'Cancel'"
+    (formSubmit)="onSubmit($event)"
+    (formCancel)="onClose()"
+  >
+  </app-project-form>
+</mat-dialog-content>

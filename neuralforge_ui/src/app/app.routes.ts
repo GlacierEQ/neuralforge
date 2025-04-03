@@ -13,8 +13,9 @@ import { SigUpComponent } from "./pages/auth/sign-up/signup.component";
 import { VerificationComponent } from "./pages/auth/verification/verification.component";
 import { DashboardComponent } from "./pages/dashboard/dashboard.component";
 import { ProfileComponent } from "./pages/profile/profile.component";
+import { LearningProjectComponent } from "./pages/projects/learning/learning-project.component";
+import { ProgrammedGoalProjectComponent } from "./pages/projects/programmed-goal/programmed-goal-project.component";
 import { UsersComponent } from "./pages/users/users.component";
-import {ProgrammedGoalProjectComponent} from "./pages/projects/programmed-goal/programmed-goal-project.component";
 
 /**
  * Application routes configuration.
@@ -22,13 +23,11 @@ import {ProgrammedGoalProjectComponent} from "./pages/projects/programmed-goal/p
  * including authentication and authorization guards.
  */
 export const routes: Routes = [
-
   {
     path: "login",
     component: LoginComponent,
     canActivate: [GuestGuard],
   },
-
 
   {
     path: "signup",
@@ -36,12 +35,10 @@ export const routes: Routes = [
     canActivate: [GuestGuard],
   },
 
-
   {
     path: "access-denied",
     component: AccessDeniedComponent,
   },
-
 
   {
     path: "",
@@ -72,7 +69,6 @@ export const routes: Routes = [
     component: AppLayoutComponent,
     canActivate: [AuthGuard],
     children: [
-
       {
         path: "app",
         redirectTo: "users",
@@ -80,7 +76,7 @@ export const routes: Routes = [
       },
 
       {
-        path: 'project/programmed_goal/:projectId',
+        path: "project/programmed_goal/:projectId",
         component: ProgrammedGoalProjectComponent,
         data: {
           authorities: [IRoleType.admin, IRoleType.teacher, IRoleType.student],
@@ -88,7 +84,15 @@ export const routes: Routes = [
           showInSidebar: false,
         },
       },
-
+      {
+        path: "project/learning/:projectId",
+        component: LearningProjectComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.teacher, IRoleType.student],
+          name: "Learning Project",
+          showInSidebar: false,
+        },
+      },
       {
         path: "users",
         component: UsersComponent,
@@ -100,7 +104,6 @@ export const routes: Routes = [
         },
       },
 
-
       {
         path: "profile",
         component: ProfileComponent,
@@ -111,7 +114,6 @@ export const routes: Routes = [
           showInSidebar: false,
         },
       },
-
 
       {
         path: "dashboard",

@@ -1,0 +1,68 @@
+<ng-container *ngIf="!isLoading && project">
+  <mat-card class="project-header">
+    <div class="project-title">
+      <h1>{{ project.name }}</h1>
+      <!-- Keep space for future features like notifications toggle -->
+    </div>
+    <p class="project-description">
+      {{ project.description || "No description available" }}
+    </p>
+  </mat-card>
+
+  <mat-tab-group>
+    <!-- Overview Tab -->
+    <mat-tab label="Overview">
+      <div class="overview-tab">
+        <mat-card class="project-info-card">
+          <h2>Project Details</h2>
+          <p>
+            <strong>Created:</strong>
+            {{
+              project.createdAt
+                ? (project.createdAt | date : "longDate")
+                : "Not specified"
+            }}
+          </p>
+          <p><strong>Project Type:</strong> Learning Project</p>
+          <p><strong>Creator ID:</strong> {{ project.creatorUserId }}</p>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Generated Content Tab -->
+    <mat-tab label="Generated Contents">
+      <div class="empty-state">
+        <p>No contents generated yet.</p>
+      </div>
+    </mat-tab>
+
+    <!-- Configuration Tab -->
+    <mat-tab label="Configuration">
+      <div class="config-actions">
+        <button (click)="editProject()" mat-stroked-button color="primary">
+          Edit Project
+        </button>
+        <button (click)="onDeleteProject()" mat-stroked-button color="warn">
+          Delete Project
+        </button>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</ng-container>
+
+<ng-container *ngIf="isLoading">
+  <div class="loading-container">
+    <mat-icon>hourglass_empty</mat-icon>
+    <p>Loading project...</p>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="hasError && !isLoading">
+  <div class="error-container">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ errorMessage }}</p>
+    <button mat-stroked-button color="primary" routerLink="/app/dashboard">
+      Return to Dashboard
+    </button>
+  </div>
+</ng-container>
