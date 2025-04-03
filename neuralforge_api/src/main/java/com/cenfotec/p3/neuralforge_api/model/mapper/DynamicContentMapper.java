@@ -4,6 +4,7 @@ import com.cenfotec.p3.neuralforge_api.model.entity.DynamicContentEntity;
 import com.cenfotec.p3.neuralforge_api.model.enums.DynamicContentTypeEnum;
 import com.cenfotec.p3.neuralforge_api.model.resource.DynamicContentResource;
 import lombok.Builder;
+import org.springframework.stereotype.Component;
 
 /**
  * Mapper class for converting DynamicContentEntity to DynamicContentResource.
@@ -12,6 +13,7 @@ import lombok.Builder;
  * @author Fabian Vargas
  * @version 1.0
  */
+@Component
 public class DynamicContentMapper {
 
     /**

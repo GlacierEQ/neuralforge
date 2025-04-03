@@ -1,5 +1,6 @@
 package com.cenfotec.p3.neuralforge_api.controller;
 
+import com.cenfotec.p3.neuralforge_api.model.resource.PasswordUpdateResource;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserResource;
 import com.cenfotec.p3.neuralforge_api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,4 +90,37 @@ public class UserController {
                 .status(HttpStatus.OK)
                 .body(null);
     }
+
+    /**
+     * Toggles the active status of a user by their ID.
+     *
+     * This endpoint is restricted to users with the ROLE_ADMINISTRATOR role.
+     * It allows administrators to activate or deactivate a user account.
+     *
+     * @param userId The unique identifier of the user whose status is to be toggled.
+     * @return A ResponseEntity with HTTP 200 OK status if the operation is successful.
+     */
+
+    @PutMapping("/{userId}/toggle-status")
+    @PreAuthorize("hasAnyRole('ROLE_ADMINISTRATOR')")
+    public ResponseEntity<Void> toggleUserStatus(@PathVariable String userId) {
+        userService.toggleUserStatus(userId);
+        return ResponseEntity.ok(null);
+    }
+
+    /**
+     * Updates the authenticated user's password.
+     * Verifies the current password before allowing the change and applies password validation.
+     * Accessible by users with any role.
+     *
+     * @param passwordUpdateResource The {@link PasswordUpdateResource} containing current and new passwords.
+     * @return A {@link ResponseEntity} with HTTP 204 No Content if the update is successful.
+     */
+    @PutMapping("/profile/password")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT', 'ROLE_TEACHER', 'ROLE_ADMINISTRATOR')")
+    public ResponseEntity<Void> updatePassword(@RequestBody PasswordUpdateResource passwordUpdateResource) {
+        userService.updatePassword(passwordUpdateResource);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 }

@@ -5,6 +5,7 @@ import com.cenfotec.p3.neuralforge_api.model.entity.UserEntity;
 import com.cenfotec.p3.neuralforge_api.model.enums.UserRoleEnum;
 import com.cenfotec.p3.neuralforge_api.model.mapper.UserMapper;
 import com.cenfotec.p3.neuralforge_api.model.resource.NotificationResource;
+import com.cenfotec.p3.neuralforge_api.model.resource.PasswordUpdateResource;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserResource;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserRoleResource;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserValidationInputResource;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -241,4 +243,45 @@ public class UserService {
         // After deletion, the user will still be authenticated for the current request
         // The client-side should handle logging out and redirecting after successful deletion
     }
+
+    /**
+     * Toggles the status (active/inactive) of a user by ID.
+     *
+     * @param userId The ID of the user to toggle.
+     * @return The updated {@link UserResource}.
+     */
+    public UserResource toggleUserStatus(String userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        user.setStatus(!user.getStatus());
+        UserEntity updatedUser = userRepository.save(user);
+        return userMapper.mapToResource(updatedUser);
+    }
+
+    /**
+     * Updates the authenticated user's password after verifying the current password.
+     * Applies password strength validations and securely encodes the new password.
+     *
+     * @param passwordUpdateResource The {@link PasswordUpdateResource} containing the current and new passwords.
+     * @throws ResponseStatusException if the current password is incorrect or the user is not found.
+     */
+    public void updatePassword(PasswordUpdateResource passwordUpdateResource) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (!passwordEncoder.matches(passwordUpdateResource.getCurrentPassword(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Current password is incorrect");
+        }
+
+        validationUtil.triggerValidations(passwordUpdateResource, "newPassword");
+
+        user.setPassword(passwordEncoder.encode(passwordUpdateResource.getNewPassword()));
+        user.setLastPasswordChangeAt(LocalDateTime.now());
+
+        userRepository.save(user);
+    }
+
 }

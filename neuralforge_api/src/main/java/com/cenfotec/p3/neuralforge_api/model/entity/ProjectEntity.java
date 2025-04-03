@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.Date;
+
 /**
  * Abstract entity representing the base class for all projects in the system.
  * Implements inheritance using joined tables strategy with a discriminator column.
@@ -65,4 +67,17 @@ public abstract class ProjectEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "project_type", insertable = false, updatable = false)
     private ProjectTypeEnum projectType;
+
+    /**
+     * Timestamp representing when the project was created.
+     * Automatically set when the entity is persisted.
+     */
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Date createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = new Date();
+    }
 }

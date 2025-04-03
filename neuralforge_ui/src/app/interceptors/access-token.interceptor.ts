@@ -34,7 +34,7 @@ export const accessTokenInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(clonedRequest).pipe(
       catchError((error: HttpErrorResponse): Observable<never> => {
-        if (error.status === 401) { // Unauthorized
+        if (error.status === 498) { // Unauthorized
           authService.logout(); // Remove token (assuming logout() handles this)
           window.location.reload(); // Reload application
         }

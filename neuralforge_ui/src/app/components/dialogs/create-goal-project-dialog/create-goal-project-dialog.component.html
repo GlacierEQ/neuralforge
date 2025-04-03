@@ -5,6 +5,7 @@
       [projectData]="goalProject"
       submitButtonText="Create"
       cancelButtonText="Close"
+      [isExtraValid]="isFrequencyValid()"
       (formSubmit)="onSubmit($event)"
       (formCancel)="onClose()"
     >
@@ -13,7 +14,7 @@
         <h3>Goal Schedule</h3>
 
         <!-- Deadline Date Picker -->
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" class="full-width deadline-picker">
           <mat-label>Deadline</mat-label>
           <input
             matInput
@@ -34,7 +35,7 @@
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Practice Frequency (days per week)</mat-label>
           <mat-select
-            [(ngModel)]="goalProject.frequency"
+            [(ngModel)]="frequency"
             name="frequency"
             (selectionChange)="onFrequencyChange()"
             required
@@ -49,19 +50,22 @@
         </mat-form-field>
 
         <!-- Weekday Picker -->
-        <p class="section-label">
-          Select {{ goalProject.frequency }} days when you will practice:
-        </p>
-        <app-weekday-picker
-          [(selectedDays)]="goalProject.selectedDays"
-        ></app-weekday-picker>
+        <ng-container *ngIf="frequency < 7">
+          <p class="section-label">
+            Select {{ frequency }} days when you will practice:
+          </p>
+          <app-weekday-picker
+                  [(selectedDays)]="goalProject.selectedDays"
+          ></app-weekday-picker>
 
-        <div
-          class="validation-warning"
-          *ngIf="getSelectedDaysCount() !== goalProject.frequency"
-        >
-          Please select exactly {{ goalProject.frequency }} days.
-        </div>
+          <div
+                  class="validation-warning"
+                  *ngIf="getSelectedDaysCount() !== frequency"
+          >
+            Please select exactly {{ frequency }} days.
+          </div>
+        </ng-container>
+
       </div>
     </app-project-form>
   </mat-dialog-content>

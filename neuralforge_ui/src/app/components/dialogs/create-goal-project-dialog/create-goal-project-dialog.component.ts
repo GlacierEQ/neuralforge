@@ -13,12 +13,10 @@ import { MatInputModule } from "@angular/material/input";
 import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MatNativeDateModule } from "@angular/material/core";
 import { MatSelectModule } from "@angular/material/select";
+import {ProgrammedGoalProjectService} from "../../../services/programmed-goal-project.service";
+import {IProgrammedGoalProject, ProjectTypeEnum} from "../../../interfaces";
 
-export interface GoalProjectData extends ProjectFormData {
-  deadline: Date;
-  frequency: number;
-  selectedDays: boolean[];
-}
+
 
 @Component({
   selector: "app-create-goal-project-dialog",
@@ -26,9 +24,9 @@ export interface GoalProjectData extends ProjectFormData {
   templateUrl: "./create-goal-project-dialog.component.html",
   styleUrls: ["./create-goal-project-dialog.component.scss"],
   imports: [
-    CommonModule, 
-    MatDialogModule, 
-    ProjectFormComponent, 
+    CommonModule,
+    MatDialogModule,
+    ProjectFormComponent,
     WeekdayPickerComponent,
     FormsModule,
     MatFormFieldModule,
@@ -40,13 +38,26 @@ export interface GoalProjectData extends ProjectFormData {
 })
 export class CreateGoalProjectDialogComponent {
   private alertService = inject(AlertService);
+  private programmedGoalProjectService = inject(ProgrammedGoalProjectService)
+  public frequency:number = 3;
 
-  goalProject: GoalProjectData = {
+  goalProject: IProgrammedGoalProject = {
+    createdAt: null,
+    notify: false,
+    projectType: ProjectTypeEnum.PROGRAMMED_GOAL,
     name: "",
     description: "",
     deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default to 30 days from now
-    frequency: 3,
-    selectedDays: [false, false, false, false, false, false, false], // Mon-Sun
+    selectedDays: {
+      monday: false,
+      tuesday: false,
+      wednesday: false,
+      thursday: false,
+      friday: false,
+      saturday: false,
+      sunday: false
+    }
+
   };
 
   frequencies = [1, 2, 3, 4, 5, 6, 7];
@@ -54,32 +65,71 @@ export class CreateGoalProjectDialogComponent {
   constructor(private dialogRef: MatDialogRef<CreateGoalProjectDialogComponent>) {}
 
   onSubmit(projectData: ProjectFormData) {
-    const goalData: GoalProjectData = {
+
+    const goalData: IProgrammedGoalProject = {
+      createdAt: null,
+      notify: false,
+      projectType: ProjectTypeEnum.PROGRAMMED_GOAL,
       ...projectData, // This includes name and description from the form
       deadline: this.goalProject.deadline,
-      frequency: this.goalProject.frequency,
       selectedDays: this.goalProject.selectedDays
+
     };
 
-    this.alertService.displayAlert(
-      "success",
-      "Programmed Goal Project created successfully",
-      "center",
-      "top",
-      ["success-snackbar"]
-    );
+    console.log(goalData);
 
-    this.dialogRef.close(goalData);
+    this.programmedGoalProjectService.add(goalData).subscribe({
+      next: (response: any) => {
+        this.alertService.displayAlert(
+            "success",
+            "Programmed goal project created successfully",
+            "center",
+            "top",
+            ["success-snackbar"]
+        );
+
+        this.dialogRef.close(response);
+      },
+      error: (error: any) => {
+        this.alertService.displayAlert(
+            "error",
+            error.error?.exception || "Failed to create programmed goal project",
+            "center",
+            "top",
+            ["error-snackbar"]
+        );
+
+        console.error("Error creating project:", error);
+      },
+    });
   }
 
   onFrequencyChange(): void {
-    // Reset selected days
-    this.goalProject.selectedDays = [false, false, false, false, false, false, false];
+    this.goalProject.selectedDays = {
+      monday: false,
+      tuesday: false,
+      wednesday: false,
+      thursday: false,
+      friday: false,
+      saturday: false,
+      sunday: false
+    };
+
+    if (this.frequency === 7) {
+      Object.keys(this.goalProject.selectedDays).forEach(day => {
+        this.goalProject.selectedDays[day] = true;
+      });
+    }
+  }
+
+  isFrequencyValid(): boolean {
+    return this.frequency === 7 || this.getSelectedDaysCount() === this.frequency;
   }
 
   getSelectedDaysCount(): number {
-    return this.goalProject.selectedDays.filter(day => day).length;
+    return Object.values(this.goalProject.selectedDays).filter(day => day).length;
   }
+
 
   onClose() {
     this.dialogRef.close();

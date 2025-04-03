@@ -47,6 +47,7 @@ public class AuthenticationService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid email or password"));
 
         if (!user.getVerified()) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Account verification pending");
+        if (!user.getStatus()) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Your account has been disabled");
 
         try {
             authenticationManager.authenticate(

@@ -10,12 +10,14 @@ import { WeekdayPickerComponent } from "../../weekday-picker/weekday-picker.comp
 import { FormsModule } from "@angular/forms";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
+import {ISelectedDays} from "../../../interfaces";
 
 export interface StudyPlanData extends ProjectFormData {
-  selectedDays: boolean[];
+  selectedDays: ISelectedDays;
   dailyHours: number;
   weeksCount: number;
 }
+
 
 @Component({
   selector: "app-create-study-plan-dialog",
@@ -23,9 +25,9 @@ export interface StudyPlanData extends ProjectFormData {
   templateUrl: "./create-study-plan-dialog.component.html",
   styleUrls: ["./create-study-plan-dialog.component.scss"],
   imports: [
-    CommonModule, 
-    MatDialogModule, 
-    ProjectFormComponent, 
+    CommonModule,
+    MatDialogModule,
+    ProjectFormComponent,
     WeekdayPickerComponent,
     FormsModule,
     MatFormFieldModule,
@@ -38,7 +40,15 @@ export class CreateStudyPlanDialogComponent {
   studyPlan: StudyPlanData = {
     name: "",
     description: "",
-    selectedDays: [false, false, false, false, false, false, false], // Mon-Sun
+    selectedDays: {
+      monday: false,
+      tuesday: false,
+      wednesday: false,
+      thursday: false,
+      friday: false,
+      saturday: false,
+      sunday: false
+    },
     dailyHours: 1,
     weeksCount: 4,
   };
@@ -54,18 +64,18 @@ export class CreateStudyPlanDialogComponent {
     };
 
     this.alertService.displayAlert(
-      "success",
-      "Study plan created successfully",
-      "center",
-      "top",
-      ["success-snackbar"]
+        "success",
+        "Study plan created successfully",
+        "center",
+        "top",
+        ["success-snackbar"]
     );
 
     this.dialogRef.close(studyPlanData);
   }
 
   getSelectedDaysCount(): number {
-    return this.studyPlan.selectedDays.filter(day => day).length;
+    return Object.values(this.studyPlan.selectedDays).filter(day => day).length;
   }
 
   getTotalHours(): number {

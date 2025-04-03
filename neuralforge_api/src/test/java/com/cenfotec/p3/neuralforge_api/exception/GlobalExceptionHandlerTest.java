@@ -171,7 +171,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void givenExpiredJwtException_whenHandle_thenReturnUnauthorizedResponse() {
+    void givenExpiredJwtException_whenHandle_thenReturnCustomResponse() {
         // Given
         ExpiredJwtException exception = mock(ExpiredJwtException.class);
 
@@ -182,7 +182,7 @@ class GlobalExceptionHandlerTest {
             ResponseEntity<ExceptionResponse> response = exceptionHandler.handleExpiredJwtException(exception);
 
             // Then
-            assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+            assertEquals(498, response.getStatusCode().value());
             assertTrue(response.getBody() instanceof SingleExceptionResponse);
             assertEquals("The JWT token sent has already expired.", ((SingleExceptionResponse) response.getBody()).getException());
             assertEquals(requestId, response.getBody().getId());
