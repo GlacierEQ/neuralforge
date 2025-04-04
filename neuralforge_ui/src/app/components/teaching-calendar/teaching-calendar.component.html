@@ -1,30 +1,146 @@
-<mat-card class="calendar">
-  <div class="weeks-container">
-    <div *ngFor="let week of weeks" class="week-card">
-      <div class="week-header">
-        <h4>Week {{ week.weekNumber }}</h4>
-        <span class="week-range">{{ getWeekRange(week) }}</span>
-      </div>
+<div class="calendar-container">
+  <!-- Schedule generation controls -->
+  <div class="controls">
+    <div *ngIf="!hasSchedule() && !isGeneratingSchedule">
+      <button mat-raised-button color="primary" (click)="generateSchedule()">
+        <mat-icon>event_note</mat-icon>
+        Generate Schedule
+      </button>
+    </div>
 
-      <div class="days-grid">
-        <div
-          *ngFor="let day of week.days"
-          class="day-box"
-          [ngClass]="{ 'teaching-day': day.isTeachingDay }"
-        >
-          <div class="day-header">
-            <span class="day-name">{{ getDayName(day.date) }}</span>
-            <span class="day-date">{{ day.date | date : "MMM d" }}</span>
-          </div>
+    <div *ngIf="hasSchedule() && !isGeneratingSchedule">
+      <button mat-stroked-button color="primary" (click)="generateSchedule()">
+        <mat-icon>restart_alt</mat-icon>
+        Regenerate Schedule
+      </button>
+    </div>
 
-          <div class="topics-list" *ngIf="day.isTeachingDay">
-            <div *ngFor="let topic of day.topics" class="topic-item">
-              <mat-icon>book</mat-icon>
-              <span>{{ topic }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div *ngIf="isGeneratingSchedule" class="loading-spinner">
+      <mat-spinner diameter="36"></mat-spinner>
+      <span class="loading-text">Generating schedule...</span>
     </div>
   </div>
-</mat-card>
+
+  <!-- Toast message for materials -->
+  <div *ngIf="hasSchedule() && !hasMaterials()" class="material-warning">
+    <mat-icon color="warn">warning</mat-icon>
+    <span
+      >No course materials have been added. Consider adding PDFs or other
+      resources.</span
+    >
+  </div>
+
+  <!-- Week-based schedule display -->
+  <ng-container *ngIf="project && project.weeks && project.weeks.length > 0">
+    <div *ngFor="let week of project.weeks; let weekIndex = index">
+      <mat-card class="schedule-card">
+        <div class="week-header">
+          <h3>
+            Week {{ week.weekNumber }}
+            <span class="date-range">{{ getWeekRange(week) }}</span>
+          </h3>
+        </div>
+
+        <div class="sessions-container">
+          <mat-card
+            *ngFor="
+              let session of getSortedClassSessions(week);
+              let sessionIndex = index
+            "
+            class="session-card"
+          >
+            <div class="session-header">
+              <div class="day-info">
+                <mat-icon>today</mat-icon>
+                <h4>{{ getDayOfWeekName(session.dayOfWeek) }}</h4>
+                <span
+                  class="session-date"
+                  *ngIf="getSessionDate(week.weekNumber, session.dayOfWeek)"
+                >
+                  {{
+                    getSessionDate(week.weekNumber, session.dayOfWeek)
+                      | date : "MMM d, yyyy"
+                  }}
+                </span>
+              </div>
+            </div>
+
+            <div class="topics-container">
+              <ng-container *ngIf="session.topics.length > 0">
+                <div
+                  *ngFor="let topic of session.topics; let topicIndex = index"
+                  class="topic-item"
+                >
+                  <div class="topic-header">
+                    <span class="topic-title">{{ topic.title }}</span>
+                    <div class="topic-actions">
+                      <button
+                        mat-icon-button
+                        [disabled]="topicIndex === 0"
+                        (click)="
+                          moveTopicUp(weekIndex, sessionIndex, topicIndex)
+                        "
+                        matTooltip="Move up"
+                      >
+                        <mat-icon>arrow_upward</mat-icon>
+                      </button>
+
+                      <button
+                        mat-icon-button
+                        [disabled]="topicIndex === session.topics.length - 1"
+                        (click)="
+                          moveTopicDown(weekIndex, sessionIndex, topicIndex)
+                        "
+                        matTooltip="Move down"
+                      >
+                        <mat-icon>arrow_downward</mat-icon>
+                      </button>
+
+                      <button
+                        mat-icon-button
+                        (click)="
+                          moveTopic(
+                            week.weekNumber,
+                            session.id,
+                            topic.id,
+                            topic
+                          )
+                        "
+                        matTooltip="Move to different day"
+                      >
+                        <mat-icon>open_with</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="topic-details" *ngIf="topic.description">
+                    <p>{{ topic.description }}</p>
+                  </div>
+
+                  <div class="topic-duration" *ngIf="topic.durationMinutes">
+                    <mat-icon>schedule</mat-icon>
+                    <span>{{ topic.durationMinutes }} min</span>
+                  </div>
+                </div>
+              </ng-container>
+
+              <div class="no-topics" *ngIf="session.topics.length === 0">
+                <mat-icon>info</mat-icon>
+                <span>No topics scheduled for this session</span>
+              </div>
+            </div>
+          </mat-card>
+        </div>
+      </mat-card>
+    </div>
+  </ng-container>
+
+  <!-- No schedule message -->
+  <div *ngIf="!hasSchedule() && !isGeneratingSchedule" class="no-schedule">
+    <mat-icon>calendar_today</mat-icon>
+    <p>
+      No teaching schedule has been generated yet. Click the button above to
+      generate one.
+    </p>
+  </div>
+</div>

@@ -1,9 +1,29 @@
 import { CommonModule, DatePipe } from "@angular/common";
-import { Component, EventEmitter, Input, Output } from "@angular/core";
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
+import { MatDialog } from "@angular/material/dialog";
 import { MatIconModule } from "@angular/material/icon";
-import { ITeachingProject } from "../../interfaces";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { MatTooltipModule } from "@angular/material/tooltip";
+import { Subscription } from "rxjs";
+import {
+  IClassSession,
+  ICourseTopic,
+  ICourseWeek,
+  ITeachingProject,
+} from "../../interfaces";
+import { AlertService } from "../../services/alert.service";
+import { ProjectMaterialService } from "../../services/project-material.service";
+import { TeachingProjectService } from "../../services/teaching-project.service";
+import { MoveTopicDialogComponent } from "../dialogs/move-topic-dialog/move-topic-dialog.component";
 
 interface IWeek {
   weekNumber: number;
@@ -24,28 +44,168 @@ interface IWeek {
     MatCardModule,
     MatButtonModule,
     MatIconModule,
+    MatProgressSpinnerModule,
+    MatTooltipModule,
     DatePipe,
   ],
   templateUrl: "./teaching-calendar.component.html",
   styleUrls: ["./teaching-calendar.component.scss"],
 })
-export class TeachingCalendarComponent {
+export class TeachingCalendarComponent implements OnInit, OnDestroy {
   @Input() project: ITeachingProject | null = null;
   @Input() calendarStartDate: Date = new Date();
   @Output() calendarStartDateChange = new EventEmitter<Date>();
 
   weeks: IWeek[] = [];
+  isGeneratingSchedule = false;
+  private subscriptions: Subscription[] = [];
+
+  constructor(
+    private teachingProjectService: TeachingProjectService,
+    private alertService: AlertService,
+    private dialog: MatDialog,
+    private projectMaterialService: ProjectMaterialService
+  ) {}
 
   ngOnInit() {
     this.generateWeeks();
+
+    if (this.project?.id) {
+      this.subscriptions.push(
+        this.projectMaterialService.materialUpdates$.subscribe((update) => {
+          if (update && update.projectId === this.project?.id) {
+            this.teachingProjectService
+              .getById(this.project.id)
+              .subscribe((updatedProject) => {
+                if (this.project) {
+                  this.project.materials = updatedProject.materials;
+                }
+              });
+          }
+        })
+      );
+    }
   }
 
   ngOnChanges() {
     this.generateWeeks();
   }
 
+  ngOnDestroy() {
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
+  }
+
+  hasSchedule(): boolean {
+    return !!this.project?.weeks && this.project.weeks.length > 0;
+  }
+
+  hasMaterials(): boolean {
+    return !!this.project?.materials && this.project.materials.length > 0;
+  }
+
+  generateSchedule() {
+    if (!this.project?.id) return;
+
+    if (!this.hasMaterials()) {
+      this.alertService.displayAlert(
+        "warning",
+        "Please add materials to your project before generating a schedule",
+        "center",
+        "top",
+        ["warning-snackbar"]
+      );
+      return;
+    }
+
+    this.isGeneratingSchedule = true;
+
+    this.teachingProjectService.generateSchedule(this.project.id).subscribe({
+      next: (updatedProject) => {
+        if (this.project) {
+          this.project = updatedProject;
+          this.generateWeeks();
+        }
+        this.isGeneratingSchedule = false;
+        this.alertService.displayAlert(
+          "success",
+          "Schedule generated successfully",
+          "center",
+          "top",
+          ["success-snackbar"]
+        );
+      },
+      error: (error) => {
+        console.error("Error generating schedule:", error);
+        this.isGeneratingSchedule = false;
+        this.alertService.displayAlert(
+          "error",
+          "Failed to generate schedule. Please try again later.",
+          "center",
+          "top",
+          ["error-snackbar"]
+        );
+      },
+    });
+  }
+
+  moveTopic(
+    weekNumber: number,
+    sessionId: string,
+    topicId: string,
+    topic: ICourseTopic
+  ) {
+    if (!this.project?.weeks) return;
+
+    const dialogRef = this.dialog.open(MoveTopicDialogComponent, {
+      width: "450px",
+      data: {
+        topic,
+        currentWeekNumber: weekNumber,
+        currentSessionId: sessionId,
+        weeks: this.project.weeks,
+        projectStartDate: this.project.startDate,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.alertService.displayAlert(
+          "info",
+          "Move topic to different day not implemented yet",
+          "center",
+          "top",
+          ["info-snackbar"]
+        );
+      }
+    });
+  }
+
+  moveTopicUp(weekIndex: number, sessionIndex: number, topicIndex: number) {
+    this.alertService.displayAlert(
+      "info",
+      "Move topic up not implemented yet",
+      "center",
+      "top",
+      ["info-snackbar"]
+    );
+  }
+
+  moveTopicDown(weekIndex: number, sessionIndex: number, topicIndex: number) {
+    this.alertService.displayAlert(
+      "info",
+      "Move topic down not implemented yet",
+      "center",
+      "top",
+      ["info-snackbar"]
+    );
+  }
+
   private generateWeeks() {
     if (!this.project?.startDate || !this.project?.endDate) return;
+
+    if (this.project.weeks && this.project.weeks.length > 0) {
+      return;
+    }
 
     const startDate = new Date(this.project.startDate);
     const endDate = new Date(this.project.endDate);
@@ -78,7 +238,7 @@ export class TeachingCalendarComponent {
         days.push({
           date: new Date(weekDate),
           isTeachingDay,
-          topics: isTeachingDay ? [`Topic for ${dayName}`] : [], // This would come from your backend
+          topics: isTeachingDay ? [] : [],
         });
 
         weekDate.setDate(weekDate.getDate() + 1);
@@ -96,11 +256,90 @@ export class TeachingCalendarComponent {
     }
   }
 
-  getWeekRange(week: IWeek): string {
-    return `${week.startDate.toLocaleDateString("en-US", {
+  getDayOfWeekName(dayOfWeek: string): string {
+    const dayMapping: { [key: string]: string } = {
+      MONDAY: "Monday",
+      TUESDAY: "Tuesday",
+      WEDNESDAY: "Wednesday",
+      THURSDAY: "Thursday",
+      FRIDAY: "Friday",
+      SATURDAY: "Saturday",
+      SUNDAY: "Sunday",
+    };
+
+    return dayMapping[dayOfWeek] || dayOfWeek;
+  }
+
+  getSessionDate(weekNumber: number, dayOfWeek: string): Date | null {
+    if (!this.project?.startDate) return null;
+
+    const projectStartDate = new Date(this.project.startDate);
+
+    const dayMapping: { [key: string]: number } = {
+      MONDAY: 1,
+      TUESDAY: 2,
+      WEDNESDAY: 3,
+      THURSDAY: 4,
+      FRIDAY: 5,
+      SATURDAY: 6,
+      SUNDAY: 0,
+    };
+
+    const startDayOfWeek = projectStartDate.getDay();
+    const targetDayOfWeek = dayMapping[dayOfWeek];
+    if (targetDayOfWeek === undefined) return null;
+
+    let daysToAdd = (weekNumber - 1) * 7;
+    let daysDiff = targetDayOfWeek - startDayOfWeek;
+    if (daysDiff < 0) daysDiff += 7;
+    daysToAdd += daysDiff;
+
+    projectStartDate.setDate(projectStartDate.getDate() + daysToAdd);
+
+    return projectStartDate;
+  }
+
+  getSortedClassSessions(week: ICourseWeek): IClassSession[] {
+    if (!week.classSessions || week.classSessions.length === 0) {
+      return [];
+    }
+
+    return [...week.classSessions].sort((a, b) => {
+      const dateA = this.getSessionDate(week.weekNumber, a.dayOfWeek);
+      const dateB = this.getSessionDate(week.weekNumber, b.dayOfWeek);
+
+      if (!dateA || !dateB) {
+        const dayOrder = {
+          MONDAY: 1,
+          TUESDAY: 2,
+          WEDNESDAY: 3,
+          THURSDAY: 4,
+          FRIDAY: 5,
+          SATURDAY: 6,
+          SUNDAY: 7,
+        };
+
+        return (
+          dayOrder[a.dayOfWeek as keyof typeof dayOrder] -
+          dayOrder[b.dayOfWeek as keyof typeof dayOrder]
+        );
+      }
+
+      return dateA.getTime() - dateB.getTime();
+    });
+  }
+
+  getWeekRange(week: ICourseWeek): string {
+    const startDate = new Date(this.project?.startDate || new Date());
+    startDate.setDate(startDate.getDate() + (week.weekNumber - 1) * 7);
+
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 6);
+
+    return `${startDate.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
-    })} - ${week.endDate.toLocaleDateString("en-US", {
+    })} - ${endDate.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
     })}`;

@@ -1,0 +1,38 @@
+<h2 mat-dialog-title>Move Topic</h2>
+<mat-dialog-content>
+  <p>Select where to move "{{ data.topic.title }}"</p>
+
+  <div class="form-container">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Week</mat-label>
+      <mat-select [(ngModel)]="selectedWeekNumber">
+        <mat-option *ngFor="let week of data.weeks" [value]="week.weekNumber">
+          Week {{ week.weekNumber }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Session</mat-label>
+      <mat-select [(ngModel)]="selectedSessionId">
+        <mat-option
+          *ngFor="let session of getAvailableSessions()"
+          [value]="session.id"
+        >
+          {{ getDayOfWeekName(session.dayOfWeek) }}
+          <span *ngIf="getSessionDate(selectedWeekNumber, session.dayOfWeek)">
+            ({{
+              getSessionDate(selectedWeekNumber, session.dayOfWeek)
+                | date : "MMM d, yyyy"
+            }})
+          </span>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="false">Cancel</button>
+  <button mat-button color="primary" (click)="onSubmit()">Move</button>
+</mat-dialog-actions>

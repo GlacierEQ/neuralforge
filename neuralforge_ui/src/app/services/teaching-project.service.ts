@@ -29,4 +29,11 @@ export class TeachingProjectService extends BaseService<ITeachingProject> {
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.source}/${id}`);
   }
+
+  generateSchedule(projectId: string): Observable<ITeachingProject> {
+    return this.http.post<ITeachingProject>(
+      `${this.source}/${projectId}/generate-schedule`,
+      {}
+    );
+  }
 }

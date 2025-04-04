@@ -178,4 +178,28 @@ export interface ITeachingProject extends IProject {
   materials: ProjectMaterial[];
   startDate?: Date;
   endDate?: Date;
+  weeks?: ICourseWeek[];
+}
+
+export interface ICourseWeek {
+  id: string;
+  weekNumber: number;
+  classSessions: IClassSession[];
+}
+
+export interface IClassSession {
+  id: string;
+  dayOfWeek: string;
+  topics: ICourseTopic[];
+}
+
+export interface ICourseTopic {
+  id: string;
+  title: string;
+  description: string;
+  orderIndex: number;
+  durationMinutes: number;
+  teacherLocked: boolean;
+  sourceMaterials: ProjectMaterial[];
+  sourceReferences: { [key: string]: string };
 }
