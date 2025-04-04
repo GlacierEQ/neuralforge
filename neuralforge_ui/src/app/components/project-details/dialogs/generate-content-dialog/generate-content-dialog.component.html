@@ -15,8 +15,8 @@
         <mat-label>Type</mat-label>
         <mat-select formControlName="type" required>
           <mat-option value="SUMMARY">Summary</mat-option>
-          <mat-option value="ANALYSIS">Analysis</mat-option>
-          <mat-option value="REVIEW">Review</mat-option>
+          <!-- <mat-option value="ANALYSIS">Analysis</mat-option>
+          <mat-option value="REVIEW">Review</mat-option> -->
         </mat-select>
         <mat-error *ngIf="form.get('type')?.hasError('required')">
           Type is required
