@@ -31,7 +31,7 @@ public class NotificationEntity {
      * This establishes a many-to-one relationship with the UserEntity.
      * Cannot be null.
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private UserEntity user;
 

@@ -102,6 +102,13 @@ public class UserEntity implements UserDetails {
     private List<UserValidationEntity> validations;
 
     /**
+     * List of notifications associated with this user.
+     * When this user is deleted, all notifications will be automatically removed.
+     */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NotificationEntity> notifications;
+
+    /**
      * Retrieves the authorities granted to the user.
      * 
      * @return A collection of {@link GrantedAuthority} representing the user's permissions.

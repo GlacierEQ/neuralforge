@@ -10,6 +10,7 @@ import com.cenfotec.p3.neuralforge_api.model.resource.UserResource;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserRoleResource;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserValidationInputResource;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserValidationResource;
+import com.cenfotec.p3.neuralforge_api.repository.DynamicContentRepository;
 import com.cenfotec.p3.neuralforge_api.repository.UserRepository;
 import com.cenfotec.p3.neuralforge_api.repository.UserValidationRepository;
 import com.cenfotec.p3.neuralforge_api.util.ValidationUtil;
@@ -56,6 +57,9 @@ public class UserService {
 
     @Autowired
     protected NotificationService notificationService;
+
+    @Autowired
+    protected DynamicContentRepository dynamicContentRepository;
 
     /**
      * Mapper instance for handling user entity transformations.
@@ -174,7 +178,7 @@ public class UserService {
         NotificationResource welcomeNotification = NotificationResource.builder()
                 .userId(user.getId())
                 .title("Welcome to NeuralForge!")
-                .description("We’re excited to have you onboard. Let’s get learning.")
+                .description("We're excited to have you onboard. Let's get learning.")
                 .actionLabel("Start Exploring")
                 .redirectTo("/app/dashboard")
                 .dismissed(false)
@@ -192,8 +196,6 @@ public class UserService {
         notificationService.createNotification(welcomeNotification);
         notificationService.createNotification(profileReminder);
     }
-
-
 
     /**
      * Retrieves the currently authenticated user's information.
@@ -231,6 +233,7 @@ public class UserService {
     /**
      * Deletes the currently authenticated user's account.
      * Retrieves the current user from the security context and removes them from the database.
+     * Also cleans up any associated dynamic content.
      *
      * @throws ResponseStatusException if the user is not found.
      */
@@ -239,6 +242,9 @@ public class UserService {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
+        // Delete associated dynamic content before deleting the user
+        dynamicContentRepository.deleteByEmail(email);
+        
         userRepository.delete(user);
         // After deletion, the user will still be authenticated for the current request
         // The client-side should handle logging out and redirecting after successful deletion

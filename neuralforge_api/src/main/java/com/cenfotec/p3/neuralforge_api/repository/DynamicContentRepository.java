@@ -31,6 +31,15 @@ public interface DynamicContentRepository extends JpaRepository<DynamicContentEn
     List<DynamicContentEntity> findByEmail(String email);
 
     /**
+     * Deletes content entries by email.
+     *
+     * @param email The email of the user whose content should be deleted.
+     */
+    @Modifying
+    @Transactional
+    void deleteByEmail(String email);
+
+    /**
      * Finds a content entry by its ID.
      *
      * @param id The ID of the content.

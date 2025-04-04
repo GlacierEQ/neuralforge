@@ -1,33 +1,30 @@
-<h2 mat-dialog-title>Eliminar cuenta</h2>
+<h2 mat-dialog-title>Delete Account</h2>
 <mat-dialog-content>
   <p>
-    Esta acción eliminará permanentemente su cuenta y todos los datos asociados.
-    Esta acción no se puede deshacer.
+    This action will permanently delete your account and all associated data.
+    This action cannot be undone.
   </p>
-  <p>
-    Para confirmar, escriba <strong>Eliminar</strong> en el campo a
-    continuación:
-  </p>
+  <p>To confirm, type <strong>Delete</strong> in the field below:</p>
 
   <mat-form-field appearance="outline" class="full-width">
     <input
       matInput
       [formControl]="confirmationControl"
-      placeholder="Escriba 'Eliminar'"
+      placeholder="Type 'Delete'"
     />
     <mat-error *ngIf="confirmationControl.invalid"
-      >Debe escribir 'Eliminar' exactamente</mat-error
+      >You must type 'Delete' exactly</mat-error
     >
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-button mat-dialog-close>Cancel</button>
   <button
     mat-raised-button
     color="warn"
     [disabled]="confirmationControl.invalid"
     [mat-dialog-close]="true"
   >
-    Eliminar cuenta
+    Delete Account
   </button>
 </mat-dialog-actions>
