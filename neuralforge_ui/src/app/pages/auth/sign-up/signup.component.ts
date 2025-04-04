@@ -1,16 +1,16 @@
-import { CommonModule } from '@angular/common';
-import { Component, ViewChild } from '@angular/core';
-import { FormsModule, NgModel } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../../services/auth.service';
-import { IExceptionResponse, IUser } from '../../../interfaces';
-import { MatIconModule } from "@angular/material/icon";
-import { MatError, MatFormFieldModule } from "@angular/material/form-field";
-import { MatInputModule } from "@angular/material/input";
+import { CommonModule } from "@angular/common";
+import { Component, ViewChild } from "@angular/core";
+import { FormsModule, NgModel } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
+import { MatError, MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
+import { Router, RouterLink } from "@angular/router";
+import { IExceptionResponse, IUser } from "../../../interfaces";
+import { AuthService } from "../../../services/auth.service";
 
 @Component({
-  selector: 'app-signup',
+  selector: "app-signup",
   standalone: true,
   imports: [
     CommonModule,
@@ -20,17 +20,17 @@ import { MatButtonModule } from "@angular/material/button";
     MatError,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule // Added MatButtonModule
+    MatButtonModule, // Added MatButtonModule
   ],
-  templateUrl: './signup.component.html',
-  styleUrl: './signup.component.scss'
+  templateUrl: "./signup.component.html",
+  styleUrl: "./signup.component.scss",
 })
 export class SigUpComponent {
   public signUpError!: [String?];
-  @ViewChild('name') nameModel!: NgModel;
-  @ViewChild('lastname') lastnameModel!: NgModel;
-  @ViewChild('email') emailModel!: NgModel;
-  @ViewChild('password') passwordModel!: NgModel;
+  @ViewChild("name") nameModel!: NgModel;
+  @ViewChild("lastName") lastNameModel!: NgModel;
+  @ViewChild("email") emailModel!: NgModel;
+  @ViewChild("password") passwordModel!: NgModel;
 
   public user: IUser = {};
   public showPassword: boolean = false;
@@ -38,7 +38,11 @@ export class SigUpComponent {
   constructor(private router: Router, private authService: AuthService) {}
 
   public get isSignUpDisabled(): boolean {
-    return !this.nameModel?.valid || !this.emailModel?.valid || !this.passwordModel?.valid;
+    return (
+      !this.nameModel?.valid ||
+      !this.emailModel?.valid ||
+      !this.passwordModel?.valid
+    );
   }
 
   public togglePasswordVisibility(): void {
@@ -60,12 +64,14 @@ export class SigUpComponent {
     if (this.emailModel.valid && this.passwordModel.valid) {
       this.authService.signup(this.user).subscribe({
         next: () => {
-          this.router.navigate(['/verification'], { queryParams: { email: this.user.email } });
+          this.router.navigate(["/verification"], {
+            queryParams: { email: this.user.email },
+          });
         },
         error: (err: IExceptionResponse) => {
           this.signUpError = Array.isArray(err.error.exception)
-              ? err.error.exception
-              : [err.error.exception];
+            ? err.error.exception
+            : [err.error.exception];
         },
       });
     }

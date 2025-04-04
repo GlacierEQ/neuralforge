@@ -14,7 +14,7 @@ export interface IResponse<T> {
 export interface IUser {
   id?: string;
   name?: string;
-  lastname?: string;
+  lastName?: string;
   email?: string;
   password?: string;
   active?: boolean;

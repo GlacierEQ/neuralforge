@@ -1,3 +1,4 @@
+import { DatePipe, NgIf } from "@angular/common";
 import {
   AfterViewInit,
   Component,
@@ -6,26 +7,22 @@ import {
   Output,
   ViewChild,
   inject,
-} from '@angular/core';
-import { IUser } from '../../../interfaces';
-import {DatePipe, NgIf} from '@angular/common';
-import {
-  MatTableDataSource,
-  MatTableModule
-} from "@angular/material/table";
-import { MatPaginator, MatPaginatorModule } from "@angular/material/paginator";
-import { MatSort, MatSortModule } from "@angular/material/sort";
-import { MatIconModule } from "@angular/material/icon";
+} from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatChipsModule } from "@angular/material/chips";
+import { MatDialog } from "@angular/material/dialog";
 import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
-import { MatDialog } from '@angular/material/dialog';
-import { UserService } from '../../../services/user.service';
-import {ConfirmDialogComponent} from "../../dialogs/confirm-dialog/confirm-dialog.component";
+import { MatPaginator, MatPaginatorModule } from "@angular/material/paginator";
+import { MatSort, MatSortModule } from "@angular/material/sort";
+import { MatTableDataSource, MatTableModule } from "@angular/material/table";
+import { IUser } from "../../../interfaces";
+import { UserService } from "../../../services/user.service";
+import { ConfirmDialogComponent } from "../../dialogs/confirm-dialog/confirm-dialog.component";
 
 @Component({
-  selector: 'app-user-list',
+  selector: "app-user-list",
   standalone: true,
   imports: [
     MatTableModule,
@@ -37,17 +34,27 @@ import {ConfirmDialogComponent} from "../../dialogs/confirm-dialog/confirm-dialo
     MatInputModule,
     MatChipsModule,
     DatePipe,
-    NgIf
+    NgIf,
   ],
-  templateUrl: './user-list.component.html',
-  styleUrl: './user-list.component.scss',
+  templateUrl: "./user-list.component.html",
+  styleUrl: "./user-list.component.scss",
 })
 export class UserListComponent implements AfterViewInit {
-  @Input() title: string = '';
+  @Input() title: string = "";
   @Input() users: IUser[] = [];
   @Output() callBlockAction = new EventEmitter<IUser>();
 
-  displayedColumns: string[] = ['id', 'name', 'lastname', 'email', 'createdAt', 'role', 'status', 'verified', 'actions'];
+  displayedColumns: string[] = [
+    "id",
+    "name",
+    "lastName",
+    "email",
+    "createdAt",
+    "role",
+    "status",
+    "verified",
+    "actions",
+  ];
   dataSource!: MatTableDataSource<IUser>;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -71,14 +78,16 @@ export class UserListComponent implements AfterViewInit {
     const isBlocking = user.status;
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: isBlocking ? 'Block User' : 'Unblock User',
-        message: `Are you sure you want to ${isBlocking ? 'block' : 'unblock'} this user?`,
-        confirmText: isBlocking ? 'Block' : 'Unblock',
-        cancelText: 'Cancel'
-      }
+        title: isBlocking ? "Block User" : "Unblock User",
+        message: `Are you sure you want to ${
+          isBlocking ? "block" : "unblock"
+        } this user?`,
+        confirmText: isBlocking ? "Block" : "Unblock",
+        cancelText: "Cancel",
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.userService.toggleStatus(user.id!).subscribe(() => {
           location.reload();
