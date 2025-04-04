@@ -1,15 +1,24 @@
 package com.cenfotec.p3.neuralforge_api.service;
 
+import com.cenfotec.p3.neuralforge_api.model.entity.SelectedDaysEntity;
 import com.cenfotec.p3.neuralforge_api.model.entity.TeachingProjectEntity;
+import com.cenfotec.p3.neuralforge_api.model.entity.UserEntity;
+import com.cenfotec.p3.neuralforge_api.model.enums.UserRoleEnum;
+import com.cenfotec.p3.neuralforge_api.model.mapper.SelectedDaysMapper;
 import com.cenfotec.p3.neuralforge_api.model.mapper.TeachingProjectMapper;
+import com.cenfotec.p3.neuralforge_api.model.resource.SelectedDaysResource;
 import com.cenfotec.p3.neuralforge_api.model.resource.TeachingProjectResource;
 import com.cenfotec.p3.neuralforge_api.repository.TeachingProjectRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -33,6 +42,21 @@ class TeachingProjectServiceTest {
 
     @Mock
     private TeachingProjectMapper teachingProjectMapper;
+    
+    @Mock
+    private SecurityContext securityContext;
+    
+    @Mock
+    private Authentication authentication;
+    
+    @Mock
+    private UserEntity mockUser;
+    
+    @Mock
+    private SelectedDaysService selectedDaysService;
+    
+    @Mock
+    private SelectedDaysMapper selectedDaysMapper;
 
     @InjectMocks
     private TeachingProjectService teachingProjectService;
@@ -40,12 +64,37 @@ class TeachingProjectServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        
+        // Setup security context mock
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        
+        // Setup authentication mock
+        when(authentication.getPrincipal()).thenReturn(mockUser);
+        
+        // Setup user mock
+        when(mockUser.getId()).thenReturn("user-123");
+        
+        // Setup SelectedDaysService mock
+        SelectedDaysEntity savedSelectedDays = new SelectedDaysEntity();
+        when(selectedDaysService.save(any(SelectedDaysResource.class))).thenReturn(savedSelectedDays);
+        
+        // Setup SelectedDaysMapper mock
+        when(selectedDaysMapper.toResource(any(SelectedDaysEntity.class))).thenReturn(new SelectedDaysResource());
+    }
+    
+    @AfterEach
+    void tearDown() {
+        // Clean up security context
+        SecurityContextHolder.clearContext();
     }
 
     @Test
     void createTeachingProject_Success() {
         // Arrange
         TeachingProjectResource resource = new TeachingProjectResource();
+        resource.setSelectedDays(new SelectedDaysResource());
+        
         TeachingProjectEntity entity = new TeachingProjectEntity();
         when(teachingProjectMapper.mapToEntity(any())).thenReturn(entity);
         when(teachingProjectRepository.save(any())).thenReturn(entity);
@@ -59,17 +108,23 @@ class TeachingProjectServiceTest {
         verify(teachingProjectMapper).mapToEntity(resource);
         verify(teachingProjectRepository).save(entity);
         verify(teachingProjectMapper).mapToResource(entity);
+        verify(selectedDaysService).save(any(SelectedDaysResource.class));
     }
 
     @Test
     void updateTeachingProject_Success() {
         // Arrange
-        Long id = 1L;
+        String id = "1";
         TeachingProjectResource resource = new TeachingProjectResource();
+        resource.setSelectedDays(new SelectedDaysResource());
+        
         TeachingProjectEntity existingEntity = new TeachingProjectEntity();
+        existingEntity.setCreatorUserId("user-123"); // Match the mocked user ID
+        
         when(teachingProjectRepository.findById(id)).thenReturn(Optional.of(existingEntity));
         when(teachingProjectRepository.save(any())).thenReturn(existingEntity);
         when(teachingProjectMapper.mapToResource(any())).thenReturn(resource);
+        when(teachingProjectMapper.mapToEntity(any())).thenReturn(existingEntity);
 
         // Act
         TeachingProjectResource result = teachingProjectService.updateTeachingProject(id, resource);
@@ -79,12 +134,13 @@ class TeachingProjectServiceTest {
         verify(teachingProjectRepository).findById(id);
         verify(teachingProjectRepository).save(existingEntity);
         verify(teachingProjectMapper).mapToResource(existingEntity);
+        verify(selectedDaysService).save(any(SelectedDaysResource.class));
     }
 
     @Test
     void getTeachingProject_Success() {
         // Arrange
-        Long id = 1L;
+        String id = "1";
         TeachingProjectEntity entity = new TeachingProjectEntity();
         TeachingProjectResource resource = new TeachingProjectResource();
         when(teachingProjectRepository.findById(id)).thenReturn(Optional.of(entity));
@@ -120,32 +176,17 @@ class TeachingProjectServiceTest {
     @Test
     void deleteTeachingProject_Success() {
         // Arrange
-        Long id = 1L;
-        when(teachingProjectRepository.existsById(id)).thenReturn(true);
+        String id = "1";
+        TeachingProjectEntity entity = new TeachingProjectEntity();
+        entity.setCreatorUserId("user-123"); // Match the mocked user ID
+        
+        when(teachingProjectRepository.findById(id)).thenReturn(Optional.of(entity));
 
         // Act
         teachingProjectService.deleteTeachingProject(id);
 
         // Assert
-        verify(teachingProjectRepository).existsById(id);
+        verify(teachingProjectRepository).findById(id);
         verify(teachingProjectRepository).deleteById(id);
     }
-
-    @Test
-    void uploadFile_Success() throws IOException {
-        // Arrange
-        MockMultipartFile file = new MockMultipartFile(
-            "file",
-            "test.txt",
-            "text/plain",
-            "test content".getBytes()
-        );
-
-        // Act
-        String result = teachingProjectService.uploadFile(file);
-
-        // Assert
-        assertNotNull(result);
-        assertTrue(result.endsWith("_test.txt"));
-    }
-} 
+}

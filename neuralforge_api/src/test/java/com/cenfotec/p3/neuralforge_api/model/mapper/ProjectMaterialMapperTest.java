@@ -1,5 +1,6 @@
 package com.cenfotec.p3.neuralforge_api.model.mapper;
 
+import com.cenfotec.p3.neuralforge_api.model.entity.ProjectEntity;
 import com.cenfotec.p3.neuralforge_api.model.entity.ProjectMaterialEntity;
 import com.cenfotec.p3.neuralforge_api.model.resource.ProjectMaterialResource;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Test class for ProjectMaterialMapper.
@@ -28,13 +30,17 @@ class ProjectMaterialMapperTest {
     @Test
     void mapToResource_Success() {
         // Arrange
+        ProjectEntity mockProject = mock(ProjectEntity.class);
+        when(mockProject.getId()).thenReturn("project-123");
+        
         ProjectMaterialEntity entity = new ProjectMaterialEntity();
-        entity.setId(1L);
+        entity.setId("123");
         entity.setType("PDF");
         entity.setFileName("test.pdf");
         entity.setFileUrl("http://example.com/test.pdf");
         entity.setDescription("Test Description");
         entity.setHyperlink("http://example.com");
+        entity.setProject(mockProject);
 
         // Act
         ProjectMaterialResource result = projectMaterialMapper.mapToResource(entity);
@@ -47,18 +53,20 @@ class ProjectMaterialMapperTest {
         assertEquals(entity.getFileUrl(), result.getFileUrl());
         assertEquals(entity.getDescription(), result.getDescription());
         assertEquals(entity.getHyperlink(), result.getHyperlink());
+        assertEquals(mockProject.getId(), result.getProjectId());
     }
 
     @Test
     void mapToEntity_Success() {
         // Arrange
         ProjectMaterialResource resource = new ProjectMaterialResource();
-        resource.setId(1L);
+        resource.setId("123");
         resource.setType("PDF");
         resource.setFileName("test.pdf");
         resource.setFileUrl("http://example.com/test.pdf");
         resource.setDescription("Test Description");
         resource.setHyperlink("http://example.com");
+        resource.setProjectId("project-123");
 
         // Act
         ProjectMaterialEntity result = projectMaterialMapper.mapToEntity(resource);
