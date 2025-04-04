@@ -1,3 +1,11 @@
+@use "@angular/material" as mat;
+@use "sass:map";
+@use "../../../../styles.scss" as theme;
+
+$primary-color: mat.get-color-from-palette(theme.$my-primary, 500);
+$accent-color: mat.get-color-from-palette(theme.$my-accent, 500);
+$primary-contrast: map.get(map.get(theme.$my-primary, contrast), 500);
+
 :host {
   display: block;
   width: 100%;
@@ -35,7 +43,8 @@
   white-space: pre-line;
 }
 
-.project-info-card {
+.project-info-card,
+.project-progress-card {
   background: #fff;
   padding: 1.5rem;
   border-radius: 1rem;
@@ -47,15 +56,73 @@
     font-size: 1.25rem;
     font-weight: 500;
     margin-bottom: 1rem;
+    color: #2b2b2b;
+  }
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background-color: rgba($primary-color, 0.05);
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba($primary-color, 0.08);
   }
 
-  p {
-    font-family: "Montserrat", sans-serif;
-    margin-bottom: 0.75rem;
+  mat-icon {
+    color: $primary-color;
+  }
 
-    strong {
-      font-weight: 500;
+  .info-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .info-label {
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 0.25rem;
+  }
+
+  .info-value {
+    font-weight: 500;
+    color: #333;
+  }
+}
+
+.progress-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem;
+
+  .progress-message {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    color: #666;
+
+    mat-icon {
+      color: $primary-color;
     }
+  }
+
+  button {
+    padding: 0.5rem 1.5rem;
+    font-family: "Poppins", sans-serif;
   }
 }
 

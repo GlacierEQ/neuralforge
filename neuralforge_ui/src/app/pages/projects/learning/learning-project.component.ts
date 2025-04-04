@@ -146,4 +146,17 @@ export class LearningProjectComponent implements OnInit {
       }
     });
   }
+
+  goToMaterials(): void {
+    const materialsTabIndex = 1;
+    const tabGroup = document.querySelector("mat-tab-group");
+    if (tabGroup) {
+      const tabHeader = tabGroup.querySelector(
+        `.mat-mdc-tab:nth-child(${materialsTabIndex + 1})`
+      );
+      if (tabHeader) {
+        (tabHeader as HTMLElement).click();
+      }
+    }
+  }
 }

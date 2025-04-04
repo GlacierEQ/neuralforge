@@ -8,17 +8,55 @@
     (deleteProject)="onDeleteProject()"
   >
     <ng-template #overviewContent>
-      <div class="project-info-card">
-        <h2>Project Details</h2>
-        <ng-container *ngIf="project">
-          <p>
-            <strong>Created:</strong>
-            {{ project.createdAt | date : "longDate" }}
-          </p>
-          <p><strong>Project Type:</strong> Learning Project</p>
-          <p><strong>Creator ID:</strong> {{ project.creatorUserId }}</p>
-        </ng-container>
-      </div>
+      <ng-container *ngIf="project">
+        <mat-card class="project-info-card">
+          <h2>Learning Journey</h2>
+          <div class="info-grid">
+            <div class="info-item">
+              <mat-icon>calendar_today</mat-icon>
+              <div class="info-content">
+                <span class="info-label">Created On</span>
+                <span class="info-value">{{
+                  project.createdAt | date : "longDate"
+                }}</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <mat-icon>update</mat-icon>
+              <div class="info-content">
+                <span class="info-label">Last Modified</span>
+                <span class="info-value">{{
+                  project.lastModifiedAt
+                    ? (project.lastModifiedAt | date : "longDate")
+                    : "Never"
+                }}</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <mat-icon>category</mat-icon>
+              <div class="info-content">
+                <span class="info-label">Project Type</span>
+                <span class="info-value">Learning Project</span>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+
+        <mat-card class="project-progress-card">
+          <h2>Learning Progress</h2>
+          <div class="progress-section">
+            <p class="progress-message">
+              <mat-icon>lightbulb</mat-icon>
+              Track your learning journey and add materials to enhance your
+              knowledge.
+            </p>
+            <button mat-raised-button color="primary" (click)="goToMaterials()">
+              <mat-icon>library_books</mat-icon>
+              View Materials
+            </button>
+          </div>
+        </mat-card>
+      </ng-container>
     </ng-template>
   </app-project-details>
 </ng-container>
