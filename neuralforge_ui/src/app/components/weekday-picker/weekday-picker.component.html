@@ -1,0 +1,11 @@
+<div class="day-buttons">
+  <button
+          type="button"
+          *ngFor="let day of weekdays"
+          class="day-button"
+          [class.selected]="selectedDays[day.key]"
+          (click)="toggleDay(day.key)"
+  >
+    {{ day.label }}
+  </button>
+</div>

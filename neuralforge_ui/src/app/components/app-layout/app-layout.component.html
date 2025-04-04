@@ -1,0 +1,44 @@
+<div class="ltr">
+  <div class="page-wrapper compact-wrapper">
+
+    <div class="page-body-wrapper">
+      <div
+        class="sidebar-wrapper"
+        sidebar-layout="default-sidebar"
+        icon="stroke-svg"
+        [ngClass]="{ close_icon: !layoutService.sidebarOpen }"
+        
+      >
+        <app-sidebar></app-sidebar>
+      </div>
+
+      <div class="page-body">
+
+        <main class="container-fluid">
+          <router-outlet></router-outlet>
+        </main>
+      </div>
+      <footer class="footer">
+        <div class="container footer-container">
+          <div class="about-us">
+            <h5>Sobre Nosotros</h5>
+            <ul>
+              <li><a href="#">Empresa</a></li>
+              <li><a href="#">Proyectos</a></li>
+              <li><a href="#">Equipo</a></li>
+            </ul>
+          </div>
+          <div class="footer-logo">
+            <img src="../../../../assets/icons/logo@2x.png" alt="Footer Logo">
+          </div>
+        </div>
+        <p>© 2025 P3 Solutions. All rights reserved.</p>
+      </footer>
+    </div>
+  </div>
+</div>
+
+<!-- <div
+  class="bg-overlay"
+  [ngClass]="{ active: layoutService.sidebarOpen }"
+></div> -->

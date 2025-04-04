@@ -1,0 +1,137 @@
+@use '@angular/material' as mat;
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-image:url("../../../../assets/img/login/Login-background.png");
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 1); // Semi-transparent white
+  backdrop-filter: blur(15px); // Blurry effect
+  -webkit-backdrop-filter: blur(15px); // Ensure cross-browser support
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  animation: fadeIn 0.5s ease-in-out;
+
+  h4 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+
+  .subtext {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+
+  .forgot-password {
+    text-align: right;
+    font-size: 14px;
+    margin-bottom: 15px;
+
+    a {
+      text-decoration: none;
+      color: #4a62bd;
+      font-weight: 500;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  button {
+    width: 100%;
+    font-size: 16px;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+
+  .error-message {
+    color: #d32f2f;
+    font-size: 14px;
+    margin:  20px 0px;
+  }
+
+  .signup-link {
+    font-size: 14px;
+    margin-top: 15px;
+
+    a {
+      color: #28C76F;
+      font-weight: 600;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// Fade-in animation
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive design
+@media (max-width: 480px) {
+  .login-card {
+    padding: 1.5rem;
+  }
+}
+
+.google-login-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px; // Adds spacing
+}
+
+.g_id_signin {
+  width: 280px !important;  // Fixed width (adjust as needed)
+  height: 50px !important;  // Fixed height
+  font-size: 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+  color: #494949FF;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.separator::before,
+.separator::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #494949FF;
+  margin: 0 10px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 5px 0 ;
+}

@@ -1,0 +1,67 @@
+<div class="login-container">
+    <div class="login-card">
+        <div class="w-100">
+            <!-- Success Message -->
+            <mat-card *ngIf="successMessage" class="success-message">
+                {{ successMessage }}
+            </mat-card>
+
+            <form (ngSubmit)="submitForm($event)" autocomplete="off" #frm="ngForm">
+                <div class="text-center">
+                    <h1>Verify Your Email</h1>
+                    <p class="subtext">Check your inbox and enter the verification code.</p>
+                </div>
+
+                <!-- Validation Errors -->
+                <div *ngIf="validationErrors?.length" class="error-message">
+                    <ul>
+                        <li *ngFor="let error of validationErrors">{{ error }}</li>
+                    </ul>
+                </div>
+
+                <!-- Email Input -->
+                <mat-form-field appearance="outline" class="w-100 no-margin-field">
+                    <mat-label>Email Address</mat-label>
+                    <input
+                            matInput
+                            #email="ngModel"
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="Insert your email"
+                            [(ngModel)]="validationRequest.email"
+                            [disabled]="hasEmailParam"
+                            required
+                    />
+                    <mat-error *ngIf="email.invalid && email.touched">
+                        Please enter a valid email
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Verification Code Input -->
+                <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Verification Code</mat-label>
+                    <input
+                            matInput
+                            #verificationCode="ngModel"
+                            type="number"
+                            id="verificationCode"
+                            name="verificationCode"
+                            placeholder="Enter code"
+                            [(ngModel)]="validationRequest.verificationCode"
+                            required
+                    />
+                    <mat-error *ngIf="verificationCode.invalid && verificationCode.touched">
+                        Please enter a valid verification code
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Submit Button -->
+                <button mat-raised-button color="primary" class="w-100" type="submit" [disabled]="isSubmitDisabled()">
+                    Submit
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+

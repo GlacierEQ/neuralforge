@@ -1,0 +1,48 @@
+<form #projectForm="ngForm" class="form">
+  <!-- Project Name -->
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Name</mat-label>
+    <input
+      matInput
+      name="name"
+      #name="ngModel"
+      [(ngModel)]="projectData.name"
+      required
+    />
+    <mat-error *ngIf="name.invalid && name.touched">
+      Name is required
+    </mat-error>
+  </mat-form-field>
+
+  <!-- Description -->
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Description</mat-label>
+    <textarea
+      matInput
+      name="description"
+      #description="ngModel"
+      [(ngModel)]="projectData.description"
+      class="description-field"
+    ></textarea>
+  </mat-form-field>
+
+  <!-- Slot for additional fields -->
+  <ng-content></ng-content>
+
+  <!-- Action buttons -->
+  <div class="form-actions">
+    <button mat-button color="warn" type="button" (click)="onCancel()">
+      {{ cancelButtonText }}
+    </button>
+    <button
+            mat-raised-button
+            color="primary"
+            type="button"
+            [disabled]="projectForm.invalid || !isExtraValid"
+            (click)="onSubmit(projectForm)"
+    >
+      {{ submitButtonText }}
+    </button>
+
+  </div>
+</form>

@@ -1,0 +1,12 @@
+<div class="gestion-card">
+  <div class="content">
+    <h2>{{ title }}</h2>
+    <p>{{ content }}</p>
+  </div>
+
+  <div class="actions">
+    <button *ngFor="let btn of buttons" [ngStyle]="{'background-color': btn.color}">
+      {{ btn.text }}
+    </button>
+  </div>
+</div>

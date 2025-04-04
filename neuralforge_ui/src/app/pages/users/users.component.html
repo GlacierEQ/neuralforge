@@ -1,0 +1,16 @@
+@defer {
+  <div class="">
+    <div class="">
+      <div class="d-flex justify-content-between align-items-center">
+      </div>
+    </div>
+    <div class="">
+      <app-user-list
+        (callBlockAction)="userService.block($event)"
+        [users]="userService.users$()"
+      />
+    </div>
+  </div>
+} @loading (minimum 1.5s) {
+  <app-loader></app-loader>
+}

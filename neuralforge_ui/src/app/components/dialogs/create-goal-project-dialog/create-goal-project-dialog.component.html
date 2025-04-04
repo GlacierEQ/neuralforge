@@ -1,0 +1,72 @@
+<div class="wrapper">
+  <h2 mat-dialog-title>Create Programmed Goal Project</h2>
+  <mat-dialog-content>
+    <app-project-form
+      [projectData]="goalProject"
+      submitButtonText="Create"
+      cancelButtonText="Close"
+      [isExtraValid]="isFrequencyValid()"
+      (formSubmit)="onSubmit($event)"
+      (formCancel)="onClose()"
+    >
+      <!-- Goal Project specific fields -->
+      <div class="goal-project-fields">
+        <h3>Goal Schedule</h3>
+
+        <!-- Deadline Date Picker -->
+        <mat-form-field appearance="outline" class="full-width deadline-picker">
+          <mat-label>Deadline</mat-label>
+          <input
+            matInput
+            [matDatepicker]="deadlinePicker"
+            [(ngModel)]="goalProject.deadline"
+            name="deadline"
+            required
+          />
+          <mat-hint>Select the target completion date</mat-hint>
+          <mat-datepicker-toggle
+            matIconSuffix
+            [for]="deadlinePicker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #deadlinePicker></mat-datepicker>
+        </mat-form-field>
+
+        <!-- Practice Frequency -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Practice Frequency (days per week)</mat-label>
+          <mat-select
+            [(ngModel)]="frequency"
+            name="frequency"
+            (selectionChange)="onFrequencyChange()"
+            required
+          >
+            <mat-option *ngFor="let freq of frequencies" [value]="freq">
+              {{ freq }} {{ freq === 1 ? "day" : "days" }} per week
+            </mat-option>
+          </mat-select>
+          <mat-hint
+            >Select how many days per week you want to practice</mat-hint
+          >
+        </mat-form-field>
+
+        <!-- Weekday Picker -->
+        <ng-container *ngIf="frequency < 7">
+          <p class="section-label">
+            Select {{ frequency }} days when you will practice:
+          </p>
+          <app-weekday-picker
+                  [(selectedDays)]="goalProject.selectedDays"
+          ></app-weekday-picker>
+
+          <div
+                  class="validation-warning"
+                  *ngIf="getSelectedDaysCount() !== frequency"
+          >
+            Please select exactly {{ frequency }} days.
+          </div>
+        </ng-container>
+
+      </div>
+    </app-project-form>
+  </mat-dialog-content>
+</div>

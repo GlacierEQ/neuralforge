@@ -1,0 +1,67 @@
+<mat-sidenav-container class="sidebar-container">
+  <mat-sidenav
+          #sidenav
+          [opened]="isSidebarOpen"
+          mode="over"
+          class="sidebar"
+          [@slideInOut]="isSidebarOpen ? 'open' : 'closed'">
+
+    <div class="sidebar-header">
+      <a routerLink="/" class="logo-container" (click)="closeSidebar()">
+        <div class="logo-wrapper">
+          <img src="../../../../../assets/icons/logo@2x.png" width="80" alt="Logo" />
+          <span class="logo-text">NeuralForge</span>
+        </div>
+      </a>
+      <div class="sidebar-divider"></div>
+    </div>
+
+    <mat-nav-list>
+      <ng-container *ngFor="let route of permittedRoutes">
+        <ng-container *ngIf="route.data?.showInSidebar">
+          <a mat-list-item routerLink="{{ route.path }}" (click)="closeSidebar()" routerLinkActive="active">
+            <span>{{ route.data?.name }}</span>
+          </a>
+        </ng-container>
+      </ng-container>
+    </mat-nav-list>
+
+    <div class="sidebar-footer">
+      <button mat-button class="sidebar-button"
+              [ngClass]="{ 'has-notifications': notificationCount > 0 }"
+              (click)="toggleNotifications()">
+        <mat-icon>notifications</mat-icon>
+        <span>Notifications</span>
+        <span *ngIf="notificationCount > 0" class="notification-badge">
+    {{ notificationCount > 99 ? '99+' : notificationCount }}
+  </span>
+      </button>
+
+
+      <button mat-button routerLink="/app/profile" (click)="closeSidebar()" class="sidebar-button">
+        <mat-icon>person</mat-icon>
+        <span>{{ this.userName }}</span>
+      </button>
+
+      <button mat-button (click)="logout()" class="sidebar-button">
+        <mat-icon>exit_to_app</mat-icon>
+        <span>Logout</span>
+      </button>
+    </div>
+  </mat-sidenav>
+
+  <div class="overlay" *ngIf="isSidebarOpen" (click)="toggleSidebar()"></div>
+</mat-sidenav-container>
+
+<button class="toggle-button" [ngClass]="{ 'open': isSidebarOpen, 'closed': !isSidebarOpen }" (click)="toggleSidebar()">
+  <mat-icon>{{ isSidebarOpen ? 'chevron_left' : 'chevron_right' }}</mat-icon>
+</button>
+
+<app-notification-overlay
+        *ngIf="showNotifications"
+        [notifications]="notifications"
+        [allNotifications]="allNotifications"
+        (dismiss)="dismissNotification($event)"
+        (close)="showNotifications = false"
+></app-notification-overlay>
+

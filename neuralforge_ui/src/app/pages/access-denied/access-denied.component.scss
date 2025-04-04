@@ -1,0 +1,23 @@
+.access-denied-container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e3eafc, #c3f0d5);
+  font-family: 'Poppins', sans-serif;
+}
+
+.access-denied-card {
+  background: white;
+  padding: 3rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+
+  a[mat-raised-button] {
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+}

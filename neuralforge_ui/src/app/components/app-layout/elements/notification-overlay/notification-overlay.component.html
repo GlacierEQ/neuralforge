@@ -1,0 +1,89 @@
+<div class="overlay-backdrop" (click)="onBackdropClick($event)">
+    <mat-card class="notification-card">
+        <div class="notification-header">
+            <h2>Notifications</h2>
+            <button mat-icon-button (click)="close.emit()" aria-label="Close overlay">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <mat-button-toggle-group
+                name="notificationView"
+                [(ngModel)]="viewMode"
+                class="notification-toggle"
+                exclusive
+        >
+            <mat-button-toggle value="new">New</mat-button-toggle>
+            <mat-button-toggle value="all">All</mat-button-toggle>
+        </mat-button-toggle-group>
+
+        <!-- Scrollable Content Area -->
+        <div class="notification-scrollable-content">
+            <!-- 🔹 New Notifications -->
+            <div class="notification-section" *ngIf="viewMode === 'new'">
+                <div *ngIf="notifications.length === 0" class="empty-message">
+                    You have no new notifications
+                </div>
+
+                <div
+                        class="notification-item"
+                        *ngFor="let notification of notifications"
+                        [@fadeOut]
+                >
+                    <div class="notification-content">
+                        <h3>{{ notification.title }}</h3>
+                        <p>{{ notification.description }}</p>
+                    </div>
+
+                    <div class="notification-actions">
+                        <button
+                                *ngIf="notification.actionLabel && notification.redirectTo"
+                                mat-stroked-button
+                                color="primary"
+                                (click)="handleAction(notification)"
+                        >
+                            {{ notification.actionLabel }}
+                        </button>
+
+                        <button
+                                mat-icon-button
+                                color="warn"
+                                (click)="dismiss.emit(notification.id)"
+                        >
+                            <mat-icon>close</mat-icon>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🔸 All Notifications -->
+            <div class="notification-section" *ngIf="viewMode === 'all'">
+                <div *ngIf="allNotifications.length === 0" class="empty-message">
+                    No notifications found
+                </div>
+
+                <div class="notification-item" *ngFor="let notification of allNotifications">
+                    <div class="notification-content">
+                        <h3>{{ notification.title }}</h3>
+                        <p>{{ notification.description }}</p>
+                    </div>
+
+                    <div
+                            class="notification-actions"
+                            *ngIf="notification.actionLabel && notification.redirectTo"
+                    >
+                        <button
+                                mat-stroked-button
+                                color="primary"
+                                (click)="handleAction(notification)"
+                        >
+                            {{ notification.actionLabel }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-card>
+</div>

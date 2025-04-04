@@ -1,0 +1,35 @@
+<mat-card class="calendar">
+    <div class="calendar-header">
+        <button mat-icon-button (click)="goBack()" [disabled]="isPrevMonthBeforeCreatedAt()">
+            <mat-icon>chevron_left</mat-icon>
+        </button>
+        <h3 class="current-month">{{ getCurrentMonth() }}</h3>
+        <button mat-icon-button (click)="goForward()" [disabled]="isNextMonthBeyondDeadline()">
+            <mat-icon>chevron_right</mat-icon>
+        </button>
+        <button mat-stroked-button class="reset-btn" (click)="resetToToday()">Today</button>
+    </div>
+
+    <div class="calendar-labels">
+        <div *ngFor="let label of ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']" class="day-label">
+            {{ label }}
+        </div>
+    </div>
+
+    <div class="day-grid">
+        <div
+                *ngFor="let day of getCalendarDays()"
+                class="day-box"
+                [ngClass]="{
+        'study-day': day.isStudyDay,
+        'deadline': day.isDeadline,
+        'today': day.isToday,
+        'empty': !day.date
+      }"
+        >
+            <ng-container *ngIf="day.date">
+                <div>{{ day.date | date: 'd' }}</div>
+            </ng-container>
+        </div>
+    </div>
+</mat-card>

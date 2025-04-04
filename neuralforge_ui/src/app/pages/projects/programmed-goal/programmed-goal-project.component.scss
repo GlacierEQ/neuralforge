@@ -1,0 +1,167 @@
+@use "@angular/material" as mat;
+@use "sass:map";
+@use "../../../../styles.scss" as theme;
+
+$primary-color: mat.get-color-from-palette(theme.$my-primary, 500);
+$accent-color: mat.get-color-from-palette(theme.$my-accent, 500);
+$primary-contrast: map.get(map.get(theme.$my-primary, contrast), 500);
+
+:host {
+  display: block;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  font-family: "Poppins", sans-serif;
+  color: #333;
+  background-color: #f9f9fc;
+}
+
+.project-header {
+  background: #ffffff;
+  color: $primary-contrast;
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+
+  h1 {
+    font-weight: 500;
+    margin: 0;
+  }
+}
+
+.project-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+  h1 {
+    color: #2b2b2b;
+  }
+}
+
+.project-description {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  color: #2b2b2b;
+}
+
+.days-left-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: $primary-color;
+  margin: 0;
+  text-align: center;
+}
+
+.deadline {
+  color: #666;
+  font-family: "Montserrat", sans-serif;
+  margin-top: 10px;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.deadline-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  margin-bottom: 1.5rem;
+}
+
+.overview-tab {
+  padding: 2rem;
+}
+
+.config-actions {
+  padding: 2rem;
+  max-height: none;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+
+  button {
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    width: 30%;
+  }
+}
+
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+  font-style: italic;
+  font-family: "Poppins";
+  color: #aaa;
+}
+
+.dynamic-content-wrapper {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 16px;
+  padding: 10px 20px;
+  display: flex;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  margin-bottom: 1.5rem;
+}
+
+.custom-card {
+  flex: 0 0 250px;
+  max-width: 300px;
+  min-width: 250px;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+mat-card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  font-family: "Poppins";
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+mat-card-content p {
+  font-size: 1rem;
+  font-family: "Poppins";
+  margin: 0.5rem 0;
+  color: #444;
+  text-align: center;
+}
+
+.content-type {
+  color: #32468e;
+  font-weight: bold;
+}
+
+mat-card-content a button {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.2rem;
+  color: #666;
+  background: #f9f9fc;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}

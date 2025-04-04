@@ -1,0 +1,61 @@
+<div class="wrapper">
+  <h2 mat-dialog-title>Create Study Plan</h2>
+  <mat-dialog-content>
+    <app-project-form
+      [projectData]="studyPlan"
+      submitButtonText="Create"
+      cancelButtonText="Close"
+      (formSubmit)="onSubmit($event)"
+      (formCancel)="onClose()"
+    >
+      <!-- Study Plan specific fields -->
+      <div class="study-plan-fields">
+        <h3>Study Schedule</h3>
+
+        <!-- Weekday Picker -->
+        <app-weekday-picker
+          [(selectedDays)]="studyPlan.selectedDays"
+        ></app-weekday-picker>
+
+        <!-- Daily Hours -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Daily Study Hours</mat-label>
+          <input
+            matInput
+            type="number"
+            min="1"
+            max="24"
+            name="dailyHours"
+            [(ngModel)]="studyPlan.dailyHours"
+            required
+          />
+          <mat-hint>How many hours will you study each day?</mat-hint>
+        </mat-form-field>
+
+        <!-- Weeks Count -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Duration (weeks)</mat-label>
+          <input
+            matInput
+            type="number"
+            min="1"
+            max="52"
+            name="weeksCount"
+            [(ngModel)]="studyPlan.weeksCount"
+            required
+          />
+          <mat-hint>How many weeks will this study plan last?</mat-hint>
+        </mat-form-field>
+
+        <div class="summary">
+          <p>
+            Total study hours: <strong>{{ getTotalHours() }}</strong>
+          </p>
+          <p>
+            Days selected: <strong>{{ getSelectedDaysCount() }}</strong>
+          </p>
+        </div>
+      </div>
+    </app-project-form>
+  </mat-dialog-content>
+</div>

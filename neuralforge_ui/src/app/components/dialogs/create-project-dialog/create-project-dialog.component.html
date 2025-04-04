@@ -1,0 +1,13 @@
+<div class="wrapper">
+  <h2 mat-dialog-title>Create Learning Project</h2>
+  <mat-dialog-content>
+    <app-project-form
+      [projectData]="project"
+      submitButtonText="Create"
+      cancelButtonText="Close"
+      (formSubmit)="onSubmit($event)"
+      (formCancel)="onClose()"
+    >
+    </app-project-form>
+  </mat-dialog-content>
+</div>

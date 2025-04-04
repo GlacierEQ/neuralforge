@@ -1,0 +1,181 @@
+@use "@angular/material" as mat;
+@use "sass:map";
+@use "../../../styles.scss" as theme;
+
+$primary-color: mat.get-color-from-palette(theme.$my-primary, 500);
+$accent-color: mat.get-color-from-palette(theme.$my-accent, 500);
+$primary-contrast: map.get(map.get(theme.$my-primary, contrast), 500);
+
+.welcome-banner {
+  display: flex;
+  margin: 10px;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(to right, $primary-color, $accent-color);
+  color: $primary-contrast;
+  padding: 1.2rem 2rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  font-family: "Poppins";
+  font-size: 1rem;
+  font-weight: 500;
+  animation: fadeIn 0.4s ease;
+
+  .welcome-icon {
+    font-size: 1.8rem;
+    color: $primary-contrast;
+  }
+
+  .welcome-text {
+    flex: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.section {
+  background: #f9f9fc;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border-radius: 1rem;
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    h2 {
+      margin: 0;
+      font-family: "Poppins";
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    button {
+      font-weight: 500;
+      font-family: "Poppins";
+    }
+  }
+
+  .card-container {
+    display: flex;
+    flex-wrap: nowrap; // Prevent wrapping
+    overflow-x: auto;  // Enable horizontal scroll
+    gap: 1.5rem;
+    padding-bottom: 1rem;
+
+    // Optional: hide scroll bar on WebKit (e.g., Chrome)
+    &::-webkit-scrollbar {
+      height: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+
+    mat-card.custom-card {
+      flex: 0 0 250px; // Fixed width, no shrinking
+      max-width: 300px;
+      min-width: 250px;
+      padding: 1rem;
+      border-radius: 1rem;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+
+      mat-card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        font-family: "Poppins";
+        margin-bottom: 0.5rem;
+      }
+
+      mat-card-content p {
+        font-size: 0.95rem;
+        font-family: "Poppins";
+        margin: 0.3rem 0;
+        color: #444;
+      }
+
+      mat-card-actions {
+        margin-top: 0.75rem;
+        button {
+          font-weight: 500;
+          font-family: "Poppins";
+        }
+      }
+    }
+  }
+
+}
+
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: $primary-color;
+  font-family: "Poppins";
+  gap: 0.5rem;
+
+  .spin {
+    animation: spin 1.5s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.error-state {
+  .error-card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem;
+    background-color: #fff5f5;
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid #f56565;
+  }
+
+  .error-icon {
+    font-size: 3rem;
+    height: 3rem;
+    width: 3rem;
+    margin-bottom: 1rem;
+    color: #e53e3e;
+  }
+
+  .error-title {
+    font-family: "Poppins";
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+
+  .error-message {
+    font-family: "Poppins";
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    color: #666;
+    max-width: 500px;
+  }
+}
