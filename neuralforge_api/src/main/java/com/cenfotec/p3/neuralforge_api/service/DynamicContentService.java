@@ -371,7 +371,9 @@ public class DynamicContentService {
 
     private String wrapText(String text, PDFont font, float fontSize, float maxWidth) {
         StringBuilder result = new StringBuilder();
-        String[] words = text.split(" ");
+        // Remove any newline characters that might cause encoding issues
+        String cleanText = text.replace("\n", " ").replace("\r", " ");
+        String[] words = cleanText.split(" ");
         StringBuilder line = new StringBuilder();
         
         for (String word : words) {
@@ -393,9 +395,12 @@ public class DynamicContentService {
                 line = new StringBuilder(testLine);
             } else {
                 if (line.length() > 0) {
-                    result.append(line).append("\n");
+                    result.append(line);
+                    // Don't add literal newlines here
+                    line = new StringBuilder(word);
+                } else {
+                    line = new StringBuilder(word);
                 }
-                line = new StringBuilder(word);
             }
         }
         
