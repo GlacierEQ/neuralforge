@@ -14,16 +14,68 @@
 .notification-card {
   width: 400px;
   max-height: 80vh;
-  overflow-y: auto;
-  padding: 1.5rem;
-  border-radius: 12px;
-}
-
-.notification-list {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
-  margin-top: 1rem;
+  padding: 1.5rem;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.notification-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 0.5rem 0;
+
+  h2 {
+    margin: 0;
+    flex: 0 1 auto;
+  }
+
+  button {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+.notification-toggle {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+  background-color: white;
+  z-index: 2;
+  min-height: 48px;
+
+  ::ng-deep .mat-button-toggle-group {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    justify-content: center;
+  }
+
+  ::ng-deep .mat-button-toggle {
+    flex: 1;
+    min-width: 100px;
+    max-width: 150px;
+    text-align: center;
+  }
+}
+
+
+.notification-scrollable-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-bottom: 1rem;
+}
+
+.notification-section {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .notification-item {
@@ -49,70 +101,14 @@
   justify-content: space-between;
   align-items: center;
 }
+
 .empty-message {
   text-align: center;
   color: #888;
   font-size: 0.95rem;
   padding: 2rem 0;
 }
-.notification-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  padding: 0.5rem 0;
-
-  h2 {
-    margin: 0;
-    flex: 0 1 auto;
-  }
-
-  button {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-}
 
 .mat-divider {
   margin: 0.5rem 0;
 }
-
-
-.notification-toggle {
-  display: flex;
-  justify-content: center;
-  margin: 1rem 0;
-
-  ::ng-deep .mat-button-toggle-group {
-    width: 100%;
-    display: flex;
-  }
-
-  ::ng-deep .mat-button-toggle {
-    flex: 1 1 50%;
-    text-transform: none;
-    font-weight: 500;
-    border-radius: 0 !important; // remove rounded edges if needed
-  }
-}
-
-.notification-section {
-  margin-bottom: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem; // more vertical space between notifications
-}
-
-
-.section-title {
-  font-size: 1rem;
-  font-weight: bold;
-  margin: 1.5rem 0 0.5rem;
-}
-
-.notification-section {
-  margin-bottom: 1.5rem;
-}
-

@@ -1,14 +1,11 @@
-<div class="weekday-picker">
-  <label class="picker-label">Days of the week:</label>
-  <div class="day-buttons">
-    <button
-      type="button"
-      *ngFor="let day of weekdays; let i = index"
-      class="day-button"
-      [class.selected]="selectedDays[i]"
-      (click)="toggleDay(i)"
-    >
-      {{ day }}
-    </button>
-  </div>
+<div class="day-buttons">
+  <button
+          type="button"
+          *ngFor="let day of weekdays"
+          class="day-button"
+          [class.selected]="selectedDays[day.key]"
+          (click)="toggleDay(day.key)"
+  >
+    {{ day.label }}
+  </button>
 </div>

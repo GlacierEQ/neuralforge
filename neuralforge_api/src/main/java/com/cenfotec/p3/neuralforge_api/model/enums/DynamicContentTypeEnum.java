@@ -12,9 +12,9 @@ public enum DynamicContentTypeEnum {
     SUMMARY,
 
     /**
-     * Type representing an SLIDEDECK.
+     * Type representing an PPT.
      */
-    SLIDEDECK,
+    PPT,
 
     /**
      * Type representing a CONCEPTMAP.

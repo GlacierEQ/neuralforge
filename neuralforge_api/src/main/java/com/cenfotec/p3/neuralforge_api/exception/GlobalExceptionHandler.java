@@ -138,7 +138,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleExpiredJwtException(ExpiredJwtException ex) {
         String requestId = MDC.get("requestId");
         logger.error("The JWT token sent has already expired: {}", ex);
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(SingleExceptionResponse.builder()
+        return ResponseEntity.status(498).body(SingleExceptionResponse.builder()
                 .id(requestId)
                 .exception("The JWT token sent has already expired.")
                 .build()

@@ -1,7 +1,10 @@
 package com.cenfotec.p3.neuralforge_api.service;
 
 import com.cenfotec.p3.neuralforge_api.model.entity.DynamicContentEntity;
+import com.cenfotec.p3.neuralforge_api.model.entity.ProgrammedGoalProjectEntity;
 import com.cenfotec.p3.neuralforge_api.model.enums.DynamicContentTypeEnum;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -18,6 +21,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import com.cenfotec.p3.neuralforge_api.repository.DynamicContentRepository;
+import com.cenfotec.p3.neuralforge_api.repository.ProgrammedGoalProjectRepository;
 
 import java.io.*;
 import java.time.LocalDateTime;
@@ -32,20 +36,29 @@ import java.util.*;
  * @author Fabian Vargas
  * @version 1.0
  */
-
 @Service
-public class DynamicContentService {
+public class SummaryContentService {
 
     private static final String DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions";
     private static final String MODEL_NAME = "deepseek-chat";
 
-
     @Value("${deepseek.api.bearer-token}")
     private String bearerToken;
+
+    @Value("${cloudinary.cloud_name}")
+    private String cloudName;
+
+    @Value("${cloudinary.api_key}")
+    private String apiKey;
+
+    @Value("${cloudinary.api_secret}")
+    private String apiSecret;
 
     @Autowired
     private DynamicContentRepository dynamicContentRepository;
 
+    @Autowired
+    private ProgrammedGoalProjectRepository programmedGoalProjectRepository;
 
     /**
      * Extracts text from a PDF file, generates a summary, and saves the summary as a PDF.
@@ -54,11 +67,11 @@ public class DynamicContentService {
      * @param title The title of the summary.
      * @param email The email of the user submitting the summary.
      * @param type The type of content for the summary.
+     * @param projectId The ID of the project to associate the summary with.
      * @return A success message indicating the PDF was generated and saved.
      * @throws IOException If an error occurs while processing the file.
      */
-
-    public String extractTextAndGeneratePdf(MultipartFile file, String title, String email, String type) throws IOException {
+    public String extractTextAndGeneratePdf(MultipartFile file, String title, String email, String type, String projectId) throws IOException {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("File is empty.");
         }
@@ -68,11 +81,10 @@ public class DynamicContentService {
             String extractedText = pdfStripper.getText(document);
 
             String summary = getSummaryFromDeepSeek(extractedText);
-            savePdf(summary, title, email, type);
+            savePdf(summary, title, email, type, projectId);
             return "PDF generated and saved successfully.";
         }
     }
-
 
     /**
      * Calls the DeepSeek API to generate a summary from the extracted text.
@@ -80,7 +92,6 @@ public class DynamicContentService {
      * @param text The extracted text to be summarized.
      * @return The summarized text.
      */
-
     private String getSummaryFromDeepSeek(String text) {
         String instructions = """
             Resume el texto de manera didáctica siguiendo estas reglas:
@@ -130,10 +141,10 @@ public class DynamicContentService {
      * @param title The title of the summary.
      * @param email The email of the user submitting the summary.
      * @param type The type of content for the summary.
+     * @param projectId The ID of the project to associate the summary with.
      * @throws IOException If an error occurs while creating the PDF.
      */
-
-    private void savePdf(String content, String title, String email, String type) throws IOException {
+    private void savePdf(String content, String title, String email, String type, String projectId) throws IOException {
         File directory = new File("src/main/resources/dynamicContent/");
         if (!directory.exists()) {
             directory.mkdirs();
@@ -280,20 +291,44 @@ public class DynamicContentService {
             pdfDocument.save(pdfFile);
         }
 
+        // Upload the PDF to Cloudinary
+        Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
+                "cloud_name", cloudName,
+                "api_key", apiKey,
+                "api_secret", apiSecret
+        ));
+
+        Map uploadResult = cloudinary.uploader().upload(pdfFile, ObjectUtils.emptyMap());
+        String cloudinaryUrl = (String) uploadResult.get("url");
+
+        ProgrammedGoalProjectEntity project = programmedGoalProjectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        // Create a new instance of DynamicContentEntity
         DynamicContentEntity dynamicContent = new DynamicContentEntity();
         dynamicContent.setTitle(title);
-        dynamicContent.setPath(pdfFile.getAbsolutePath());
+        dynamicContent.setPath(cloudinaryUrl); // Set the Cloudinary URL as the path
         dynamicContent.setEmail(email);
         dynamicContent.setType(DynamicContentTypeEnum.valueOf(type));
         dynamicContent.setCreationDate(LocalDateTime.now());
 
+        // Associate the dynamic content with the project
+        project.getDynamicContents().add(dynamicContent);
+
+        // Save the project and its dynamic contents (this also saves the associated contents due to CascadeType.ALL)
+        programmedGoalProjectRepository.save(project);
+
+        // Optionally, you can save the dynamic content separately
         dynamicContentRepository.save(dynamicContent);
 
+        // Confirmation
         System.out.println("PDF generated and saved successfully.");
-        System.out.println("Path: " + pdfFile.getAbsolutePath());
+        System.out.println("Path: " + cloudinaryUrl);
         System.out.println("Title: " + title);
         System.out.println("Email: " + email);
         System.out.println("Type: " + type);
+        System.out.println("Project ID: " + project.getId());
+        System.out.println("DynamicContent ID: " + dynamicContent.getId());
     }
 
     /**
@@ -306,7 +341,6 @@ public class DynamicContentService {
      * @return A list of wrapped lines.
      * @throws IOException If an error occurs while measuring text width.
      */
-
     private List<String> wrapText(String text, PDFont font, float fontSize, float maxWidth) throws IOException {
         List<String> lines = new ArrayList<>();
         String[] words = text.split(" ");

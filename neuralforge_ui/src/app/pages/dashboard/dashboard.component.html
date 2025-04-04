@@ -12,13 +12,15 @@
   <div class="section-header">
     <h2>{{ section.title }}</h2>
     <button
-      mat-raised-button
-      color="primary"
-      (click)="section.buttonAction && section.buttonAction()"
+            *ngIf="section.cards.length > 0"
+            mat-raised-button
+            color="primary"
+            (click)="section.buttonAction && section.buttonAction()"
     >
       {{ section.buttonText }}
     </button>
   </div>
+
 
   <div class="loading-indicator" *ngIf="section.isLoading">
     <mat-icon class="spin">refresh</mat-icon>
@@ -59,13 +61,16 @@
       <mat-card class="custom-card" *ngFor="let card of section.cards">
         <mat-card-title>{{ card.title }}</mat-card-title>
         <mat-card-content>
-          <p>{{ card.content }}</p>
+          <p>
+            {{ card.content.length > 50 ? (card.content | slice:0:50) + '...' : card.content }}
+          </p>
+
           <p *ngIf="card.count !== undefined">
             <strong>{{ card.count }} students</strong>
           </p>
         </mat-card-content>
         <mat-card-actions>
-          <button mat-button color="primary">Enter</button>
+          <button [routerLink]="['/app/project', card.projectType.toLowerCase(), card.id]" mat-button color="primary">Enter</button>
         </mat-card-actions>
       </mat-card>
     </div>

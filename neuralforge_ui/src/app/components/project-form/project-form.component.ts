@@ -29,9 +29,11 @@ export class ProjectFormComponent {
     name: "",
     description: "",
   };
+  @Input() isExtraValid: boolean = true;
 
   @Input() submitButtonText: string = "Create";
   @Input() cancelButtonText: string = "Cancel";
+  @Input() disableSubmit: boolean = false;
 
   @Output() formSubmit = new EventEmitter<ProjectFormData>();
   @Output() formCancel = new EventEmitter<void>();

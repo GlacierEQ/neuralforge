@@ -83,6 +83,9 @@ public class GoogleOAuth2Service {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Account verification pending");
         }
 
+        if (!user.getStatus()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Your account has been disabled");
+        }
         return AuthenticationResource.builder()
                 .token(jwtService.generateToken(user))
                 .expiresIn(jwtService.getExpirationTime())

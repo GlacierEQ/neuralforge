@@ -29,6 +29,7 @@ public class LearningProjectMapper extends ProjectMapper<LearningProjectEntity, 
                 .id(learningProject.getId())
                 .creatorUserId(learningProject.getCreatorUserId())
                 .name(learningProject.getName())
+                .createdAt(learningProject.getCreatedAt())
                 .description(learningProject.getDescription())
                 .projectType(ProjectTypeEnum.LEARNING)
                 .build();
@@ -47,6 +48,7 @@ public class LearningProjectMapper extends ProjectMapper<LearningProjectEntity, 
                 .creatorUserId(learningProject.getCreatorUserId())
                 .name(learningProject.getName())
                 .description(learningProject.getDescription())
+                .createdAt(learningProject.getCreatedAt())
                 .build();
     }
 }

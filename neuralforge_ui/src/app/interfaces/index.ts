@@ -10,7 +10,7 @@ export interface IResponse<T> {
 }
 
 export interface IUser {
-  id?: number;
+  id?: string;
   name?: string;
   lastname?: string;
   email?: string;
@@ -91,7 +91,76 @@ export enum IProjectType {
 export interface ILearningProject {
   id: string;
   creatorUserId: string;
+  createdAt?: Date;
   name: string;
   description?: string;
   projectType: IProjectType;
+}
+
+interface IDashboardCard {
+  title: string;
+  content: string;
+  count?: number;
+  id?: string | number;
+  projectType: IProjectType;
+}
+
+export interface IDashboardSection {
+  title: string;
+  buttonText: string;
+  buttonAction?: () => void;
+  cards: IDashboardCard[];
+  isLoading?: boolean;
+  hasError?: boolean;
+  errorMessage?: string;
+}
+
+export enum ProjectTypeEnum {
+  PROGRAMMED_GOAL,
+  LEARNING,
+}
+
+
+export interface IProgrammedGoalProject {
+  id?: string;
+  projectType: ProjectTypeEnum;
+  creatorUserId?: string;
+  name: string;
+  description: string;
+  deadline: Date;
+  createdAt: Date | null;
+  notify: boolean;
+  selectedDays: ISelectedDays;
+  dynamicContents?: IDynamicContent[];
+}
+
+export interface ISelectedDays {
+  monday: boolean;
+  tuesday: boolean;
+  wednesday: boolean;
+  thursday: boolean;
+  friday: boolean;
+  saturday: boolean;
+  sunday: boolean;
+  [key: string]: boolean;
+}
+
+export interface IDynamicContent {
+  id?: string;
+  title: string;
+  creationDate?: Date;
+  path: string;
+  email: string;
+  type: string;
+  projectId: string;
+}
+
+export interface IDynamicContentSection {
+  title: string;
+  buttonText: string;
+  buttonAction: () => void;
+  isLoading: boolean;
+  cards: IDynamicContent[];
+  hasError?: boolean;
+  errorMessage?: string;
 }

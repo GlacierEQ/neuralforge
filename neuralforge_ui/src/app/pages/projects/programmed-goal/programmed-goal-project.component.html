@@ -1,0 +1,73 @@
+<ng-container *ngIf="!isLoading && project">
+  <mat-card class="project-header">
+    <div class="project-title">
+      <h1>{{ project.name }}</h1>
+      <mat-slide-toggle [checked]="project.notify" (change)="onToggleNotify()">
+        Notifications
+      </mat-slide-toggle>
+    </div>
+    <p class="project-description">{{ project.description }}</p>
+  </mat-card>
+
+  <mat-tab-group>
+    <mat-tab label="Overview">
+      <div class="overview-tab">
+        <mat-card class="deadline-card">
+          <h2 class="days-left-title">Days Left: {{ getDaysLeft() }}</h2>
+          <p class="deadline">Deadline: {{ project.deadline | date: 'longDate' }}</p>
+        </mat-card>
+
+        <app-deadline-calendar
+          [calendarStartDate]="calendarStartDate"
+          [today]="today"
+          [project]="project"
+          (calendarStartDateChange)="calendarStartDate = $event"
+        />
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Generated Contents">
+      <div class="overview-tab">
+    
+        <mat-card class="deadline-card">
+          <button mat-raised-button color="primary" (click)="openDynamicContentForm()">
+            Generate Dynamic Content
+          </button>
+        </mat-card>
+        
+        <div *ngIf="project.dynamicContents?.length; else noContent">
+          <div class="dynamic-content-wrapper">
+            <div *ngFor="let content of project.dynamicContents" class="dynamic-content-card">
+              <mat-card class="custom-card">
+                <mat-card-title>{{ content.title }}</mat-card-title>
+                <mat-card-content>
+                  <p>
+                    <span class="content-type">{{ content.type }}</span>
+                  </p>
+                  <p>
+                    <a [href]="content.path" target="_blank">
+                      <button mat-raised-button color="primary">Open File</button>
+                    </a>
+                  </p>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
+        </div>
+        
+        <ng-template #noContent>
+          <div class="empty-state">
+            <p>No contents generated yet.</p>
+          </div>
+        </ng-template>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Configuration">
+      <div class="config-actions">
+        <button (click)="editProject()" mat-stroked-button color="primary">Edit Project</button>
+        <button (click)="onDeleteProject()" mat-stroked-button color="warn">Delete Project</button>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</ng-container>

@@ -31,7 +31,7 @@ describe('UserService', () => {
   });
 
   it('should fetch users with parameters', () => {
-    const mockResponse = { data: [{ id: 1, name: 'User Test' }], meta: { totalPages: 1 } };
+    const mockResponse = { data: [{ id: "1", name: 'User Test' }], meta: { totalPages: 1 } };
 
     service.getAll();
     const req = httpMock.expectOne('api/neuralforge/v1/users?page=1&size=5');
@@ -42,7 +42,7 @@ describe('UserService', () => {
   });
 
   it('should add a user and show success alert', () => {
-    const mockUser: IUser = { id: 2, name: 'New User' };
+    const mockUser: IUser = { id: "2", name: 'New User' };
     const mockResponse = { message: 'User added successfully' };
 
     service.save(mockUser);
@@ -54,7 +54,7 @@ describe('UserService', () => {
   });
 
   it('should update a user and show success alert', () => {
-    const mockUser: IUser = { id: 3, name: 'Updated User' };
+    const mockUser: IUser = { id: "3", name: 'Updated User' };
     const mockResponse = { message: 'User updated successfully' };
 
     service.update(mockUser);
@@ -66,7 +66,7 @@ describe('UserService', () => {
   });
 
   it('should delete a user and show success alert', () => {
-    const mockUser: IUser = { id: 4, name: 'Deleted User' };
+    const mockUser: IUser = { id: "4", name: 'Deleted User' };
     const mockResponse = { message: 'User deleted successfully' };
 
     service.delete(mockUser);

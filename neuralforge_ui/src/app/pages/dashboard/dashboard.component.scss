@@ -69,12 +69,24 @@ $primary-contrast: map.get(map.get(theme.$my-primary, contrast), 500);
 
   .card-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap; // Prevent wrapping
+    overflow-x: auto;  // Enable horizontal scroll
     gap: 1.5rem;
+    padding-bottom: 1rem;
+
+    // Optional: hide scroll bar on WebKit (e.g., Chrome)
+    &::-webkit-scrollbar {
+      height: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
 
     mat-card.custom-card {
-      flex: 1 1 250px;
+      flex: 0 0 250px; // Fixed width, no shrinking
       max-width: 300px;
+      min-width: 250px;
       padding: 1rem;
       border-radius: 1rem;
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
@@ -102,6 +114,7 @@ $primary-contrast: map.get(map.get(theme.$my-primary, contrast), 500);
       }
     }
   }
+
 }
 
 .loading-indicator {

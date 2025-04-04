@@ -17,5 +17,6 @@ public enum ProjectTypeEnum {
      * Learning projects allow users to practice and develop their skills
      * in a structured environment with specific learning objectives.
      */
-    LEARNING
+    LEARNING,
+    PROGRAMMED_GOAL
 }

@@ -24,6 +24,14 @@ export class ProfileService extends BaseService<IUser> {
     }
   }
 
+  updatePassword(payload: {
+    currentPassword: string;
+    newPassword: string;
+  }) {
+    return this.http.put(`${this.source}/password`, payload);
+  }
+
+
   updateUserName(name: string): void {
     this.userNameSignal.set(name);
   }

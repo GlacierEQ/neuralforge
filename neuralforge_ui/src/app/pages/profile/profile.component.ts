@@ -23,6 +23,7 @@ import { SpinnerComponent } from "../../components/spinner/spinner.component";
 import { AlertService } from "../../services/alert.service";
 import { AuthService } from "../../services/auth.service";
 import { ProfileService } from "../../services/profile.service";
+import { ChangePasswordDialogComponent } from '../../components/dialogs/change-password-dialog/change-password-dialog.component';
 
 interface UserProfile {
   firstName: string;
@@ -242,9 +243,18 @@ export class ProfileComponent implements OnInit {
   }
 
   changePassword(): void {
-    console.log("Change password clicked");
-    alert("Not implemented yet");
+    this.dialog
+        .open(ChangePasswordDialogComponent, {
+          width: '400px',
+        })
+        .afterClosed()
+        .subscribe((result) => {
+          if (result) {
+            this.loadUserProfile(); // Refresh password change date
+          }
+        });
   }
+
 
   deleteAccount(): void {
     const dialogRef = this.dialog.open(DeleteAccountDialogComponent, {

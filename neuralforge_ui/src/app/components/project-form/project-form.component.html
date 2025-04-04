@@ -35,13 +35,14 @@
       {{ cancelButtonText }}
     </button>
     <button
-      mat-raised-button
-      color="primary"
-      type="button"
-      [disabled]="projectForm.invalid"
-      (click)="onSubmit(projectForm)"
+            mat-raised-button
+            color="primary"
+            type="button"
+            [disabled]="projectForm.invalid || !isExtraValid"
+            (click)="onSubmit(projectForm)"
     >
       {{ submitButtonText }}
     </button>
+
   </div>
 </form>

@@ -14,6 +14,7 @@ import { VerificationComponent } from "./pages/auth/verification/verification.co
 import { DashboardComponent } from "./pages/dashboard/dashboard.component";
 import { ProfileComponent } from "./pages/profile/profile.component";
 import { UsersComponent } from "./pages/users/users.component";
+import {ProgrammedGoalProjectComponent} from "./pages/projects/programmed-goal/programmed-goal-project.component";
 
 /**
  * Application routes configuration.
@@ -78,6 +79,15 @@ export const routes: Routes = [
         pathMatch: "full",
       },
 
+      {
+        path: 'project/programmed_goal/:projectId',
+        component: ProgrammedGoalProjectComponent,
+        data: {
+          authorities: [IRoleType.admin, IRoleType.teacher, IRoleType.student],
+          name: "Programmed Goal",
+          showInSidebar: false,
+        },
+      },
 
       {
         path: "users",
