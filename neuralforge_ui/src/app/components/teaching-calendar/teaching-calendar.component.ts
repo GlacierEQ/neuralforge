@@ -200,6 +200,10 @@ export class TeachingCalendarComponent implements OnInit, OnDestroy {
     );
   }
 
+  toggleLock(topic: ICourseTopic) {
+    topic.teacherLocked = !topic.teacherLocked;
+  }
+
   private generateWeeks() {
     if (!this.project?.startDate || !this.project?.endDate) return;
 

@@ -67,7 +67,7 @@
                     <div class="topic-actions">
                       <button
                         mat-icon-button
-                        [disabled]="topicIndex === 0"
+                        [disabled]="topicIndex === 0 || topic.teacherLocked"
                         (click)="
                           moveTopicUp(weekIndex, sessionIndex, topicIndex)
                         "
@@ -78,7 +78,10 @@
 
                       <button
                         mat-icon-button
-                        [disabled]="topicIndex === session.topics.length - 1"
+                        [disabled]="
+                          topicIndex === session.topics.length - 1 ||
+                          topic.teacherLocked
+                        "
                         (click)="
                           moveTopicDown(weekIndex, sessionIndex, topicIndex)
                         "
@@ -97,9 +100,22 @@
                             topic
                           )
                         "
+                        [disabled]="topic.teacherLocked"
                         matTooltip="Move to different day"
                       >
                         <mat-icon>open_with</mat-icon>
+                      </button>
+
+                      <button
+                        mat-icon-button
+                        (click)="toggleLock(topic)"
+                        [matTooltip]="
+                          topic.teacherLocked ? 'Unlock topic' : 'Lock topic'
+                        "
+                      >
+                        <mat-icon>{{
+                          topic.teacherLocked ? "lock" : "lock_open"
+                        }}</mat-icon>
                       </button>
                     </div>
                   </div>
