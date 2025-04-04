@@ -9,17 +9,13 @@ import {
   IValidationRequest,
 } from "../interfaces";
 
-
 @Injectable({
   providedIn: "root",
 })
 export class AuthService {
-
   private accessToken!: string;
 
-
   private expiresIn!: number;
-
 
   private userRole: IRole = {
     name: "",
@@ -29,13 +25,11 @@ export class AuthService {
   };
   private user: IUser = { email: "", role: this.userRole };
 
-
   private http: HttpClient = inject(HttpClient);
 
   constructor() {
     this.load();
   }
-
 
   public save(): void {
     if (this.user) localStorage.setItem("auth_user", JSON.stringify(this.user));
@@ -46,7 +40,6 @@ export class AuthService {
     if (this.expiresIn)
       localStorage.setItem("expiresIn", JSON.stringify(this.expiresIn));
   }
-
 
   private load(): void {
     let token = localStorage.getItem("access_token");
@@ -59,21 +52,17 @@ export class AuthService {
     if (user) this.user = JSON.parse(user);
   }
 
-
   public getUser(): IUser | undefined {
     return this.user;
   }
-
 
   public getAccessToken(): string | null {
     return this.accessToken;
   }
 
-
   public check(): boolean {
     return !!this.accessToken;
   }
-
 
   public login(credentials: {
     email: string;
@@ -117,21 +106,17 @@ export class AuthService {
       );
   }
 
-
   public hasRole(role: string): boolean {
     return this.user.role?.name === role;
   }
-
 
   public isSuperAdmin(): boolean {
     return this.user.role?.name === IRoleType.admin;
   }
 
-
   public hasAnyRole(roles: any[]): boolean {
     return roles.some((role) => this.hasRole(role));
   }
-
 
   public getPermittedRoutes(routes: any[]): any[] {
     let permittedRoutes: any[] = [];
@@ -144,7 +129,6 @@ export class AuthService {
     }
     return permittedRoutes;
   }
-
 
   public signup(user: IUser): Observable<ILoginResponse> {
     return this.http.post<ILoginResponse>(
@@ -160,12 +144,8 @@ export class AuthService {
     );
   }
 
-  public requestPasswordReset(email: string): Observable<string> {
-    return this.http.post(
-      "api/neuralforge/v1/auth/request",
-      { email },
-      { responseType: "text" }
-    );
+  public requestPasswordReset(email: string): Observable<Object> {
+    return this.http.post("api/neuralforge/v1/auth/request", { email });
   }
 
   public resetPassword(token: string, newPassword: string): Observable<string> {
@@ -183,20 +163,15 @@ export class AuthService {
     localStorage.removeItem("auth_user");
   }
 
-
   public getUserAuthorities(): IRole | undefined {
     return this.getUser()?.role;
   }
 
-
   public areActionsAvailable(routeAuthorities: string[]): boolean {
-
     let allowedUser: boolean = false;
     let isAdmin: boolean = false;
 
-
     let userRole = this.getUserAuthorities();
-
 
     for (const authority of routeAuthorities) {
       if (userRole?.name == authority) {
@@ -204,7 +179,6 @@ export class AuthService {
         break;
       }
     }
-
 
     if (userRole?.name == IRoleType.admin) {
       isAdmin = true;

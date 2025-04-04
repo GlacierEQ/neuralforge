@@ -93,7 +93,7 @@ public class AuthenticationController {
     public ResponseEntity<String> requestPasswordReset(@RequestBody PasswordResetRequestResource request) {
         try {
             passwordResetService.requestPasswordReset(request);
-            return ResponseEntity.ok("An email has been sent with the link to reset your password.");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         } catch (NeuralForgeEmailException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error sending the password reset email.");
