@@ -95,7 +95,7 @@ export class ProfileComponent implements OnInit {
           console.error("Error loading user profile:", error);
           this.alertService.displayAlert(
             "error",
-            "No se pudo cargar la información del perfil",
+            "Could not load user profile",
             "right",
             "top",
             ["error-snackbar"]
@@ -114,7 +114,7 @@ export class ProfileComponent implements OnInit {
             email: userData.email || "",
             registrationDate: this.formatDate(userData.createdAt),
             lastPasswordChange:
-              this.formatDate(userData.passwordLastChanged) || "Nunca",
+              this.formatDate(userData.lastPasswordChangeAt) || "Never",
           };
 
           // Update form with fetched data
@@ -206,7 +206,7 @@ export class ProfileComponent implements OnInit {
             console.error("Error updating profile:", error);
             this.alertService.displayAlert(
               "error",
-              "No se pudo actualizar el perfil",
+              "Could not update profile",
               "right",
               "top",
               ["error-snackbar"]
@@ -229,7 +229,7 @@ export class ProfileComponent implements OnInit {
             this.toggleEdit();
             this.alertService.displayAlert(
               "success",
-              "Perfil modificado correctamente",
+              "Profile updated successfully",
               "right",
               "top",
               ["success-snackbar"]
@@ -279,7 +279,7 @@ export class ProfileComponent implements OnInit {
           if (result !== undefined) {
             this.alertService.displayAlert(
               "success",
-              "Cuenta eliminada correctamente",
+              "Account deleted successfully",
               "center",
               "top",
               ["success-snackbar"]
@@ -293,7 +293,7 @@ export class ProfileComponent implements OnInit {
         error: (error) => {
           this.alertService.displayAlert(
             "error",
-            "Error al eliminar la cuenta",
+            "Could not delete account",
             "center",
             "top",
             ["error-snackbar"]
