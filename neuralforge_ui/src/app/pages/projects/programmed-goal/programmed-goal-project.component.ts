@@ -90,7 +90,6 @@ export class ProgrammedGoalProjectComponent implements OnInit {
                     this.projectLoaded = true;
                     this.isLoading = false;
                     this.cdr.detectChanges();
-                    console.log(project)
                 },
                 error: (err) => {
                     console.error('Error fetching project:', err);

@@ -318,9 +318,6 @@ public class SummaryContentService {
         // Save the project and its dynamic contents (this also saves the associated contents due to CascadeType.ALL)
         programmedGoalProjectRepository.save(project);
 
-        // Optionally, you can save the dynamic content separately
-        dynamicContentRepository.save(dynamicContent);
-
         // Confirmation
         System.out.println("PDF generated and saved successfully.");
         System.out.println("Path: " + cloudinaryUrl);

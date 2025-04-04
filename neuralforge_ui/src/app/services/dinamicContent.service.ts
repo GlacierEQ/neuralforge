@@ -25,11 +25,6 @@ export class DynamicContentService {
     formData.append("type", type);
     formData.append("projectId", projectId);
   
-    console.log("Sending FormData:");
-    formData.forEach((value, key) => {
-      console.log(key + ": " + value);
-    });
-  
     return this.http.post<string>(`${this.baseUrl}/generateSummary`, formData, { responseType: 'text' as 'json' });
   }
 }
