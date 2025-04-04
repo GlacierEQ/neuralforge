@@ -20,21 +20,58 @@
   <div *ngIf="!isLoading && projectMaterials.length > 0" class="materials-grid">
     <mat-card *ngFor="let material of projectMaterials" class="material-card">
       <mat-card-header>
-        <mat-card-title>{{ material.fileName }}</mat-card-title>
+        <mat-card-title>
+          <mat-icon
+            [class.file-icon]="material.type === 'file'"
+            [class.hyperlink-icon]="material.type === 'hyperlink'"
+          >
+            {{ getMaterialIcon(material.type) }}
+          </mat-icon>
+          {{ material.fileName }}
+        </mat-card-title>
         <mat-card-subtitle>{{ material.type }}</mat-card-subtitle>
       </mat-card-header>
-      <mat-card-actions align="end">
-        <button
-          mat-icon-button
-          color="primary"
-          (click)="downloadMaterial(material)"
+      <mat-card-content>
+        <p class="material-description" *ngIf="material.description">
+          {{ material.description }}
+        </p>
+
+        <!-- Display hyperlink for hyperlink type materials -->
+        <div
+          class="hyperlink-url"
+          *ngIf="material.type === 'hyperlink' && material.hyperlink"
         >
-          <mat-icon>download</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" (click)="deleteMaterial(material)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </mat-card-actions>
+          <mat-icon class="url-icon">link</mat-icon>
+          <span>{{ material.hyperlink }}</span>
+        </div>
+
+        <div class="material-actions">
+          <button
+            mat-icon-button
+            color="primary"
+            (click)="downloadMaterial(material)"
+            *ngIf="material.type === 'file'"
+          >
+            <mat-icon>download</mat-icon>
+          </button>
+          <a
+            mat-icon-button
+            color="primary"
+            [href]="material.hyperlink"
+            target="_blank"
+            *ngIf="material.type === 'hyperlink'"
+          >
+            <mat-icon>open_in_new</mat-icon>
+          </a>
+          <button
+            mat-icon-button
+            color="warn"
+            (click)="deleteMaterial(material)"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </mat-card-content>
     </mat-card>
   </div>
 </div>

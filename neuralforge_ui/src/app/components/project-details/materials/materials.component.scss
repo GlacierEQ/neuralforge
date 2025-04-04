@@ -106,21 +106,12 @@
   border-radius: 4px;
   font-size: 14px;
   word-break: break-all;
-  
+
   .url-icon {
     font-size: 16px;
     height: 16px;
     width: 16px;
     margin-right: 8px;
     color: #1976d2;
-  }
-  
-  .url-text {
-    color: #1976d2;
-    text-decoration: none;
-    
-    &:hover {
-      text-decoration: underline;
-    }
   }
 }

@@ -110,7 +110,12 @@ export class MaterialsComponent implements OnInit, OnChanges, OnDestroy {
       width: "400px",
       data: {
         title: "Delete Material",
-        message: `Are you sure you want to delete ${material.fileName}?`,
+        message:
+          material.type === "hyperlink"
+            ? `Are you sure you want to delete this link: ${material.hyperlink}?`
+            : `Are you sure you want to delete ${
+                material.fileName || "this material"
+              }?`,
         confirmText: "Delete",
         cancelText: "Cancel",
       },
