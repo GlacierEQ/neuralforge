@@ -32,22 +32,6 @@
           [calendarStartDate]="calendarStartDate"
           (calendarStartDateChange)="calendarStartDate = $event"
         ></app-teaching-calendar>
-
-        <mat-card
-          class="materials-card"
-          *ngIf="project.materials && project.materials.length > 0"
-        >
-          <h2>Course Materials</h2>
-          <div class="materials-list">
-            <div
-              *ngFor="let material of project.materials"
-              class="material-item"
-            >
-              <mat-icon>description</mat-icon>
-              <span>{{ material }}</span>
-            </div>
-          </div>
-        </mat-card>
       </ng-container>
     </ng-template>
   </app-project-details>

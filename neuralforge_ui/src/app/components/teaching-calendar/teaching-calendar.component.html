@@ -21,15 +21,6 @@
     </div>
   </div>
 
-  <!-- Toast message for materials -->
-  <div *ngIf="hasSchedule() && !hasMaterials()" class="material-warning">
-    <mat-icon color="warn">warning</mat-icon>
-    <span
-      >No course materials have been added. Consider adding PDFs or other
-      resources.</span
-    >
-  </div>
-
   <!-- Week-based schedule display -->
   <ng-container *ngIf="project && project.weeks && project.weeks.length > 0">
     <div *ngFor="let week of project.weeks; let weekIndex = index">

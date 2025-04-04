@@ -121,6 +121,10 @@ export class MaterialsComponent implements OnInit, OnChanges, OnDestroy {
         this.isLoading = true;
         this.projectMaterialService.deleteMaterial(material.id).subscribe({
           next: () => {
+            this.projectMaterials = this.projectMaterials.filter(
+              (item) => item.id !== material.id
+            );
+
             this.snackBar.open("Material deleted successfully", "Close", {
               duration: 3000,
             });
