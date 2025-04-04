@@ -1,0 +1,52 @@
+<div class="dialog-container">
+  <h2 mat-dialog-title>Generate Content</h2>
+
+  <mat-dialog-content>
+    <form [formGroup]="form" class="form-container">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Select Material</mat-label>
+        <mat-select formControlName="materialId" required>
+          <mat-option *ngFor="let material of materials" [value]="material.id">
+            {{ material.fileName }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('materialId')?.hasError('required')">
+          Material is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Title</mat-label>
+        <input matInput formControlName="title" required />
+        <mat-error *ngIf="form.get('title')?.hasError('required')">
+          Title is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Type</mat-label>
+        <mat-select formControlName="type" required>
+          <mat-option value="SUMMARY">Summary</mat-option>
+          <mat-option value="ANALYSIS">Analysis</mat-option>
+          <mat-option value="REVIEW">Review</mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('type')?.hasError('required')">
+          Type is required
+        </mat-error>
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions>
+    <button mat-button (click)="onCancel()">Cancel</button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onSubmit()"
+      [disabled]="!form.valid || isLoading"
+    >
+      <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+      Generate
+    </button>
+  </mat-dialog-actions>
+</div>

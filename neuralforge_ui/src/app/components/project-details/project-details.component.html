@@ -29,9 +29,10 @@
   </mat-tab>
 
   <mat-tab label="Generated Contents">
-    <div class="empty-state">
-      <p>No contents generated yet.</p>
-    </div>
+    <app-generated-contents
+      [projectId]="project.id"
+      [projectMaterials]="project.materials || []"
+    ></app-generated-contents>
   </mat-tab>
 
   <mat-tab label="Configuration">

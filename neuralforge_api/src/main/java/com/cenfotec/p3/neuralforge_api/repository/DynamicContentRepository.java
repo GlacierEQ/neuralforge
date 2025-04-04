@@ -47,6 +47,14 @@ public interface DynamicContentRepository extends JpaRepository<DynamicContentEn
     Optional<DynamicContentEntity> findByTitle(String title);
 
     /**
+     * Finds content entries by project ID.
+     *
+     * @param projectId The ID of the project.
+     * @return A list of dynamic content entities.
+     */
+    List<DynamicContentEntity> findByProjectId(String projectId);
+
+    /**
      * Updates dynamic content attributes while ignoring null or empty values.
      * Only provided non-null values will be updated in the database.
      *

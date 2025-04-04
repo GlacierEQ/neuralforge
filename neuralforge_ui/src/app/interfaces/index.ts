@@ -141,12 +141,12 @@ export interface ISelectedDays {
 }
 
 export interface IDynamicContent {
-  id?: string;
+  id: string;
   title: string;
-  creationDate?: Date;
+  type: string;
+  creationDate: Date;
   path: string;
   email: string;
-  type: string;
   projectId: string;
 }
 
@@ -158,6 +158,7 @@ export interface IDynamicContentSection {
   cards: IDynamicContent[];
   hasError?: boolean;
   errorMessage?: string;
+  projectId: string;
 }
 
 export interface ILearningMaterial {

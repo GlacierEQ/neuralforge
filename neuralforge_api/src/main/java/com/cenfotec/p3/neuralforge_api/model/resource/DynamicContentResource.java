@@ -26,4 +26,5 @@ public class DynamicContentResource {
     private String path;
     private String email;
     private String type;
+    private String projectId;
 }

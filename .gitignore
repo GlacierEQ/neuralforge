@@ -42,3 +42,6 @@ node_modules/
 
 ### User uploads ###
 neuralforge_api/uploads
+
+### Generated files ###
+neuralforge_api/src/main/resources/dynamicContent

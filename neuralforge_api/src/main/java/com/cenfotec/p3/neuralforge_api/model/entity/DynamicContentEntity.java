@@ -69,4 +69,7 @@ public class DynamicContentEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DynamicContentTypeEnum type;
+
+    @Column(nullable = false)
+    private String projectId;
 }

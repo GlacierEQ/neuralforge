@@ -14,6 +14,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatTabsModule } from "@angular/material/tabs";
 import { Project } from "../../models/project.model";
+import { GeneratedContentsComponent } from "./generated-contents/generated-contents.component";
 import { MaterialsComponent } from "./materials/materials.component";
 
 @Component({
@@ -27,6 +28,7 @@ import { MaterialsComponent } from "./materials/materials.component";
     MatIconModule,
     MatSlideToggleModule,
     MaterialsComponent,
+    GeneratedContentsComponent,
   ],
   templateUrl: "./project-details.component.html",
   styleUrls: ["./project-details.component.scss"],
