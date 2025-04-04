@@ -47,6 +47,9 @@ export class CreateTeachingProjectDialogComponent {
   private alertService = inject(AlertService);
   private teachingProjectService = inject(TeachingProjectService);
 
+  minStartDate = new Date(); // Today's date
+  minEndDate = new Date();
+
   teachingProject: TeachingProjectData = {
     name: "",
     description: "",
@@ -61,26 +64,60 @@ export class CreateTeachingProjectDialogComponent {
     },
     dailyHours: 1,
     startDate: new Date(),
-    endDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+    endDate: new Date(new Date().setDate(new Date().getDate() + 7)), // At least 7 days from now
   };
 
   constructor(
     private dialogRef: MatDialogRef<CreateTeachingProjectDialogComponent>
-  ) {}
+  ) {
+    // Set min end date to be 7 days after start date
+    this.updateMinEndDate();
+  }
 
   isFormValid(): boolean {
-    return this.getSelectedDaysCount() > 0;
+    return this.getSelectedDaysCount() > 0 && this.areDatesValid();
+  }
+
+  areDatesValid(): boolean {
+    const start = new Date(this.teachingProject.startDate);
+    const end = new Date(this.teachingProject.endDate);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return start < end && diffDays >= 7;
+  }
+
+  onStartDateChange() {
+    this.updateMinEndDate();
+
+    // If the current end date is less than min end date, update it
+    const currentEndDate = new Date(this.teachingProject.endDate);
+    if (currentEndDate < this.minEndDate) {
+      this.teachingProject.endDate = new Date(this.minEndDate);
+    }
+  }
+
+  updateMinEndDate() {
+    // Set min end date to be 7 days after start date
+    const startDate = new Date(this.teachingProject.startDate);
+    this.minEndDate = new Date(startDate);
+    this.minEndDate.setDate(startDate.getDate() + 7);
   }
 
   onSubmit(projectData: ProjectFormData) {
     if (!this.isFormValid()) {
-      this.alertService.displayAlert(
-        "error",
-        "Please select at least one day of the week",
-        "center",
-        "top",
-        ["error-snackbar"]
-      );
+      let errorMessage = "";
+
+      if (this.getSelectedDaysCount() === 0) {
+        errorMessage = "Please select at least one day of the week";
+      } else if (!this.areDatesValid()) {
+        errorMessage =
+          "Please ensure the end date is at least 7 days after the start date";
+      }
+
+      this.alertService.displayAlert("error", errorMessage, "center", "top", [
+        "error-snackbar",
+      ]);
       return;
     }
 

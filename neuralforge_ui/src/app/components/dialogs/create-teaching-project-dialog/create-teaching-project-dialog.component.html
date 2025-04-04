@@ -48,6 +48,8 @@
             matInput
             [matDatepicker]="startPicker"
             [(ngModel)]="teachingProject.startDate"
+            [min]="minStartDate"
+            (dateChange)="onStartDateChange()"
             name="startDate"
             required
           />
@@ -66,16 +68,24 @@
             matInput
             [matDatepicker]="endPicker"
             [(ngModel)]="teachingProject.endDate"
+            [min]="minEndDate"
             name="endDate"
             required
           />
-          <mat-hint>When will the course end?</mat-hint>
+          <mat-hint
+            >When will the course end? (Must be at least 7 days after start
+            date)</mat-hint
+          >
           <mat-datepicker-toggle
             matIconSuffix
             [for]="endPicker"
           ></mat-datepicker-toggle>
           <mat-datepicker #endPicker></mat-datepicker>
         </mat-form-field>
+
+        <div class="validation-warning" *ngIf="!areDatesValid()">
+          End date must be at least 7 days after start date
+        </div>
 
         <div class="summary">
           <p>
