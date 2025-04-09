@@ -26,4 +26,8 @@ export class ProjectService extends BaseService<any> {
   getAllUserProjects(): Observable<AllProjects> {
     return this.http.get<AllProjects>(`${this.source}/all-mine`);
   }
+
+  getAllProjects(): Observable<AllProjects> {
+    return this.http.get<AllProjects>(`${this.source}/all`);
+  }
 }

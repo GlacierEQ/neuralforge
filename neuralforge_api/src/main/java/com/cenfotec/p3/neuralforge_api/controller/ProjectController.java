@@ -33,4 +33,11 @@ public class ProjectController {
     public ResponseEntity<UserProjectsResource> getAllUserProjects() {
         return ResponseEntity.ok(projectService.getAllUserProjects());
     }
+
+
+    @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('ROLE_ADMINISTRATOR')")
+    public ResponseEntity<UserProjectsResource> getAllProjects() {
+        return ResponseEntity.ok(projectService.getAllProjects());
+    }
 } 

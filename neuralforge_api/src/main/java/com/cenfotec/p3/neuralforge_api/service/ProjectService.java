@@ -45,4 +45,21 @@ public class ProjectService {
                 .programmedGoalProjects(programmedGoalProjects)
                 .build();
     }
+
+    /**
+     * Retrieves all types of projects for all users
+     *
+     * @return An {@link UserProjectsResource} containing all projects
+     */
+    public UserProjectsResource getAllProjects() {
+        List<LearningProjectResource> learningProjects = learningProjectService.getAllLearningProjects();
+        List<TeachingProjectResource> teachingProjects = teachingProjectService.getAllTeachingProjects();
+        List<ProgrammedGoalProjectResource> programmedGoalProjects = programmedGoalProjectService.getAllProgrammedGoalProjects();
+
+        return UserProjectsResource.builder()
+                .learningProjects(learningProjects)
+                .teachingProjects(teachingProjects)
+                .programmedGoalProjects(programmedGoalProjects)
+                .build();
+    }
 } 

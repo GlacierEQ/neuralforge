@@ -79,11 +79,19 @@ class ProgrammedGoalProjectServiceTest {
 
     @Test
     void whenGetById_thenReturnResource() {
+        mockAuthentication();
+
         when(repository.findById("proj123")).thenReturn(Optional.of(mockEntity));
         when(mapper.mapToResource(mockEntity)).thenReturn(mockResource);
 
-        assertEquals("proj123", service.getProgrammedGoalProjectById("proj123").getId());
+        ProgrammedGoalProjectResource result = service.getProgrammedGoalProjectById("proj123");
+
+        assertNotNull(result);
+        assertEquals("proj123", result.getId());
+
+        SecurityContextHolder.clearContext(); // Clean up
     }
+
 
     @Test
     void whenGetByInvalidId_thenThrow() {

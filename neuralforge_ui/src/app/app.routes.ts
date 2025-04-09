@@ -17,6 +17,7 @@ import { LearningProjectComponent } from "./pages/projects/learning/learning-pro
 import { ProgrammedGoalProjectComponent } from "./pages/projects/programmed-goal/programmed-goal-project.component";
 import { TeachingProjectComponent } from "./pages/projects/teaching/teaching-project.component";
 import { UsersComponent } from "./pages/users/users.component";
+import {ProjectGlobalViewComponent} from "./pages/projects/project-global-view/project-global-view.component";
 
 /**
  * Application routes configuration.
@@ -113,7 +114,16 @@ export const routes: Routes = [
           showInSidebar: true,
         },
       },
-
+      {
+        path: "projects",
+        component: ProjectGlobalViewComponent,
+        canActivate: [AdminRoleGuard],
+        data: {
+          authorities: [IRoleType.admin],
+          name: "Projects",
+          showInSidebar: true,
+        },
+      },
       {
         path: "profile",
         component: ProfileComponent,

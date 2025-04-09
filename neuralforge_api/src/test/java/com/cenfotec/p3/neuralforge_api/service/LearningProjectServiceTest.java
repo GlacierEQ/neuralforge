@@ -144,6 +144,13 @@ class LearningProjectServiceTest {
 
     @Test
     void givenValidId_whenGetLearningProjectById_thenReturnProject() {
+        // ✅ Mock authentication
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(mockUserEntity);
+        SecurityContextHolder.setContext(securityContext);
+
         // Given
         when(learningProjectRepository.findById("project123")).thenReturn(Optional.of(mockLearningProjectEntity));
         when(learningProjectMapper.mapToResource(mockLearningProjectEntity)).thenReturn(mockLearningProjectResource);
@@ -158,7 +165,11 @@ class LearningProjectServiceTest {
 
         verify(learningProjectRepository, times(1)).findById("project123");
         verify(learningProjectMapper, times(1)).mapToResource(mockLearningProjectEntity);
+
+        // Clean up
+        SecurityContextHolder.clearContext();
     }
+
 
     @Test
     void givenInvalidId_whenGetLearningProjectById_thenThrowException() {

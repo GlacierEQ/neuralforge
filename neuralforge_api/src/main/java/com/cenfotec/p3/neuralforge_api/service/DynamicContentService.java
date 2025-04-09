@@ -1,12 +1,16 @@
 package com.cenfotec.p3.neuralforge_api.service;
 
 import com.cenfotec.p3.neuralforge_api.model.entity.DynamicContentEntity;
+import com.cenfotec.p3.neuralforge_api.model.entity.ProjectEntity;
+import com.cenfotec.p3.neuralforge_api.model.entity.UserEntity;
 import com.cenfotec.p3.neuralforge_api.model.enums.DynamicContentTypeEnum;
+import com.cenfotec.p3.neuralforge_api.model.enums.UserRoleEnum;
 import com.cenfotec.p3.neuralforge_api.model.mapper.DynamicContentMapper;
 import com.cenfotec.p3.neuralforge_api.model.mapper.ProjectMaterialMapper;
 import com.cenfotec.p3.neuralforge_api.model.resource.DynamicContentResource;
 import com.cenfotec.p3.neuralforge_api.repository.DynamicContentRepository;
 import com.cenfotec.p3.neuralforge_api.repository.ProjectMaterialRepository;
+import com.cenfotec.p3.neuralforge_api.repository.ProjectRepository;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -15,6 +19,7 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -56,6 +61,9 @@ public class DynamicContentService {
     @Value("${deepseek.api.bearer-token}")
     private String bearerToken;
 
+    @Autowired
+    ProjectRepository projectRepository;
+
     private final DynamicContentRepository dynamicContentRepository;
     private final ProjectMaterialRepository materialRepository;
     private final ProjectMaterialMapper materialMapper;
@@ -74,8 +82,18 @@ public class DynamicContentService {
         ProjectMaterialEntity material = materialRepository.findById(materialId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material not found"));
 
+
         if (!"file".equals(material.getType()) || material.getFileUrl() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Material is not a file");
+        }
+
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found with id: " + projectId));
+
+        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (!user.getId().equals(project.getCreatorUserId()) && user.getRole().getName() != UserRoleEnum.ROLE_ADMINISTRATOR){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to modify this project");
         }
 
         // Extract the filename from the URL
