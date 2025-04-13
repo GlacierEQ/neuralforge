@@ -1,0 +1,19 @@
+.users-page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f9fafb;
+  font-family: "Poppins", sans-serif;
+}
+
+.page-header {
+  font-size: 1.25rem;
+  font-weight: 600;
+  justify-content: center;
+}
+
+.content-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: auto;
+}

@@ -48,6 +48,15 @@ export class UserService extends BaseService<IUser> {
     return this.http.put(`${this.source}/${userId}/toggle-status`, {});
   }
 
+  getAllRoles() {
+    return this.http.get<any[]>(`api/neuralforge/v1/roles`);
+  }
+
+  updateUserRole(userId: string, roleId: string) {
+    console.log(roleId, userId)
+    return this.http.put(`${this.source}/${userId}/role`,  roleId ); // or PATCH
+  }
+
   save(user: IUser) {
     this.add(user).subscribe({
       next: (response: any) => {

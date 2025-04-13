@@ -1,123 +1,71 @@
-<div class="profile-container">
-  <app-spinner
-    *ngIf="isLoading"
-    [message]="'Loading profile information...'"
-  ></app-spinner>
+<div class="all-profile-container">
+  <div class="profile-container">
+    <app-spinner *ngIf="isLoading" [message]="'Loading profile information...'"></app-spinner>
 
-  <div *ngIf="!isLoading">
-    <!-- Header with user info -->
-    <div class="profile-header">
-      <div class="user-info">
-        <h2>{{ userProfile.firstName }} {{ userProfile.lastName }}</h2>
-        <p>{{ userProfile.email }}</p>
+    <div *ngIf="!isLoading">
+      <!-- Page Header -->
+      <div class="profile-page-header">
+        <mat-icon class="profile-icon">account_circle</mat-icon>
+        <h1>User Profile</h1>
       </div>
-      <div class="action-buttons">
-        <button
-          *ngIf="!isEditing"
-          mat-raised-button
-          color="primary"
-          class="edit-button"
-          (click)="toggleEdit()"
-        >
-          Edit
-        </button>
-        <ng-container *ngIf="isEditing">
-          <button
-            mat-raised-button
-            class="cancel-button"
-            (click)="cancelEdit()"
-          >
-            Cancel
-          </button>
-          <button mat-raised-button class="save-button" (click)="onSubmit()">
-            Save
-          </button>
-        </ng-container>
-      </div>
-    </div>
 
-    <!-- User form -->
-    <form [formGroup]="userProfileForm" (ngSubmit)="onSubmit()">
-      <div class="form-row">
-        <div class="form-field">
-          <label>First Name</label>
+      <!-- Profile Info Card -->
+      <mat-card class="profile-card">
+        <div class="card-header">
+          <div class="user-details">
+            <h2>{{ userProfile.firstName }} {{ userProfile.lastName }}</h2>
+            <p>{{ userProfile.email }}</p>
+          </div>
+          <div class="action-buttons">
+            <button *ngIf="!isEditing" mat-raised-button color="primary" (click)="toggleEdit()">
+              Edit
+            </button>
+            <ng-container *ngIf="isEditing">
+              <button mat-stroked-button color="warn" (click)="cancelEdit()">Cancel</button>
+              <button mat-raised-button color="primary" (click)="onSubmit()">Save</button>
+            </ng-container>
+          </div>
+        </div>
+
+        <form [formGroup]="userProfileForm" (ngSubmit)="onSubmit()">
           <mat-form-field appearance="outline" class="full-width">
-            <input
-              matInput
-              formControlName="firstName"
-              placeholder="First Name"
-            />
-            <mat-error
-              *ngIf="userProfileForm.get('firstName')?.errors?.['required'] && userProfileForm.get('firstName')?.touched"
-            >
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="firstName" />
+            <mat-error *ngIf="userProfileForm.get('firstName')?.hasError('required')">
               First name is required
             </mat-error>
           </mat-form-field>
-        </div>
-        <div class="form-field">
-          <label>Last Name</label>
+
           <mat-form-field appearance="outline" class="full-width">
-            <input
-              matInput
-              formControlName="lastName"
-              placeholder="Last Name"
-            />
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="lastName" />
           </mat-form-field>
-        </div>
-      </div>
-    </form>
+        </form>
+      </mat-card>
 
-    <!-- Credentials section -->
-    <div class="credentials-section">
-      <h3>Credentials</h3>
-      <div class="credentials-content">
-        <div class="email-display">
-          <mat-icon>email</mat-icon>
-          <span>{{ userProfile.email }}</span>
-        </div>
-        <div class="credential-buttons">
-          <button
-            mat-flat-button
-            class="credential-button"
-            (click)="changePassword()"
-          >
-            CHANGE PASSWORD
-          </button>
-          <button
-            mat-raised-button
-            class="cancel-button"
-            (click)="deleteAccount()"
-          >
-            DELETE ACCOUNT
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Dates section -->
-    <div class="dates-section">
-      <div class="form-row">
-        <div class="form-field">
+      <!-- Activity Card -->
+      <mat-card class="profile-card">
+        <h3>Activity</h3>
+        <div class="static-field">
           <label>Registration Date</label>
-          <mat-form-field appearance="outline" class="full-width">
-            <input
-              matInput
-              [formControl]="registrationDateControl"
-              [readonly]="true"
-            />
-          </mat-form-field>
+          <p>{{ registrationDateControl.value }}</p>
         </div>
-        <div class="form-field">
+
+        <div class="static-field">
           <label>Last Password Change</label>
-          <mat-form-field appearance="outline" class="full-width">
-            <input
-              matInput
-              [formControl]="lastPasswordChangeControl"
-              [readonly]="true"
-            />
-          </mat-form-field>
+          <p>{{ lastPasswordChangeControl.value }}</p>
         </div>
-      </div>
+
+      </mat-card>
+
+      <!-- Account Management -->
+      <mat-card class="profile-card delete-card">
+        <h3>Account Management</h3>
+        <button class="account-mgt-btn" mat-flat-button color="primary" (click)="changePassword()">Change Password</button>
+        <p class="danger-text">Deleting your account is irreversible. Proceed with caution.</p>
+        <button class="account-mgt-btn" mat-raised-button color="warn" (click)="deleteAccount()">Delete Account</button>
+      </mat-card>
     </div>
   </div>
 </div>
+

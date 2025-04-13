@@ -25,7 +25,7 @@ export class AlertService {
         ? 'Success'
         : message;
 
-    this.snackBar.open(finalMessage, 'Cerrar', {
+    this.snackBar.open(finalMessage, 'close', {
       horizontalPosition: horizontalPosition ?? 'center',
       verticalPosition: verticalPosition ?? 'top',
       panelClass: panelClass ?? ['error-snackbar'],

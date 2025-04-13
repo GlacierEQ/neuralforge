@@ -1,5 +1,6 @@
 package com.cenfotec.p3.neuralforge_api.service;
 
+import com.cenfotec.p3.neuralforge_api.model.entity.UserRoleEntity;
 import com.cenfotec.p3.neuralforge_api.model.enums.UserRoleEnum;
 import com.cenfotec.p3.neuralforge_api.model.mapper.UserRoleMapper;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserRoleResource;
@@ -9,6 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Service responsible for managing user roles.
@@ -41,5 +46,21 @@ public class UserRoleService {
                         .findByName(role)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"))
         );
+    }
+
+    /**
+     * Retrieves all roles.
+     *
+     * @return A list of {@link UserRoleResource} containing all available roles.
+     */
+    public List<UserRoleResource> getAllRoles() {
+        List<UserRoleEntity> roles = userRoleRepository.findAll();
+        return roles.stream()
+                .map(userRoleMapper::mapToResource)
+                .collect(Collectors.toList());
+    }
+
+    public Optional<UserRoleEntity> getRoleById(String id) {
+        return userRoleRepository.findById(id);
     }
 }
