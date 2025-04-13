@@ -111,7 +111,13 @@ public class ProgrammedGoalProjectService {
         ProgrammedGoalProjectEntity entity = programmedGoalProjectRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
                     "ProgrammedGoal project not found with ID: " + id));
-        
+
+        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (!user.getId().equals(entity.getCreatorUserId()) && user.getRole().getName() != UserRoleEnum.ROLE_ADMINISTRATOR){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to visualize this project");
+        }
+
         return programmedGoalProjectMapper.mapToResource(entity);
     }
 

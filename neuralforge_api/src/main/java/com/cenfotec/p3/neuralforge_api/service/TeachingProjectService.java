@@ -141,6 +141,12 @@ public class TeachingProjectService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
                     "Teaching project not found with id: " + id));
 
+        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (!user.getId().equals(entity.getCreatorUserId()) && user.getRole().getName() != UserRoleEnum.ROLE_ADMINISTRATOR){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to visualize this project");
+        }
+
         return teachingProjectMapper.mapToResource(entity);
     }
 

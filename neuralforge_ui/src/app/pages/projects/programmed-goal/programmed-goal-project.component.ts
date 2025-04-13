@@ -68,7 +68,7 @@ export class ProgrammedGoalProjectComponent implements OnInit {
 
           this.alert.displayAlert(
             "error",
-            "Project not found or could not be loaded.",
+            err.error.exception,
             "center",
             "top",
             ["error-snackbar"]
