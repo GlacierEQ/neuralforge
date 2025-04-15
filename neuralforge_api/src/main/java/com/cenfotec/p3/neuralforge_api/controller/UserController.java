@@ -123,4 +123,16 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    /**
+     * Updates a user's role based on user ID and the new role.
+     *
+     * @param userId The ID of the user whose role is being updated.
+     * @param newRole The new role to assign to the user.
+     * @return The updated {@link UserResource} with the new role.
+     */
+    @PutMapping("/{userId}/role")
+    @PreAuthorize("hasAnyRole('ROLE_ADMINISTRATOR')")
+    public ResponseEntity<UserResource> updateUserRole(@PathVariable String userId, @RequestBody String newRole) {
+        return ResponseEntity.ok(userService.updateUserRole(userId, newRole));
+    }
 }

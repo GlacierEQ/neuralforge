@@ -47,6 +47,7 @@ export class NotificationOverlayComponent {
     @Input() allNotifications: INotification[] = [];
     @Output() dismiss = new EventEmitter<string>();
     @Output() close = new EventEmitter<void>();
+    @Output() action = new EventEmitter<INotification>();
 
     viewMode: 'new' | 'all' = 'new';
 
@@ -59,10 +60,7 @@ export class NotificationOverlayComponent {
     }
 
     handleAction(notification: INotification) {
-        if (notification.redirectTo) {
-            this.router.navigate([notification.redirectTo]);
-        }
-        this.dismiss.emit(notification.id!);
-        this.close.emit();
+        this.action.emit(notification);
     }
+
 }

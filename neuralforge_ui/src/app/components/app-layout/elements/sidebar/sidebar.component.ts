@@ -130,6 +130,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.notificationCount = this.notifications.length;
   }
 
+  onNotificationAction(notification: INotification) {
+    this.router.navigate([notification.redirectTo!]);
+    this.dismissNotification(notification.id!);
+    this.showNotifications = false;
+    this.closeSidebar();
+  }
+
+
   fetchNotifications() {
     const user = localStorage.getItem("auth_user");
     const email = user ? JSON.parse(user)?.email : null;

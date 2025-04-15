@@ -2,8 +2,10 @@ package com.cenfotec.p3.neuralforge_api.service;
 
 import com.cenfotec.p3.neuralforge_api.exception.customTypes.NeuralForgeEmailException;
 import com.cenfotec.p3.neuralforge_api.model.entity.UserEntity;
+import com.cenfotec.p3.neuralforge_api.model.entity.UserRoleEntity;
 import com.cenfotec.p3.neuralforge_api.model.enums.UserRoleEnum;
 import com.cenfotec.p3.neuralforge_api.model.mapper.UserMapper;
+import com.cenfotec.p3.neuralforge_api.model.mapper.UserRoleMapper;
 import com.cenfotec.p3.neuralforge_api.model.resource.NotificationResource;
 import com.cenfotec.p3.neuralforge_api.model.resource.PasswordUpdateResource;
 import com.cenfotec.p3.neuralforge_api.model.resource.UserResource;
@@ -57,6 +59,8 @@ public class UserService {
 
     @Autowired
     protected NotificationService notificationService;
+
+    protected UserRoleMapper userRoleMapper = new UserRoleMapper();
 
     /**
      * Mapper instance for handling user entity transformations.
@@ -289,4 +293,25 @@ public class UserService {
         userRepository.save(user);
     }
 
+    /**
+     * Updates a user's role based on user ID and new role name.
+     *
+     * @param userId The ID of the user.
+     * @param newRole The new role name.
+     * @return The updated {@link UserResource}.
+     */
+    public UserResource updateUserRole(String userId, String newRole) {
+        UserEntity currentUser = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (currentUser.getId().equals(userId)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot update your own role");
+
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        UserRoleEntity role = userRoleService.getRoleById(newRole).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
+        user.setRole(role);
+
+        userRepository.save(user);
+        return userMapper.mapToResource(user);
+    }
 }

@@ -176,4 +176,8 @@ public class ProgrammedGoalProjectService {
         
         programmedGoalProjectRepository.deleteById(id);
     }
+
+    public List<ProgrammedGoalProjectEntity> findAllByNotifyTrue(){
+        return programmedGoalProjectRepository.findAllByNotifyTrue();
+    }
 }

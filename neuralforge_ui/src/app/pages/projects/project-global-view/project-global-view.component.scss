@@ -9,7 +9,6 @@ $primary-contrast: map.get(map.get(theme.$my-primary, contrast), 500);
 :host {
   display: block;
   background-color: #f7f9fc;
-  min-height: 100vh;
   padding-bottom: 2rem;
 }
 
@@ -32,7 +31,7 @@ $primary-contrast: map.get(map.get(theme.$my-primary, contrast), 500);
 .paginator-wrapper {
   display: flex;
   justify-content: center;
-  margin-top: 2rem;
+
 
   mat-paginator {
     background-color:#f7f9fc ;
@@ -74,7 +73,10 @@ $primary-contrast: map.get(map.get(theme.$my-primary, contrast), 500);
   justify-content: center;
   gap: 1rem;
   padding: 1rem;
-  background-color: $primary-color;
+  background: linear-gradient(
+                  to right,
+                  #a9b9f6,
+                  #9cfcc4);
   border-radius: 1.5rem;
 
   button {
@@ -155,7 +157,7 @@ $primary-contrast: map.get(map.get(theme.$my-primary, contrast), 500);
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 4rem auto;
+  margin: 20px auto;
   padding: 2rem;
   max-width: 500px;
   border-radius: 1.5rem;
@@ -192,7 +194,6 @@ $primary-contrast: map.get(map.get(theme.$my-primary, contrast), 500);
   margin: 0 auto;
   width: 100%;
   max-width: 850px;
-  border-top: 1px solid #eee;
   padding-top: 1rem;
 
   &::-webkit-scrollbar {

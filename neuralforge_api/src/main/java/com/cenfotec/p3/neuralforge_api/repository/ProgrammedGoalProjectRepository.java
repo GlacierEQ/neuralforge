@@ -25,4 +25,6 @@ public interface ProgrammedGoalProjectRepository extends JpaRepository<Programme
      * @return A list of learning projects created by the specified user
      */
     List<ProgrammedGoalProjectEntity> findByCreatorUserId(String creatorUserId);
+
+    List<ProgrammedGoalProjectEntity> findAllByNotifyTrue();
 }

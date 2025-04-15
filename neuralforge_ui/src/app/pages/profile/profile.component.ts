@@ -123,6 +123,8 @@ export class ProfileComponent implements OnInit {
             lastName: this.userProfile.lastName,
           });
 
+          console.log(userData)
+
           // Update date controls
           this.registrationDateControl.setValue(
             this.userProfile.registrationDate
