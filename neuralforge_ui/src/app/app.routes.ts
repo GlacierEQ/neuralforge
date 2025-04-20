@@ -18,6 +18,8 @@ import { ProgrammedGoalProjectComponent } from "./pages/projects/programmed-goal
 import { TeachingProjectComponent } from "./pages/projects/teaching/teaching-project.component";
 import { UsersComponent } from "./pages/users/users.component";
 import {ProjectGlobalViewComponent} from "./pages/projects/project-global-view/project-global-view.component";
+import {VirtualClassDashboardComponent} from "./pages/virtual-class-dashboard/virtual-class-dashboard.component";
+import {VirtualClass} from "./pages/virtual-class/virtual-class.component";
 
 /**
  * Application routes configuration.
@@ -122,6 +124,26 @@ export const routes: Routes = [
           authorities: [IRoleType.admin],
           name: "Projects",
           showInSidebar: true,
+        },
+      },
+      {
+        path: "virtual-class-dashboard",
+        component: VirtualClassDashboardComponent,
+
+        data: {
+          authorities: [IRoleType.admin, IRoleType.teacher, IRoleType.student],
+          name: "Virtual Classes",
+          showInSidebar: true,
+        },
+      },
+      {
+        path: "virtual-class/:classId",
+        component: VirtualClass,
+
+        data: {
+          authorities: [IRoleType.admin, IRoleType.teacher, IRoleType.student],
+          name: "Virtual Classes",
+          showInSidebar: false,
         },
       },
       {

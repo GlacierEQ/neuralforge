@@ -63,6 +63,35 @@ export interface IRole {
   name: string;
 }
 
+export interface IVirtualStudent {
+  id: string;
+  userId: string;
+  grade: number;
+}
+
+export interface IVirtualWeek {
+  id: string;
+  topic: string;
+  startDate: Date;
+  endDate: Date;
+  content: string;
+  visible: boolean;
+}
+
+export interface IVirtualClass {
+  id: string;
+  name: string;
+  description: string;
+  title: string;
+  creatorUserId: string;
+  studentIds: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  weeks?: IVirtualWeek[];
+  students?: IVirtualStudent[];
+}
+
+
 export interface ISearch {
   page?: number;
   size?: number;

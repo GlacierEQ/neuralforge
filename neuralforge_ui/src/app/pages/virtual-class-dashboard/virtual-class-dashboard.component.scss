@@ -1,0 +1,306 @@
+@use "@angular/material" as mat;
+@use "sass:map";
+@use "../../../styles.scss" as theme;
+
+$primary-color: mat.get-color-from-palette(theme.$my-primary, 500);
+$primary-contrast: map.get(map.get(theme.$my-primary, contrast), 500);
+
+.section-header {
+  margin-bottom: 2rem;
+  padding-top: 50px;
+
+  .section-title {
+    text-align: center;
+    font-family: "Poppins";
+    font-size: 2rem;
+    font-weight: 600;
+    color: $primary-color;
+    margin: 0 auto;
+    padding-bottom: 0.5rem;
+  }
+}
+
+.search-tabs-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+
+  .tab-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(to right, #a9b9f6, #9cfcc4);
+    border-radius: 1.5rem;
+
+    button {
+      background-color: #fff;
+      border-radius: 2rem;
+      font-family: "Poppins";
+      font-weight: 500;
+      padding: 0.5rem 1.2rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      transition: all 0.3s ease;
+      color: #333;
+
+      &.active {
+        background-color: $primary-contrast;
+        color: $primary-color;
+      }
+
+      &:hover {
+        background-color: lighten($primary-contrast, 10%);
+        color: $primary-color;
+      }
+    }
+  }
+}
+
+.create-class-card {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-radius: 1.25rem;
+  background: white;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  margin-bottom: 30px;
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    .full-width {
+      width: 100%;
+    }
+  }
+}
+
+.tab-content-placeholder {
+  padding: 3rem 1rem;
+  text-align: center;
+  font-family: "Poppins";
+  color: #555;
+
+  mat-icon {
+    margin-bottom: 1rem;
+    color: #bbb;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+    font-weight: 500;
+  }
+}
+
+.virtual-class-card {
+  margin: 1.5rem auto;
+  text-align: center;
+  width: 80%;
+  max-width: 400px;
+
+  .mat-card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    padding: 1.2rem;
+    background-color: #fff;
+    transition: transform 0.3s ease-in-out;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    mat-card-title {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+
+    mat-card-content {
+      font-size: 1rem;
+      color: #555;
+      margin-bottom: 1rem;
+    }
+  }
+}
+
+.mat-paginator {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.mat-paginator .mat-button {
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  background-color: #f5f5f5;
+  color: $primary-color;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: lighten($primary-color, 30%);
+    color: #fff;
+  }
+
+  &:disabled {
+    background-color: #ddd;
+    cursor: not-allowed;
+  }
+}
+
+.mat-paginator span {
+  font-size: 1.1rem;
+  color: $primary-color;
+}
+
+.search-bar {
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+
+  mat-form-field {
+    width: 80%;
+    max-width: 500px;
+    margin: 0 auto;
+
+    mat-label {
+      font-family: "Poppins";
+      color: $primary-color;
+    }
+
+    mat-icon {
+      color: $primary-color;
+    }
+  }
+}
+
+.tab-content-list {
+  padding: 1rem;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+
+  button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    color: $primary-color;
+    background-color: #f5f5f5;
+
+    &:disabled {
+      background-color: #ddd;
+      cursor: not-allowed;
+    }
+  }
+
+  span {
+    font-size: 1.2rem;
+    color: $primary-color;
+  }
+}
+
+.card-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+
+.virtual-classes-list {
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 850px;
+  padding-top: 1rem;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+.project-item {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 1.5rem;
+  padding: 1.5rem;
+  border-radius: 1.25rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  font-family: "Poppins";
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  mat-card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  mat-card-content {
+    font-size: 0.95rem;
+    color: #444;
+  }
+
+  mat-card-actions {
+    margin-top: 1rem;
+
+    button {
+      font-family: "Poppins";
+      font-weight: 500;
+    }
+  }
+}
+
+.no-projects {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #777;
+  font-family: "Poppins";
+
+  mat-icon {
+    color: #ccc;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    font-size: 1rem;
+    color: #555;
+  }
+}
