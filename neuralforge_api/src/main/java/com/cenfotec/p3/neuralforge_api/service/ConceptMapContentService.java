@@ -35,39 +35,13 @@ public class ConceptMapContentService {
 
     @Autowired
     private DynamicContentRepository dynamicContentRepository;
-
-    /**
-     * Extracts text from a PDF file, generates a concept map, and saves the concept map as an image.
-     *
-     * @param file The PDF file to be processed.
-     * @param title The title of the concept map.
-     * @param email The email of the user submitting the concept map.
-     * @param type The type of content for the concept map.
-     * @return A success message indicating the concept map was generated and saved.
-     * @throws IOException If an error occurs while processing the file.
-     */
-    public String extractTextAndGenerateConceptMap(MultipartFile file, String title, String email, String type) throws IOException {
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("File is empty.");
-        }
-
-        try (PDDocument document = PDDocument.load(file.getInputStream())) {
-            PDFTextStripper pdfStripper = new PDFTextStripper();
-            String extractedText = pdfStripper.getText(document);
-
-            String conceptMap = getConceptMapFromDeepSeek(extractedText);
-            savePlantUmlDiagram(conceptMap, title, email, type);
-            return "Concept map generated and saved successfully.";
-        }
-    }
-
     /**
      * Calls the DeepSeek API to generate a concept map from the extracted text.
      *
      * @param text The extracted text to be summarized.
      * @return The concept map in PlantUML format.
      */
-    private String getConceptMapFromDeepSeek(String text) {
+    public String getConceptMapFromDeepSeek(String text, String language) {
         String instructions = """
             Genera un mapa conceptual en formato PlantUML siguiendo estas reglas:
             - NO uses bloques de código Markdown como ```plantuml``` ni ningún otro formato de código.
@@ -78,7 +52,7 @@ public class ConceptMapContentService {
             - Usa "**** " para subtemas de tercer nivel.
             - NO agregues "@startmindmap" ni "@endmindmap".
             - Toma en cuenta solo info importante, que sea un mapa util didacticamente, descarta informacion de formato o referencias"
-            """;
+           - El contenido debe estar redactado en el siguiente idioma: """ + language + ".";
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", MODEL_NAME);
@@ -120,7 +94,7 @@ public class ConceptMapContentService {
      * @param type The type of content for the concept map.
      * @throws IOException If an error occurs while creating the image.
      */
-    private void savePlantUmlDiagram(String content, String title, String email, String type) {
+    public void savePlantUmlDiagram(String content, String title, String email, String type, String projectId) {
         try {
             File directory = new File("src/main/resources/dynamicContent/");
             if (!directory.exists() && !directory.mkdirs()) {
@@ -131,7 +105,23 @@ public class ConceptMapContentService {
             File imageFile = new File(directory, title + ".png");
 
             try (OutputStream pngOutput = new FileOutputStream(imageFile)) {
-                String umlContent = "@startmindmap\n" + content + "\n@endmindmap";
+
+                String umlContent = "@startmindmap\n"
+                        + "skinparam backgroundColor #18285a\n"
+                        + "skinparam nodeFontSize 16\n"
+                        + "skinparam nodePadding 20\n"
+                        + "skinparam nodeBorderColor #5064BC\n"
+                        + "skinparam nodeBackgroundColor #5064BC\n"
+                        + "skinparam ArrowColor #5064BC\n"
+                        + "skinparam ArrowThickness 2\n"
+                        + "skinparam titleFontSize 24\n"
+                        + "skinparam titleFontColor #FFFFFF\n"
+                        + "skinparam nodeFontColor #FFFFFF\n"
+                        + "skinparam lineStyle solid\n"
+                        + "skinparam mindMapEdgeThickness 1\n"
+                        + "title " + title + "\n"
+                        + content + "\n@endmindmap";
+
                 SourceStringReader reader = new SourceStringReader(umlContent);
                 reader.generateImage(pngOutput);
             }
@@ -143,12 +133,14 @@ public class ConceptMapContentService {
 
             System.out.println("Image generated successfully at: " + imageFile.getAbsolutePath());
 
+            // Guardar los detalles del diagrama en la base de datos
             DynamicContentEntity dynamicContent = new DynamicContentEntity();
             dynamicContent.setTitle(title);
             dynamicContent.setPath(imageFile.getAbsolutePath());
             dynamicContent.setEmail(email);
             dynamicContent.setType(DynamicContentTypeEnum.valueOf(type));
             dynamicContent.setCreationDate(LocalDateTime.now());
+            dynamicContent.setProjectId(projectId);
 
             dynamicContentRepository.save(dynamicContent);
 

@@ -19,16 +19,27 @@ export class DynamicContentService extends BaseService<IDynamicContent> {
     projectId: string,
     materialId: string,
     title: string,
-    type: string
+    type: string,
+    language: string
   ): Observable<void> {
+    // Imprimir los datos que se están enviando
+    console.log('Enviando datos al servidor:', {
+      projectId,
+      materialId,
+      title,
+      type,
+      language
+    });
+  
+    // Realizar la solicitud POST
     return this.http.post<void>(`${this.source}/generate`, {
       projectId,
       materialId,
       title,
       type,
+      language
     });
   }
-
   download(contentId: string): Observable<ArrayBuffer> {
     return this.http.get(`${this.source}/download/${contentId}`, {
       responseType: "arraybuffer",

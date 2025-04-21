@@ -4,7 +4,10 @@
   <mat-dialog-content>
     <form [formGroup]="form" class="form-container">
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Title</mat-label>
+        <mat-label>
+          Title
+          <mat-icon matTooltip="Enter the title for the content." matTooltipPosition="above" class="inline-icon">info</mat-icon>
+        </mat-label>
         <input matInput formControlName="title" required />
         <mat-error *ngIf="form.get('title')?.hasError('required')">
           Title is required
@@ -12,11 +15,15 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Type</mat-label>
+        <mat-label>
+          Type
+          <mat-icon matTooltip="Choose the type of content you want to generate, such as a summary, PowerPoint, or concept map." matTooltipPosition="above" class="inline-icon">info</mat-icon>
+        </mat-label>
         <mat-select formControlName="type" required>
           <mat-option value="SUMMARY">Summary</mat-option>
-          <!-- <mat-option value="ANALYSIS">Analysis</mat-option>
-          <mat-option value="REVIEW">Review</mat-option> -->
+          <mat-option value="PPT">PPT</mat-option>
+          <mat-option value="CONCEPTMAP">Concept Map</mat-option>
+          <mat-option value="CUESTIONARY">Cuestionary</mat-option>
         </mat-select>
         <mat-error *ngIf="form.get('type')?.hasError('required')">
           Type is required
@@ -24,13 +31,61 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Select Material</mat-label>
+        <mat-label>
+          Language
+          <mat-icon matTooltip="Choose the language for the content." matTooltipPosition="above" class="inline-icon">info</mat-icon>
+        </mat-label>
+        <mat-select formControlName="language" required>
+          <mat-option value="English">English</mat-option>
+          <mat-option value="Spanish">Spanish</mat-option>
+          <mat-option value="French">French</mat-option>
+          <mat-option value="German">German</mat-option>
+          <mat-option value="Italian">Italian</mat-option>
+          <mat-option value="Portuguese">Portuguese</mat-option>
+          <mat-option value="Catalan">Catalan</mat-option>
+          <mat-option value="Dutch">Dutch</mat-option>
+          <mat-option value="Polish">Polish</mat-option>
+          <mat-option value="Czech">Czech</mat-option>
+          <mat-option value="Slovak">Slovak</mat-option>
+          <mat-option value="Russian">Russian</mat-option>
+          <mat-option value="Ukrainian">Ukrainian</mat-option>
+          <mat-option value="Bulgarian">Bulgarian</mat-option>
+          <mat-option value="Serbian">Serbian</mat-option>
+          <mat-option value="Croatian">Croatian</mat-option>
+          <mat-option value="Slovenian">Slovenian</mat-option>
+          <mat-option value="Lithuanian">Lithuanian</mat-option>
+          <mat-option value="Latvian">Latvian</mat-option>
+          <mat-option value="Estonian">Estonian</mat-option>
+          <mat-option value="Swedish">Swedish</mat-option>
+          <mat-option value="Norwegian">Norwegian</mat-option>
+          <mat-option value="Danish">Danish</mat-option>
+          <mat-option value="Icelandic">Icelandic</mat-option>
+          <mat-option value="Finnish">Finnish</mat-option>
+          <mat-option value="Greek">Greek</mat-option>
+          <mat-option value="Turkish">Turkish</mat-option>
+          <mat-option value="Romanian">Romanian</mat-option>
+          <mat-option value="Vietnamese">Vietnamese</mat-option>
+          <mat-option value="Hebrew">Hebrew</mat-option>
+          <mat-option value="Arabic">Arabic</mat-option>
+          <mat-option value="Thai">Thai</mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('language')?.hasError('required')">
+          Language is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>
+          Select Material
+          <mat-icon matTooltip="Choose the material you want to upload or link to this content." matTooltipPosition="above" class="inline-icon">info</mat-icon>
+        </mat-label>
         <mat-select formControlName="materialId" required>
-          <mat-option
-            *ngFor="let material of materials$ | async"
-            [value]="material.id"
-          >
-            {{ material.fileName }}
+          <mat-option *ngFor="let material of materials$ | async" [value]="material.id">
+            {{
+              material.fileName
+                || (material.type === 'hyperlink' ? getDefaultNameForHyperlink(material) : '')
+                || 'Unnamed Material'
+            }}
           </mat-option>
         </mat-select>
         <mat-error *ngIf="form.get('materialId')?.hasError('required')">

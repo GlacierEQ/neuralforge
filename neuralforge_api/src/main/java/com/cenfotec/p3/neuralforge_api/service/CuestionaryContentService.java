@@ -2,6 +2,7 @@ package com.cenfotec.p3.neuralforge_api.service;
 
 import com.cenfotec.p3.neuralforge_api.model.entity.DynamicContentEntity;
 import com.cenfotec.p3.neuralforge_api.model.enums.DynamicContentTypeEnum;
+import com.cenfotec.p3.neuralforge_api.repository.DynamicContentRepository;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -11,21 +12,23 @@ import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import com.cenfotec.p3.neuralforge_api.repository.DynamicContentRepository;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-public class SummaryContentService {
+public class CuestionaryContentService {
 
     private static final String DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions";
     private static final String MODEL_NAME = "deepseek-chat";
@@ -35,34 +38,31 @@ public class SummaryContentService {
 
     private final DynamicContentRepository dynamicContentRepository;
 
-    public SummaryContentService(DynamicContentRepository dynamicContentRepository) {
+    public CuestionaryContentService(DynamicContentRepository dynamicContentRepository) {
         this.dynamicContentRepository = dynamicContentRepository;
     }
 
-    public String getSummaryFromDeepSeek(String text, String language) {
+    public String getCuestionaryFromDeepSeek(String text, String language) {
         String instructions = """
-        Dame este texto completo con las siguientes reglas:
-        - Usa "# " para títulos principales.
-        - Usa "## " para subtítulos.
-        - Usa "### " para sub-subtítulos.
-        - Utiliza solo estos 3 tipos de titulo no más.
-        - Los títulos deben ser procesados correctamente y no deben ser fragmentados.
-        - Los títulos deben empezar con mayúscula aun si tienen una numeracion antes y deben ser completos, no cortados.
+        Dame este texto completo convertido en un cuestionario destinado al estudio:
+        - Usa "## " para preguntas.
+        - Usa "### " para respuestas.
         - Usa "**texto**" para negrita.
         - Usa "*texto*" para cursiva.
         - Usa "- " para listas con viñetas en caso de ser necesarias para el resumen.
         - No agregues comentarios adicionales.
-        - Antes de resumir, asegúrate de entender el contenido global.
+        - Sigue una estructura en el que el documento solo tenga preguntas y respuestas numeradas del 1 al n, extrayendo la info conmpartida no agregues titulos o numeraciones propias.
+        - Antes de crear el cuestionario, asegúrate de entender el contenido global.
         - Usa un vocabulario acorde al público objetivo que es estudiantes de secundaria y universitarios.
-        - Usa una estructura lógica y coherente y resume por secciones.
+        - Usa una estructura lógica y coherente.
         - No omitas ideas fundamentales.
-        - El resumen debe tener solo la información esencial, pero bien conectada.
+        - El cuestionario debe tener solo la información esencial, pero bien conectada.
         - Omite texto fuera del contenido como referencias, bibliografía, notas fuera de contenido, etc.
         - Agrega el texto necesario para darle sentido al resumen sin añadir más contenido.
         - El contenido debe estar redactado en el siguiente idioma: """ + language + ".";
 
-        List<String> fragments = splitTextIntoChunks(text, 1000000);
-        StringBuilder fullSummary = new StringBuilder();
+        List<String> fragments = splitTextIntoChunks(text, 20000);
+        StringBuilder fullCuestionary = new StringBuilder();
 
         System.out.println("Iniciando el proceso de resumen...");
 
@@ -72,7 +72,7 @@ public class SummaryContentService {
             if (i == 0) {
                 messages.add(Map.of("role", "user", "content", instructions + "\n\n" + fragments.get(0)));
             } else {
-                messages.add(Map.of("role", "assistant", "content", fullSummary.toString().trim()));
+                messages.add(Map.of("role", "assistant", "content", fullCuestionary.toString().trim()));
                 messages.add(Map.of("role", "user", "content",
                         "Continúa resumiendo el siguiente fragmento del texto, manteniendo el estilo anterior. Estas son las instrucciones:\n\n"
                                 + instructions + "\n\n" + fragments.get(i)));
@@ -100,8 +100,8 @@ public class SummaryContentService {
                     if (choices != null && !choices.isEmpty()) {
                         Map<String, Object> messageResponse = (Map<String, Object>) choices.get(0).get("message");
                         if (messageResponse != null && messageResponse.containsKey("content")) {
-                            String summary = (String) messageResponse.get("content");
-                            fullSummary.append(summary).append("\n\n");
+                            String cuestionary = (String) messageResponse.get("content");
+                            fullCuestionary.append(cuestionary).append("\n\n");
                             System.out.println("Fragmento " + (i + 1) + " procesado correctamente.");
                         }
                     }
@@ -113,7 +113,7 @@ public class SummaryContentService {
         }
 
         System.out.println("Resumen final generado.");
-        return fullSummary.toString().trim();
+        return fullCuestionary.toString().trim();
     }
 
     private List<String> splitTextIntoChunks(String text, int maxLength) {

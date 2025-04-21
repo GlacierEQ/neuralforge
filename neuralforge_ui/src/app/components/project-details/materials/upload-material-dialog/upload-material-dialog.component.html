@@ -37,7 +37,7 @@
             Hyperlink is required
           </mat-error>
           <mat-error *ngIf="uploadForm.get('hyperlink')?.hasError('pattern')">
-            Please enter a valid URL starting with http:// or https://
+            Please enter a valid URL starting with http:// or https:// and ending in .pdf or .txt (e.g. https://example.com/file.pdf)
           </mat-error>
         </mat-form-field>
       </ng-container>
