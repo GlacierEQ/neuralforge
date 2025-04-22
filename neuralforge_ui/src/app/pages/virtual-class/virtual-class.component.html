@@ -1,0 +1,51 @@
+<ng-container *ngIf="!isLoading && !hasError && virtualClass">
+    <mat-card class="deadline-card">
+        <h2 class="days-left-title">{{ virtualClass.title }}</h2>
+        <p class="deadline">
+            Description:
+            {{ virtualClass.description || 'No description provided.' }}
+        </p>
+    </mat-card>
+
+    <mat-card class="overview-tab">
+        <h3>Weeks</h3>
+        <div *ngIf="virtualClass.weeks?.length; else noWeeks">
+            <ul>
+                <li *ngFor="let week of virtualClass.weeks">
+                    {{ week.topic }} - Visible: {{ week.visible ? 'Yes' : 'No' }}
+                </li>
+            </ul>
+        </div>
+        <ng-template #noWeeks>
+            <div class="empty-state">No weeks configured.</div>
+        </ng-template>
+    </mat-card>
+
+    <mat-card class="overview-tab">
+        <h3>Students</h3>
+        <div *ngIf="virtualClass.students?.length; else noStudents">
+            <ul>
+                <li *ngFor="let student of virtualClass.students">
+                    Student ID: {{ student.userId }} | Grade: {{ student.grade }}
+                </li>
+            </ul>
+        </div>
+        <ng-template #noStudents>
+            <div class="empty-state">No students enrolled.</div>
+        </ng-template>
+    </mat-card>
+</ng-container>
+
+<ng-container *ngIf="isLoading">
+    <div class="loading-container">
+        <mat-icon>hourglass_empty</mat-icon>
+        <p>Loading virtual class...</p>
+    </div>
+</ng-container>
+
+<ng-container *ngIf="hasError && !isLoading">
+    <div class="error-container">
+        <mat-icon color="warn" class="error-icon">error_outline</mat-icon>
+        <p class="error-message">{{ errorMessage }}</p>
+    </div>
+</ng-container>
