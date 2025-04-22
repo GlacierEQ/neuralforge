@@ -59,9 +59,10 @@ describe("DynamicContentService", () => {
     const materialId = "material-1";
     const title = "Generated Content";
     const type = "pdf";
+    const language = "English";
 
     service
-      .generateContent(projectId, materialId, title, type)
+      .generateContent(projectId, materialId, title, type, language)
       .subscribe((response) => {
         expect(response).toBeUndefined();
       });
@@ -73,6 +74,7 @@ describe("DynamicContentService", () => {
       materialId,
       title,
       type,
+      language,
     });
     req.flush(null);
   });

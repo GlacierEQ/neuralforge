@@ -18,6 +18,7 @@ import { MatInputModule } from "@angular/material/input";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatSelectModule } from "@angular/material/select";
 import { ProjectMaterialService } from "../../../../services/project-material.service";
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: "app-upload-material-dialog",
@@ -34,6 +35,7 @@ import { ProjectMaterialService } from "../../../../services/project-material.se
     MatSelectModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatTooltipModule
   ],
 })
 export class UploadMaterialDialogComponent implements OnInit {
@@ -63,11 +65,11 @@ export class UploadMaterialDialogComponent implements OnInit {
     this.uploadForm.get("type")?.valueChanges.subscribe((type) => {
       const hyperlinkControl = this.uploadForm.get("hyperlink");
       const fileControl = this.uploadForm.get("file");
-
+  
       if (type === "hyperlink") {
         hyperlinkControl?.setValidators([
           Validators.required,
-          Validators.pattern("https?://.+"),
+          Validators.pattern(/^https?:\/\/.+\.(pdf|txt)$/i),
         ]);
         hyperlinkControl?.updateValueAndValidity();
         fileControl?.clearValidators();

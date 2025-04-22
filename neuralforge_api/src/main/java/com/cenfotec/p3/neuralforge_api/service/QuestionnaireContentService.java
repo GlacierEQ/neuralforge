@@ -2,6 +2,7 @@ package com.cenfotec.p3.neuralforge_api.service;
 
 import com.cenfotec.p3.neuralforge_api.model.entity.DynamicContentEntity;
 import com.cenfotec.p3.neuralforge_api.model.enums.DynamicContentTypeEnum;
+import com.cenfotec.p3.neuralforge_api.repository.DynamicContentRepository;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -11,21 +12,23 @@ import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import com.cenfotec.p3.neuralforge_api.repository.DynamicContentRepository;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-public class SummaryContentService {
+public class QuestionnaireContentService {
 
     private static final String DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions";
     private static final String MODEL_NAME = "deepseek-chat";
@@ -35,66 +38,58 @@ public class SummaryContentService {
 
     private final DynamicContentRepository dynamicContentRepository;
 
-    public SummaryContentService(DynamicContentRepository dynamicContentRepository) {
+    public QuestionnaireContentService(DynamicContentRepository dynamicContentRepository) {
         this.dynamicContentRepository = dynamicContentRepository;
     }
 
-    public String getSummaryFromDeepSeek(String text, String language) {
+    public String getQuestionnaireFromDeepSeek(String text, String language) {
         String instructions = """
-            Summarize the text using the following rules:
+            Convert the following text into a clear and structured study questionnaire, strictly following these rules:
             
-            - Use "# " for main titles.
-            - Use "## " for subtitles.
-            - Use "### " for sub-subtitles.
-            - Only use these 3 types of headings—no more.
-            - Headings must be processed correctly and not be fragmented.
-            - Headings must start with a capital letter, even if preceded by numbering, and should not be cut off.
-            - Use "**text**" for bold.
-            - Use "*text*" for italic.
-            - Use "- " for bullet lists when appropriate.
-            - Do not include extra comments or explanations outside the main content.
-            - Understand the overall content before summarizing.
-            - Use vocabulary appropriate for high school and college students.
-            - Maintain a logical and coherent structure. Summarize by sections.
-            - Do not skip essential ideas.
-            - The summary should contain only essential information but remain well connected.
-            - Omit sections such as references, bibliography, and footnotes.
-            - Add necessary transitions for clarity without introducing new content.
-            - Do not use "---" to separate sections or ANYWHERE IMPORTANT.
-            - The output must be in this language: """ + language + """
+            1. Use "## " at the beginning of each question.
+            2. Use "### " at the beginning of each answer.
+            3. Highlight **key concepts** in bold.
+            4. Use *italics* for definitions or additional explanations.
+            5. Use bullet points with "- " when listing complex information.
+            6.Do not add titles, introductions, or model-generated numbering; only generate questions and answers, and add your own numbering to the questions from 1 to n.
+            7. Do not repeat content or generate unnecessary explanations.
+            8. Ensure the output is logically structured and preserves the essential information from the original text.
+            9. Do not include references, bibliographies, or external notes.
+            10. Do not add any comments outside the questionnaire content.
+            11. The style must be accessible to high school and college students.
+            12. Do not use "---" to separate questions or ANYWHERE IMPORTANT.
+            13. The language must be: """ + language + """
             
-            Example of the expected format (output only, do not include original text):
+            Before starting, analyze the entire text and ensure you understand it. The goal is to facilitate study by transforming the text into clear questions with complete and informative answers.
             
-            # Photosynthesis
             
-            ## Definition And Importance
+            Example of expected format:
+            ## What is photosynthesis?
+            ### **Photosynthesis** is the process by which **green plants and some organisms** use **sunlight** to synthesize **food** with the help of *chlorophyll*.
             
-            **Photosynthesis** is a process where **green plants** and some **organisms** use *sunlight* to convert *carbon dioxide* and *water* into **glucose**. This process is vital for life on Earth because:
+            ## What materials are required for photosynthesis?
+            ### The materials required are:
+            - **Carbon dioxide (CO₂)**
+            - **Water (H₂O)**
+            - **Light energy**
             
-            - It produces **oxygen** for respiration.
-            - It provides **glucose**, the foundation of most food chains.
+            ## What are the products of photosynthesis?
+            ### The main products are:
+            - **Glucose (C₆H₁₂O₆)**
+            - **Oxygen (O₂)**
             
-            ## Where It Happens
+            ## Where does photosynthesis take place in plant cells?
+            ### Photosynthesis occurs in the **chloroplasts**, which contain *chlorophyll*, the green pigment essential for capturing light energy.
             
-            Photosynthesis occurs in **chloroplasts**, specialized cell structures in plants. These contain **chlorophyll**, a pigment that absorbs sunlight.
-            
-            ## General Equation
-            
-            The general photosynthesis equation is:
-            
+            ## What is the general equation for photosynthesis?
+            ### The equation is:
             **6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂**
-            
-            ### Key Concepts
-            
-            - **Carbon dioxide** and **water** are the inputs.
-            - **Light energy** is essential for the reaction.
-            - **Oxygen** is produced as a *byproduct*.
             """;
 
         List<String> fragments = splitTextIntoChunks(text, 20000);
-        StringBuilder fullSummary = new StringBuilder();
+        StringBuilder fullCuestionary = new StringBuilder();
 
-        System.out.println("Starting the summarization process...");
+        System.out.println("Iniciando el proceso de resumen...");
 
         for (int i = 0; i < fragments.size(); i++) {
             List<Map<String, String>> messages = new ArrayList<>();
@@ -102,9 +97,9 @@ public class SummaryContentService {
             if (i == 0) {
                 messages.add(Map.of("role", "user", "content", instructions + "\n\n" + fragments.get(0)));
             } else {
-                messages.add(Map.of("role", "assistant", "content", fullSummary.toString().trim()));
+                messages.add(Map.of("role", "assistant", "content", fullCuestionary.toString().trim()));
                 messages.add(Map.of("role", "user", "content",
-                        "Just continue the following fragment of the text, maintaining the previous style, do not use (---) to separate sections or ANYWHERE, do not add any extra explanation. These are the instructions of the whole summary:\n\n"
+                        "Just continue the following fragment of the text, maintaining the previous style, do not use (---) to separate questions or ANYWHERE, do not add any extra explanation. These are the instructions of the whole summary:\n\n"
                                 + instructions + "\n\n" + fragments.get(i)));
             }
 
@@ -130,8 +125,8 @@ public class SummaryContentService {
                     if (choices != null && !choices.isEmpty()) {
                         Map<String, Object> messageResponse = (Map<String, Object>) choices.get(0).get("message");
                         if (messageResponse != null && messageResponse.containsKey("content")) {
-                            String summary = (String) messageResponse.get("content");
-                            fullSummary.append(summary).append("\n\n");
+                            String cuestionary = (String) messageResponse.get("content");
+                            fullCuestionary.append(cuestionary).append("\n\n");
                             System.out.println("Fragment " + (i + 1) + " processed successfully.");
                         }
                     }
@@ -143,7 +138,7 @@ public class SummaryContentService {
         }
 
         System.out.println("Final summary generated.");
-        return fullSummary.toString().trim();
+        return fullCuestionary.toString().trim();
     }
 
     private List<String> splitTextIntoChunks(String text, int maxLength) {
@@ -283,7 +278,7 @@ public class SummaryContentService {
                     while (matcher.find()) {
                         String segment = matcher.group();
                         PDFont fontToUse = fontRegular;
-                        float textWidth;
+
 
                         if (segment.startsWith("**") && segment.endsWith("**")) {
                             fontToUse = fontBold;
@@ -294,7 +289,7 @@ public class SummaryContentService {
                         }
 
                         contentStream.setFont(fontToUse, fontSize);
-                        textWidth = fontToUse.getStringWidth(segment) / 1000 * fontSize;
+
                         contentStream.showText(segment);
                     }
 

@@ -3,9 +3,8 @@ package com.cenfotec.p3.neuralforge_api.service;
 import com.cenfotec.p3.neuralforge_api.model.entity.DynamicContentEntity;
 import com.cenfotec.p3.neuralforge_api.model.enums.DynamicContentTypeEnum;
 import com.cenfotec.p3.neuralforge_api.repository.DynamicContentRepository;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.poi.sl.usermodel.PictureData;
+import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.xslf.usermodel.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.time.LocalDateTime;
@@ -38,6 +36,7 @@ public class PPTContentService {
     @Autowired
     private DynamicContentRepository dynamicContentRepository;
 
+
     /**
      * Extracts text from a PDF file, generates a slide deck, and saves the presentation.
      *
@@ -48,38 +47,71 @@ public class PPTContentService {
      * @return A success message indicating the slide deck was generated and saved.
      * @throws IOException If an error occurs while processing the file.
      */
-    public String extractTextAndGeneratePPT(MultipartFile file, String title, String email, String type) throws IOException {
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("File is empty.");
-        }
-
-        try (PDDocument document = PDDocument.load(file.getInputStream())) {
-            PDFTextStripper pdfStripper = new PDFTextStripper();
-            String extractedText = pdfStripper.getText(document);
-
-            String slideContent = getSlideDeckFromDeepSeek(extractedText);
-            saveTextAsPPT(slideContent, title, email, type);
-            return "Slide deck generated and saved successfully.";
-        }
-    }
-
     /**
      * Calls the DeepSeek API to generate a structured slide deck from the extracted text.
      *
-     * @param text The extracted text to be converted into slides.
+     * @param text          The extracted text to be converted into slides.
      * @return The structured slide content.
      */
-    private String getSlideDeckFromDeepSeek(String text) {
+    public String getPPTFromDeepSeek(String text, String language) {
         String instructions = """
-            Genera una presentación en texto siguiendo este formato:
-            - Cada diapositiva comienza con "Slide X:"
-            - El título de la diapositiva empieza con "Title: "
-            - Los puntos clave de la diapositiva empiezan con "- "
-            - NO uses bloques de código ni etiquetas Markdown.
-            - NO agregues texto extra ni explicaciones, solo devuelve el contenido en el formato indicado.
-            - Resumir información de manera efectiva para una presentación didáctica.
-            - Que lo que coloques tenga sentido con el tema, esta bien si quitas texto que no sea relevante.
-            """;
+            Generate a text-based presentation following this format:
+            - Each slide starts with "Slide X:"
+            - The slide title starts with "Title: "
+            - Key points start with "- "
+            - DO NOT use code blocks or Markdown tags.
+            - Slide titles must be no longer than 30 characters.
+            - DO NOT add extra text or explanations, only return the content in the format specified.
+            - Summarize information effectively for an educational presentation.
+            - Make sure the content makes sense for the topic; it's okay to omit irrelevant text.
+            - The content must be written in the following language: """ + language + """
+            - DO NOT include sub-points or bullet points within bullet points.
+            - Each slide should contain a maximum of 5 key points.
+            - Each key point must be no longer than 60 characters.
+        
+            Example of expected format:
+        
+            Slide 1:
+            Title: Introduction to Java
+            - Overview of Java programming language
+            - Key features: object-oriented, platform-independent
+            - Widely used for web and mobile development
+            - Strong community support
+            - High performance and scalability
+        
+            Slide 2:
+            Title: Java Syntax Basics
+            - Classes and objects are fundamental
+            - Java uses curly braces for code blocks
+            - Statements end with semicolons
+            - Case-sensitive language
+            - Commonly used for backend development
+        
+            Slide 3:
+            Title: Control Structures
+            - If-else: Used for conditional branching
+            - Switch: Simplifies multiple conditions
+            - Loops: for, while, and do-while for repetition
+            - Break and continue control loop flow
+            - Nested loops for complex operations
+        
+            Slide 4:
+            Title: Object-Oriented Concepts
+            - Encapsulation: Hiding data in classes
+            - Inheritance: Reuse code with subclasses
+            - Polymorphism: Method variety in classes
+            - Abstraction: Hide complexity with simplicity
+            - Interfaces: Define contracts for classes
+        
+            Slide 5:
+            Title: Conclusions
+            - Java is versatile and widely used
+            - Strong support for object-oriented design
+            - Great for web, mobile, enterprise apps
+            - Large library and community ecosystem
+            - Suitable for scalable applications
+        """;
+
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", MODEL_NAME);
@@ -120,29 +152,30 @@ public class PPTContentService {
      * @param email   The email of the user.
      * @param type    The type of content.
      */
-    private void saveTextAsPPT(String content, String title, String email, String type) {
+    public void saveTextAsPPT(String content, String title, String email, String type, String projectId) {
         try {
             File directory = new File("src/main/resources/dynamicContent/");
             if (!directory.exists() && !directory.mkdirs()) {
-                System.err.println("Error: Could not create directory " + directory.getAbsolutePath());
+                System.err.println("Error: Could not create the directory. " + directory.getAbsolutePath());
                 return;
             }
 
             File pptFile = new File(directory, title + ".pptx");
 
+            if (pptFile.exists() && pptFile.length() > 0) {
+                System.out.println("The file already exists and contains content. It will be overwritten.");
+            }
+
             try (XMLSlideShow ppt = new XMLSlideShow(); FileOutputStream out = new FileOutputStream(pptFile)) {
-                // Establecer las dimensiones de la diapositiva en 16:9 (1920x1080 píxeles)
+
                 ppt.setPageSize(new java.awt.Dimension(1920, 1080));
 
-                // Ruta de las imágenes de fondo
-                File coverImageFile = new File("src/main/resources/images/mainBackground.png"); // Fondo para la primera diapositiva
-                File contentImageFile = new File("src/main/resources/images/finalBackground.png"); // Fondo para las demás
+                File coverImageFile = new File("src/main/resources/images/mainBackground.png");
+                File contentImageFile = new File("src/main/resources/images/finalBackground.png");
 
-                // Crear PictureData a partir de los archivos de imagen
                 PictureData coverPictureData = ppt.addPicture(coverImageFile, XSLFPictureData.PictureType.PNG);
                 PictureData contentPictureData = ppt.addPicture(contentImageFile, XSLFPictureData.PictureType.PNG);
 
-                // Crear la primera diapositiva (portada)
                 XSLFSlide coverSlide = ppt.createSlide();
                 XSLFPictureShape coverPictureShape = coverSlide.createPicture(coverPictureData);
                 coverPictureShape.setAnchor(new java.awt.Rectangle(0, 0, 1920, 1080));
@@ -150,6 +183,7 @@ public class PPTContentService {
                 XSLFTextBox coverTitleBox = coverSlide.createTextBox();
                 coverTitleBox.setAnchor(new java.awt.Rectangle(400, 400, 1120, 200));
                 XSLFTextParagraph coverTitleParagraph = coverTitleBox.addNewTextParagraph();
+                coverTitleParagraph.setTextAlign(TextParagraph.TextAlign.CENTER);
                 XSLFTextRun coverTitleRun = coverTitleParagraph.addNewTextRun();
                 coverTitleRun.setText(title);
                 coverTitleRun.setBold(true);
@@ -183,21 +217,22 @@ public class PPTContentService {
                     }
 
                     XSLFTextBox contentBox = slide.createTextBox();
-                    contentBox.setAnchor(new java.awt.Rectangle(500, 250, 1820, 800));
+                    contentBox.setAnchor(new java.awt.Rectangle(500, 350, 1220, 700));
 
                     for (int i = 1; i < lines.length; i++) {
                         if (lines[i].startsWith("-")) {
                             XSLFTextParagraph bulletParagraph = contentBox.addNewTextParagraph();
                             bulletParagraph.setBullet(true);
+                            bulletParagraph.setSpaceAfter(35.0);
                             XSLFTextRun bulletRun = bulletParagraph.addNewTextRun();
-                            bulletRun.setText(lines[i].replace("-", "").trim());
+                            bulletRun.setText(" " + lines[i].replace("-", "").trim());
                             bulletRun.setFontSize(44.0);
                             bulletRun.setFontFamily("Arial");
                             bulletRun.setFontColor(new java.awt.Color(255, 255, 255));
-                            bulletParagraph.setSpaceAfter(25.0);
                         } else {
                             XSLFTextParagraph textParagraph = contentBox.addNewTextParagraph();
-                            textParagraph.setLineSpacing(18.0);
+                            textParagraph.setLineSpacing(28.0);
+                            textParagraph.setSpaceAfter(25.0);
                             XSLFTextRun textRun = textParagraph.addNewTextRun();
                             textRun.setText(lines[i].trim());
                             textRun.setFontSize(35.0);
@@ -211,11 +246,11 @@ public class PPTContentService {
             }
 
             if (!pptFile.exists() || pptFile.length() == 0) {
-                System.err.println("Error: Presentation was not generated correctly.");
+                System.err.println("Error: The presentation was not generated correctly.");
                 return;
             }
 
-            System.out.println("Presentation generated successfully at: " + pptFile.getAbsolutePath());
+            System.out.println("Presentation successfully generated at: " + pptFile.getAbsolutePath());
 
             DynamicContentEntity dynamicContent = new DynamicContentEntity();
             dynamicContent.setTitle(title);
@@ -223,6 +258,7 @@ public class PPTContentService {
             dynamicContent.setEmail(email);
             dynamicContent.setType(DynamicContentTypeEnum.valueOf(type));
             dynamicContent.setCreationDate(LocalDateTime.now());
+            dynamicContent.setProjectId(projectId);
 
             dynamicContentRepository.save(dynamicContent);
 
@@ -235,5 +271,4 @@ public class PPTContentService {
             e.printStackTrace();
         }
     }
-
 }

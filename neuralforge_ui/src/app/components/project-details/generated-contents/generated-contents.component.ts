@@ -141,14 +141,33 @@ export class GeneratedContentsComponent implements OnInit, OnDestroy {
 
   downloadContent(content: IDynamicContent): void {
     if (!content.id) return;
-
+  
     this.dynamicContentService.download(content.id).subscribe({
       next: (response: ArrayBuffer) => {
-        const blob = new Blob([response], { type: "application/pdf" });
+        let mimeType = "application/pdf";
+        let extension = "pdf";
+  
+        switch (content.type) {
+          case "PPT":
+            mimeType = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+            extension = "pptx";
+            break;
+          case "CONCEPTMAP":
+            mimeType = "image/png";
+            extension = "png";
+            break;
+          case "SUMMARY":
+          default:
+            mimeType = "application/pdf";
+            extension = "pdf";
+            break;
+        }
+  
+        const blob = new Blob([response], { type: mimeType });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `${content.title}.pdf`;
+        a.download = `${content.title}.${extension}`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);

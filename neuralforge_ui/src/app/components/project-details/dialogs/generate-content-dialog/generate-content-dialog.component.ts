@@ -20,6 +20,8 @@ import { BehaviorSubject } from "rxjs";
 import { ProjectMaterial } from "../../../../models/project-material.model";
 import { AlertService } from "../../../../services/alert.service";
 import { DynamicContentService } from "../../../../services/dynamic-content.service";
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 interface DialogData {
   projectId: string;
@@ -38,6 +40,8 @@ interface DialogData {
     MatSelectModule,
     MatButtonModule,
     MatProgressSpinnerModule,
+    MatIconModule,
+    MatTooltipModule,
   ],
   templateUrl: "./generate-content-dialog.component.html",
   styleUrls: ["./generate-content-dialog.component.scss"],
@@ -46,6 +50,7 @@ export class GenerateContentDialogComponent implements OnInit {
   form: FormGroup;
   isLoading = false;
   materials$ = new BehaviorSubject<ProjectMaterial[]>([]);
+  languages = ['en', 'es', 'fr', 'de'];
 
   constructor(
     private fb: FormBuilder,
@@ -58,27 +63,31 @@ export class GenerateContentDialogComponent implements OnInit {
       title: ["", [Validators.required]],
       type: ["SUMMARY", [Validators.required]],
       materialId: ["", [Validators.required]],
+      language: ["en", [Validators.required]], 
     });
   }
 
   ngOnInit(): void {
-    const filteredMaterials = this.data.materials.filter(
-      (m) => m.type === "file" && m.fileName?.toLowerCase().endsWith(".pdf")
+    const filteredMaterials = this.data.materials.filter((m) =>
+      (m.type === "file" && m.fileName?.toLowerCase().match(/\.(pdf|txt)$/)) ||
+      (m.type === "hyperlink" && m.hyperlink?.toLowerCase().match(/\.(pdf|txt)$/))
     );
+  
     this.materials$.next(filteredMaterials);
   }
 
   onSubmit(): void {
     if (this.form.valid) {
       this.isLoading = true;
-      const formData = this.form.value;
+      const { materialId, title, type, language } = this.form.value;
 
       this.dynamicContentService
         .generateContent(
           this.data.projectId,
-          formData.materialId,
-          formData.title,
-          formData.type
+          materialId,
+          title,
+          type,
+          language
         )
         .subscribe({
           next: () => {
@@ -102,6 +111,18 @@ export class GenerateContentDialogComponent implements OnInit {
           },
         });
     }
+  }
+
+  getDefaultNameForHyperlink(material: ProjectMaterial): string {
+    if (material.type === 'hyperlink' && material.hyperlink) {
+      // Eliminar los parámetros de la URL si existen (todo después del ?)
+      const cleanUrl = material.hyperlink.split('?')[0];
+  
+      // Obtener el nombre del archivo, que es la última parte de la URL
+      const parts = cleanUrl.split('/');
+      return parts[parts.length - 1] || 'Unnamed Link';
+    }
+    return 'Unnamed';
   }
 
   onCancel(): void {

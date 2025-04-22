@@ -11,14 +11,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 
 /**
- * Controller for handling operations related to generating and processing dynamic content.
- * This controller exposes endpoints for generating summaries, concept maps, and slide decks.
+ * Controller for handling operations related to dynamic content generation and management.
+ * This controller provides endpoints for generating, retrieving, deleting, and downloading dynamic content.
+ * Supported content types include summaries, concept maps, and slide decks.
  *
  * @author Fabian Vargas
  * @version 1.1
@@ -26,109 +26,76 @@ import java.util.List;
 @RestController
 @RequestMapping("DynamicContent")
 public class DynamicContentController {
+
     private final DynamicContentService dynamicContentService;
-    // private final SummaryContentService summaryContentService;
-    private final ConceptMapContentService conceptMapService;
-    private final PPTContentService pptContentService;
 
     /**
      * Constructor for the DynamicContentController.
      *
      * @param dynamicContentService Service used for processing summary generation logic.
-     * @param conceptMapService Service used for generating concept maps.
-     * @param pptContentService Service used for generating PowerPoint slide decks.
+     * @param conceptMapService Service used for generating concept maps (not used in this class).
+     * @param pptContentService Service used for generating PowerPoint presentations (not used in this class).
      */
     public DynamicContentController(DynamicContentService dynamicContentService, ConceptMapContentService conceptMapService, PPTContentService pptContentService) {
         this.dynamicContentService = dynamicContentService;
-        this.conceptMapService = conceptMapService;
-        this.pptContentService = pptContentService;
     }
 
     /**
-     * Endpoint for extracting text from a file and generating a PDF summary.
+     * Retrieves a list of dynamic content resources associated with a specific project.
+     *
+     * @param projectId The ID of the project for which to retrieve content.
+     * @return A ResponseEntity containing a list of DynamicContentResource objects.
      */
-    @PostMapping("/generateSummary")
-    public ResponseEntity<String> extractTextAndGeneratePdf(@RequestParam("file") MultipartFile file,
-                                                            @RequestParam("title") String title,
-                                                            @RequestParam("email") String email,
-                                                            @RequestParam("type") String type) {
-        try {
-            String responseMessage = dynamicContentService.extractTextAndGeneratePdf(file, title, email, type);
-            return ResponseEntity.ok(responseMessage);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al procesar el archivo PDF.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error inesperado: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Endpoint for extracting text from a file and generating a concept map.
-     */
-    @PostMapping("/generateConceptMap")
-    public ResponseEntity<String> extractTextAndGenerateConceptMap(@RequestParam("file") MultipartFile file,
-                                                                   @RequestParam("title") String title,
-                                                                   @RequestParam("email") String email,
-                                                                   @RequestParam("type") String type) {
-        try {
-            String responseMessage = conceptMapService.extractTextAndGenerateConceptMap(file, title, email, type);
-            return ResponseEntity.ok(responseMessage);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al procesar el archivo PDF.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error inesperado: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Endpoint for extracting text from a file and generating a PowerPoint slide deck.
-     */
-    @PostMapping("/generatePPT")
-    public ResponseEntity<String> extractTextAndGeneratePPT(@RequestParam("file") MultipartFile file,
-                                                            @RequestParam("title") String title,
-                                                            @RequestParam("email") String email,
-                                                            @RequestParam("type") String type) {
-        try {
-            String responseMessage = pptContentService.extractTextAndGeneratePPT(file, title, email, type);
-            return ResponseEntity.ok(responseMessage);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al procesar el archivo PDF.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error inesperado: " + e.getMessage());
-        }
-    }
-
     @GetMapping("/project/{projectId}")
     public ResponseEntity<List<DynamicContentResource>> getByProjectId(@PathVariable String projectId) {
         List<DynamicContentResource> contents = dynamicContentService.getByProjectId(projectId);
         return ResponseEntity.ok(contents);
     }
 
+    /**
+     * Generates dynamic content based on the provided request.
+     *
+     * @param request The request object containing details for content generation, such as project ID, material ID, title, type, and language.
+     * @return A ResponseEntity with an HTTP 200 status if the content generation is successful.
+     */
     @PostMapping("/generate")
     public ResponseEntity<Void> generateContent(@RequestBody GenerateContentRequest request) {
         dynamicContentService.generateContent(
-            request.getProjectId(),
-            request.getMaterialId(),
-            request.getTitle(),
-            request.getType()
+                request.getProjectId(),
+                request.getMaterialId(),
+                request.getTitle(),
+                request.getType(),
+                request.getLanguage()
         );
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Deletes a specific dynamic content resource by its ID.
+     *
+     * @param contentId The ID of the content to delete.
+     * @return A ResponseEntity with an HTTP 204 status if the deletion is successful.
+     */
+    @DeleteMapping("/{contentId}")
+    public ResponseEntity<Void> deleteContent(@PathVariable String contentId) {
+        dynamicContentService.deleteDynamicContent(contentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Downloads a specific dynamic content resource by its ID.
+     *
+     * @param contentId The ID of the content to download.
+     * @return A ResponseEntity containing the content as a downloadable resource, or an HTTP 500 status if an error occurs.
+     */
     @GetMapping("/download/{contentId}")
     public ResponseEntity<Resource> downloadContent(@PathVariable String contentId) {
         try {
             Resource resource = dynamicContentService.downloadContent(contentId);
             return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                    .body(resource);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
