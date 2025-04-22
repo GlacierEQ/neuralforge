@@ -23,7 +23,7 @@
 
   <!-- Week-based schedule display -->
   <ng-container *ngIf="project && project.weeks && project.weeks.length > 0">
-    <div *ngFor="let week of project.weeks; let weekIndex = index">
+    <div *ngFor="let week of getSortedWeeks(); let weekIndex = index">
       <mat-card class="schedule-card">
         <div class="week-header">
           <h3>
@@ -59,7 +59,7 @@
             <div class="topics-container">
               <ng-container *ngIf="session.topics.length > 0">
                 <div
-                  *ngFor="let topic of session.topics; let topicIndex = index"
+                  *ngFor="let topic of getSortedTopics(session); let topicIndex = index"
                   class="topic-item"
                 >
                   <div class="topic-header">
