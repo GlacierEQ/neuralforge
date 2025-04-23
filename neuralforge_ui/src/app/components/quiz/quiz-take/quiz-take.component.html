@@ -1,0 +1,74 @@
+<div class="quiz-take-container">
+  <mat-card *ngIf="loading" class="loading-card">
+    <mat-card-content>
+      <div class="loading-container">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        <p>Loading quiz...</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card *ngIf="error" class="error-card">
+    <mat-card-content>
+      <div class="error-container">
+        <mat-icon color="warn">error</mat-icon>
+        <p>Failed to load quiz. Please try again later.</p>
+        <button mat-button color="primary" (click)="navigateBack()">Back</button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div *ngIf="!loading && !error && quiz && attempt" class="quiz-content">
+    <mat-card class="quiz-header-card">
+      <mat-card-header>
+        <mat-card-title>{{ quiz.title }}</mat-card-title>
+        <mat-card-subtitle *ngIf="quiz.description">{{ quiz.description }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="quiz-progress">
+          <p>Question {{ currentQuestionIndex + 1 }} of {{ quiz.questions.length }}</p>
+          <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card *ngIf="currentQuestion" class="question-card">
+      <mat-card-content>
+        <h2 class="question-text">{{ currentQuestion.questionText }}</h2>
+        
+        <div class="options-container">
+          <mat-radio-group [(ngModel)]="selectedAnswerId" [disabled]="answerSubmitted">
+            <div *ngFor="let answer of currentQuestion.answers" class="answer-option"
+                [ngClass]="{
+                  'correct-answer': isAnswerCorrect(answer.id),
+                  'incorrect-answer': isAnswerIncorrect(answer.id)
+                }">
+              <mat-radio-button [value]="answer.id" [disabled]="answerSubmitted">
+                {{ answer.answerText }}
+              </mat-radio-button>
+              <mat-icon *ngIf="answerSubmitted && answer.isCorrect" color="primary">check_circle</mat-icon>
+            </div>
+          </mat-radio-group>
+        </div>
+
+        <div *ngIf="answerSubmitted && lastSubmittedAnswer" class="answer-feedback">
+          <mat-divider></mat-divider>
+          <div class="feedback-container" [ngClass]="{'correct-feedback': lastSubmittedAnswer.isCorrect, 'incorrect-feedback': !lastSubmittedAnswer.isCorrect}">
+            <mat-icon *ngIf="lastSubmittedAnswer.isCorrect">check_circle</mat-icon>
+            <mat-icon *ngIf="!lastSubmittedAnswer.isCorrect">cancel</mat-icon>
+            <h3>{{ lastSubmittedAnswer.isCorrect ? 'Correct!' : 'Incorrect!' }}</h3>
+          </div>
+          <p class="explanation" *ngIf="lastSubmittedAnswer.explanation">{{ lastSubmittedAnswer.explanation }}</p>
+        </div>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-button color="primary" *ngIf="!answerSubmitted" [disabled]="!selectedAnswerId" (click)="submitAnswer()">
+          Submit Answer
+        </button>
+        <button mat-button color="primary" *ngIf="answerSubmitted" (click)="nextQuestion()">
+          {{ currentQuestionIndex < quiz.questions.length - 1 ? 'Next Question' : 'Finish Quiz' }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

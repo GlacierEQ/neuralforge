@@ -14,6 +14,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatTabsModule } from "@angular/material/tabs";
 import { Project } from "../../models/project.model";
+import { QuizListComponent } from "../quiz/quiz-list/quiz-list.component";
 import { GeneratedContentsComponent } from "./generated-contents/generated-contents.component";
 import { MaterialsComponent } from "./materials/materials.component";
 
@@ -29,6 +30,7 @@ import { MaterialsComponent } from "./materials/materials.component";
     MatSlideToggleModule,
     MaterialsComponent,
     GeneratedContentsComponent,
+    QuizListComponent,
   ],
   templateUrl: "./project-details.component.html",
   styleUrls: ["./project-details.component.scss"],

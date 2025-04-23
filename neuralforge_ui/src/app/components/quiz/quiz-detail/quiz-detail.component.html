@@ -1,0 +1,113 @@
+<div class="quiz-detail-container">
+  <div class="quiz-detail-header">
+    <button mat-button color="primary" (click)="navigateBack()">
+      <mat-icon>arrow_back</mat-icon> Back to Project
+    </button>
+    
+    <h1 *ngIf="quiz">{{ quiz.title }}</h1>
+    
+    <div class="header-actions" *ngIf="quiz">
+      <button mat-raised-button color="warn" (click)="deleteQuiz()">
+        <mat-icon>delete</mat-icon> Delete Quiz
+      </button>
+    </div>
+  </div>
+
+  <ng-container *ngIf="isLoading">
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading quiz...</p>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!isLoading && error">
+    <div class="error-container">
+      <mat-icon color="warn">error</mat-icon>
+      <h2>Error loading quiz</h2>
+      <p>{{ error }}</p>
+      <button mat-raised-button color="primary" (click)="loadQuiz()">Try Again</button>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!isLoading && !error && quiz">
+    <div class="quiz-detail-content">
+      <mat-card class="quiz-info-card">
+        <mat-card-content>
+          <div class="quiz-description" *ngIf="quiz.description">
+            {{ quiz.description }}
+          </div>
+          
+          <div class="quiz-metadata">
+            <div class="metadata-item">
+              <mat-icon>question_answer</mat-icon>
+              <span>{{ quiz.questions.length || 0 }} Questions</span>
+            </div>
+            <div class="metadata-item">
+              <mat-icon>calendar_today</mat-icon>
+              <span>Created on {{ formatDate(quiz.createdAt) }}</span>
+            </div>
+          </div>
+          
+          <div class="quiz-actions">
+            <button mat-raised-button color="primary" (click)="startQuiz()">
+              <mat-icon>play_arrow</mat-icon> Start Quiz
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <div class="quiz-attempts-history">
+        <h2>Your Attempt History</h2>
+        
+        <div *ngIf="loadingAttempts" class="loading-container">
+          <mat-spinner diameter="30"></mat-spinner>
+          <p>Loading attempts...</p>
+        </div>
+        
+        <div *ngIf="!loadingAttempts && quizAttempts.length === 0" class="no-attempts">
+          <p>You haven't taken this quiz yet. Click 'Start Quiz' to begin!</p>
+        </div>
+        
+        <mat-accordion *ngIf="!loadingAttempts && quizAttempts.length > 0">
+          <mat-expansion-panel *ngFor="let attempt of quizAttempts; let i = index">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                Attempt #{{ quizAttempts.length - i }}
+              </mat-panel-title>
+              <mat-panel-description>
+                {{ formatDate(attempt.completedAt) }} - Score: {{ attempt.score }}%
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            
+            <div class="attempt-details">
+              <div class="attempt-metadata">
+                <div class="metadata-item">
+                  <mat-icon>play_arrow</mat-icon>
+                  <span>Started: {{ formatDate(attempt.startedAt) }}</span>
+                </div>
+                <div class="metadata-item">
+                  <mat-icon>check_circle</mat-icon>
+                  <span>Completed: {{ formatDate(attempt.completedAt) }}</span>
+                </div>
+                <div class="metadata-item" [ngClass]="{
+                  'score-excellent': attempt.score >= 80,
+                  'score-good': attempt.score >= 60 && attempt.score < 80,
+                  'score-needs-improvement': attempt.score < 60
+                }">
+                  <mat-icon>stars</mat-icon>
+                  <span>Score: {{ attempt.score }}%</span>
+                </div>
+              </div>
+              
+              <div class="attempt-actions">
+                <button mat-raised-button color="primary" (click)="viewAttemptDetails(attempt.id)">
+                  <mat-icon>visibility</mat-icon> View Details
+                </button>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+    </div>
+  </ng-container>
+</div>

@@ -9,6 +9,7 @@ import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { ConfirmDialogComponent } from "../../../components/dialogs/confirm-dialog/confirm-dialog.component";
 import { EditLearningProjectDialogComponent } from "../../../components/dialogs/edit-learning-project-dialog/edit-learning-project-dialog.component";
 import { ProjectDetailsComponent } from "../../../components/project-details/project-details.component";
+import { QuizListComponent } from "../../../components/quiz/quiz-list/quiz-list.component";
 import { ILearningProject } from "../../../interfaces";
 import { AlertService } from "../../../services/alert.service";
 import { LearningProjectService } from "../../../services/learning-project.service";
@@ -27,6 +28,7 @@ import { LearningProjectService } from "../../../services/learning-project.servi
     MatCardModule,
     RouterLink,
     ProjectDetailsComponent,
+    QuizListComponent,
   ],
 })
 export class LearningProjectComponent implements OnInit {

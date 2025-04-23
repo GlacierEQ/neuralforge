@@ -1,7 +1,22 @@
 <h2 mat-dialog-title>Move Topic</h2>
 <mat-dialog-content>
-  <p>Select where to move "{{ data.topic.title }}"</p>
+  <div class="topic-info">
+    <h3>"{{ data.topic.title }}"</h3>
+    <div class="current-location">
+      <strong>Currently in:</strong> Week {{ data.currentWeekNumber }}, 
+      {{ getDayOfWeekName(getCurrentSession()?.dayOfWeek || '') }}
+      <span *ngIf="getSessionDate(data.currentWeekNumber, getCurrentSession()?.dayOfWeek || '')">
+        ({{
+          getSessionDate(data.currentWeekNumber, getCurrentSession()?.dayOfWeek || '')
+            | date : "MMM d, yyyy"
+        }})
+      </span>
+    </div>
+  </div>
 
+  <div class="divider"></div>
+  
+  <h3>Move to:</h3>
   <div class="form-container">
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Week</mat-label>
@@ -30,9 +45,13 @@
       </mat-select>
     </mat-form-field>
   </div>
+  
+  <div class="note" *ngIf="isSameLocation()">
+    <mat-icon>warning</mat-icon> This is the current location of the topic.
+  </div>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
   <button mat-button [mat-dialog-close]="false">Cancel</button>
-  <button mat-button color="primary" (click)="onSubmit()">Move</button>
+  <button mat-button color="primary" [disabled]="isSameLocation()" (click)="onSubmit()">Move</button>
 </mat-dialog-actions>

@@ -32,9 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.DayOfWeek;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -218,7 +216,7 @@ public class TeachingProjectService {
      * @param projectOwnerId The ID of the project owner.
      * @throws ResponseStatusException if the user is not authorized.
      */
-    private void validateProjectOwnership(String projectOwnerId) {
+    protected void validateProjectOwnership(String projectOwnerId) {
         UserEntity currentUser = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (!currentUser.getId().equals(projectOwnerId) && currentUser.getRole().getName() != UserRoleEnum.ROLE_ADMINISTRATOR) {
@@ -237,40 +235,6 @@ public class TeachingProjectService {
      * 5. Saves the structured data and the raw response
      *
      * @param teachingProjectId The ID of the teaching project.
-     * @return The updated teaching project resource with the generated schedule.
-     * @throws ResponseStatusException if the project is not found, the user is not authorized,
-     *         there is an issue with materials processing, or there is an error in AI response.
-     */
-    @Transactional
-    public TeachingProjectResource generateTeachingSchedule(String teachingProjectId) {
-        // Retrieve teaching project
-        TeachingProjectEntity project = teachingProjectRepository.findById(teachingProjectId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
-                    "Teaching project not found with id: " + teachingProjectId));
-
-        validateProjectOwnership(project.getCreatorUserId());
-        
-        // Extract text from all materials
-        String materialsText = extractTextFromMaterials(project);
-        
-        // Generate the prompt for DeepSeek API
-        String prompt = generateCourseSchedulePrompt(project, materialsText);
-        
-        try {
-            // Send prompt to DeepSeek API and get the response
-            String responseJson = dynamicContentService.sendToDeepSeekAndGetRawResponse(prompt);
-            
-            // Parse the response and save the schedule
-            return processAndSaveSchedule(project, responseJson);
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, 
-                "Error processing DeepSeek AI response: " + e.getMessage());
-        }
-    }
-    
-    /**
-     * Extracts text content from all materials associated with a teaching project.
-     * 
      * @param project The teaching project entity.
      * @return The extracted text from all materials.
      * @throws ResponseStatusException if there is an error extracting text or no content is available.
@@ -320,14 +284,60 @@ public class TeachingProjectService {
     }
     
     /**
+     * Generates a teaching schedule for a project using DeepSeek AI.
+     *
+     * @param teachingProjectId The ID of the teaching project.
+     * @return The teaching project resource with the generated schedule.
+     */
+    @Transactional
+    public TeachingProjectResource generateTeachingSchedule(String teachingProjectId) {
+        // Retrieve teaching project
+        TeachingProjectEntity project = teachingProjectRepository.findById(teachingProjectId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
+                    "Teaching project not found with id: " + teachingProjectId));
+
+        validateProjectOwnership(project.getCreatorUserId());
+        
+        // Collect locked topics if any exist
+        List<CourseTopicEntity> lockedTopics = new ArrayList<>();
+        if (project.getWeeks() != null && !project.getWeeks().isEmpty()) {
+            for (CourseWeekEntity week : project.getWeeks()) {
+                for (ClassSessionEntity session : week.getClassSessions()) {
+                    lockedTopics.addAll(session.getTopics().stream()
+                        .filter(CourseTopicEntity::getTeacherLocked)
+                        .collect(Collectors.toList()));
+                }
+            }
+        }
+        
+        // Extract text from all materials
+        String materialsText = extractTextFromMaterials(project);
+        
+        // Generate the prompt for DeepSeek API
+        String prompt = generateCourseSchedulePrompt(project, materialsText, lockedTopics);
+        
+        try {
+            // Send prompt to DeepSeek API and get the response
+            String responseJson = dynamicContentService.sendToDeepSeekAndGetRawResponse(prompt);
+            
+            // Parse the response and save the schedule, preserving locked topics
+            return processAndSaveSchedule(project, responseJson, lockedTopics);
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, 
+                "Error processing DeepSeek AI response: " + e.getMessage());
+        }
+    }
+    
+    /**
      * Processes the AI response, saves the raw JSON, creates the course structure, and persists everything.
      * 
      * @param project The teaching project entity.
      * @param responseJson The JSON response from DeepSeek AI.
+     * @param lockedTopics List of locked topics to preserve during regeneration.
      * @return The updated teaching project resource.
      * @throws IOException if there is an error parsing the JSON response.
      */
-    private TeachingProjectResource processAndSaveSchedule(TeachingProjectEntity project, String responseJson) throws IOException {
+    private TeachingProjectResource processAndSaveSchedule(TeachingProjectEntity project, String responseJson, List<CourseTopicEntity> lockedTopics) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode responseNode = objectMapper.readTree(responseJson);
         
@@ -335,11 +345,38 @@ public class TeachingProjectService {
         String filePath = saveRawResponseToFile(project, responseJson);
         System.out.println("Raw JSON response saved to: " + filePath);
         
+        // Create a map of locked topic titles to make identification easier during processing
+        Map<String, Boolean> lockedTopicTitles = lockedTopics.stream()
+            .collect(Collectors.toMap(CourseTopicEntity::getTitle, topic -> true, (a, b) -> a));
+            
+        // Also store a map of original locked topics by their session ID for validation
+        Map<String, List<CourseTopicEntity>> lockedTopicsBySessionId = lockedTopics.stream()
+            .collect(Collectors.groupingBy(topic -> topic.getClassSession().getId()));
+        
+        // Store the original locked topic information for validation
+        // This creates a map of original locked topics by week number and day of week
+        Map<Integer, Map<DayOfWeek, List<CourseTopicEntity>>> originalLockedTopicsByWeekAndDay = new HashMap<>();
+        for (CourseTopicEntity topic : lockedTopics) {
+            int weekNumber = topic.getClassSession().getCourseWeek().getWeekNumber();
+            DayOfWeek dayOfWeek = topic.getClassSession().getDayOfWeek();
+            
+            originalLockedTopicsByWeekAndDay.computeIfAbsent(weekNumber, k -> new HashMap<>())
+                .computeIfAbsent(dayOfWeek, k -> new ArrayList<>())
+                .add(topic);
+        }
+        
         // Clear existing schedule data if any
         project.getWeeks().clear();
         
         // Create and save course weeks, class sessions and topics based on the response
-        processCourseStructure(project, responseNode);
+        // The AI should have already incorporated the locked topics into the schedule based on our prompt
+        // We'll also preserve the locked status for any topics that match the original locked topics
+        processCourseStructure(project, responseNode, lockedTopicTitles);
+        
+        // VALIDATION STEP: Ensure that all locked topics were preserved in their original sessions
+        if (!lockedTopics.isEmpty()) {
+            validateLockedTopicsPreservation(project, originalLockedTopicsByWeekAndDay, lockedTopics);
+        }
         
         // Save the project with its new schedule
         TeachingProjectEntity savedProject = teachingProjectRepository.save(project);
@@ -375,9 +412,10 @@ public class TeachingProjectService {
      *
      * @param project The teaching project entity.
      * @param materialsText The extracted text from project materials.
+     * @param lockedTopics List of locked topics that should be preserved in the new schedule.
      * @return A prompt string for DeepSeek AI.
      */
-    private String generateCourseSchedulePrompt(TeachingProjectEntity project, String materialsText) {
+    private String generateCourseSchedulePrompt(TeachingProjectEntity project, String materialsText, List<CourseTopicEntity> lockedTopics) {
         List<String> selectedDaysList = getSelectedDaysList(project.getSelectedDays());
         int hoursPerWeek = selectedDaysList.size() * project.getDailyHours();
         
@@ -393,8 +431,8 @@ public class TeachingProjectService {
         // Course content section
         promptBuilder.append("Course Content:\n").append(materialsText).append("\n\n");
         
-        // Instructions section
-        appendInstructions(promptBuilder);
+        // Instructions section with locked topics if any
+        appendInstructions(promptBuilder, lockedTopics);
         
         // Response format section
         appendResponseFormat(promptBuilder);
@@ -435,6 +473,9 @@ public class TeachingProjectService {
      */
     private void appendCourseDetails(StringBuilder promptBuilder, TeachingProjectEntity project, 
                                     List<String> selectedDaysList, int hoursPerWeek) {
+        // Calculate minutes per session for clarity
+        int minutesPerSession = project.getDailyHours() * 60;
+        
         promptBuilder.append("Course Details:\n")
                     .append("- Course Name: ").append(project.getName()).append("\n")
                     .append("- Course Description: ").append(project.getDescription()).append("\n")
@@ -442,16 +483,20 @@ public class TeachingProjectService {
                     .append("- End Date: ").append(project.getEndDate()).append("\n")
                     .append("- Total Weeks: ").append(project.getWeeksCount()).append("\n")
                     .append("- Teaching Days: ").append(String.join(", ", selectedDaysList)).append("\n")
-                    .append("- Hours Per Session: ").append(project.getDailyHours()).append("\n")
-                    .append("- Total Hours Per Week: ").append(hoursPerWeek).append("\n\n");
+                    .append("- Hours Per Session: ").append(project.getDailyHours()).append(" hours (")
+                    .append(minutesPerSession).append(" minutes)\n")
+                    .append("- Total Hours Per Week: ").append(hoursPerWeek).append("\n")
+                    .append("- IMPORTANT: The sum of all topic durations for a single class session MUST EQUAL ")
+                    .append(minutesPerSession).append(" minutes exactly.\n\n");
     }
     
     /**
-     * Appends instructions to the prompt builder.
+     * Appends instructions to the prompt builder, including information about locked topics.
      * 
      * @param promptBuilder The StringBuilder to append to.
+     * @param lockedTopics List of locked topics that should be preserved in the new schedule
      */
-    private void appendInstructions(StringBuilder promptBuilder) {
+    private void appendInstructions(StringBuilder promptBuilder, List<CourseTopicEntity> lockedTopics) {
         promptBuilder.append("Instructions:\n")
                     .append("1. Create a comprehensive teaching schedule that covers the entire course content over the specified weeks.\n")
                     .append("2. Divide the content logically across the weeks, ensuring proper sequencing of topics.\n")
@@ -459,7 +504,80 @@ public class TeachingProjectService {
                     .append("4. Each topic should include a title and a brief description.\n")
                     .append("5. Ensure the distribution of content is balanced across sessions, with approximately equal workloads.\n")
                     .append("6. Consider the natural progression of learning, starting with fundamentals and building up to advanced concepts.\n")
-                    .append("7. IMPORTANT: The orderIndex for topics should restart from 1 for each class session. For example, each session should have topics with orderIndex 1, 2, etc., rather than continuing from the previous session.\n\n");
+                    .append("7. IMPORTANT: The orderIndex for topics should restart from 1 for each class session. For example, each session should have topics with orderIndex 1, 2, etc., rather than continuing from the previous session.\n")
+                    .append("8. CRITICAL - TIME CONSTRAINTS: The sum of durationMinutes for all topics in a class session MUST EQUAL EXACTLY the total minutes available for that session. ")
+                    .append("For example, if a session is 2 hours (120 minutes), the total duration of all topics in that session must be exactly 120 minutes.\n")
+                    .append("9. TOPIC DIVISION REQUIREMENT: Each class session MUST have at least 2-4 separate topics. Never create a single topic that consumes the entire session time. ")
+                    .append("Break down long topics into subtopics with their own titles, descriptions, and appropriate durations.\n");
+        
+        // Add locked topics to instructions if any exist
+        if (lockedTopics != null && !lockedTopics.isEmpty()) {
+            promptBuilder.append("\nLOCKED TOPICS:\n")
+                        .append("The following topics have been locked by the teacher and MUST be preserved EXACTLY as listed below. ")
+                        .append("⚠️ FAILURE TO FOLLOW THESE RULES WILL RESULT IN AN UNUSABLE SCHEDULE. ⚠️\n\n")
+                        .append("MANDATORY RULES FOR LOCKED TOPICS (THESE OVERRIDE ALL OTHER INSTRUCTIONS):\n")
+                        .append("1. LOCKED TOPICS MUST REMAIN IN THEIR EXACT ORIGINAL LOCATION - same week, same day, same class session.\n")
+                        .append("2. LOCKED TOPICS CANNOT BE MOVED OR MERGED under any circumstances.\n")
+                        .append("3. LOCKED TOPICS MUST MAINTAIN THEIR EXACT ORIGINAL DURATION - do not shorten or lengthen them.\n")
+                        .append("4. If a session has multiple locked topics, ALL of those locked topics must be included in that same session.\n")
+                        .append("5. SPECIAL CASE HANDLING: If the locked topics in a session already EXCEED the session duration, KEEP ALL the locked topics anyway.\n")
+                        .append("   In this case, you should NOT add any additional topics to that session.\n")
+                        .append("6. NORMAL CASE: When locked topics do NOT exceed session duration, adjust the remaining time with non-locked topics \n")
+                        .append("   to exactly fit the session duration (e.g., in a 120-minute session with 60 minutes of locked topics, \n")
+                        .append("   add new topics that total exactly 60 more minutes).\n\n");
+            
+            // Group locked topics by week and day for more precise organization
+            Map<Integer, Map<DayOfWeek, List<CourseTopicEntity>>> topicsByWeekAndDay = new HashMap<>();
+            
+            // Organize topics by week number and day of week
+            for (CourseTopicEntity topic : lockedTopics) {
+                int weekNumber = topic.getClassSession().getCourseWeek().getWeekNumber();
+                DayOfWeek dayOfWeek = topic.getClassSession().getDayOfWeek();
+                
+                topicsByWeekAndDay.computeIfAbsent(weekNumber, k -> new HashMap<>())
+                    .computeIfAbsent(dayOfWeek, k -> new ArrayList<>())
+                    .add(topic);
+            }
+            
+            // Output locked topics organized by week and day
+            for (Map.Entry<Integer, Map<DayOfWeek, List<CourseTopicEntity>>> weekEntry : topicsByWeekAndDay.entrySet()) {
+                int weekNumber = weekEntry.getKey();
+                promptBuilder.append("WEEK ").append(weekNumber).append(":\n");
+                
+                for (Map.Entry<DayOfWeek, List<CourseTopicEntity>> dayEntry : weekEntry.getValue().entrySet()) {
+                    DayOfWeek dayOfWeek = dayEntry.getKey();
+                    List<CourseTopicEntity> topicsForDay = dayEntry.getValue();
+                    
+                    promptBuilder.append("  ").append(dayOfWeek.toString()).append(" session:\n");
+                    
+                    // Calculate the total locked time for this session
+                    int totalLockedMinutes = topicsForDay.stream()
+                        .mapToInt(CourseTopicEntity::getDurationMinutes)
+                        .sum();
+                    
+                    // Get session ID for reference
+                    String sessionId = topicsForDay.get(0).getClassSession().getId();
+                    
+                    promptBuilder.append("  Session ID: ").append(sessionId).append("\n")
+                                .append("  Total locked time for this session: ").append(totalLockedMinutes).append(" minutes\n");
+                    
+                    // List all locked topics for this session
+                    for (CourseTopicEntity topic : topicsForDay) {
+                        promptBuilder.append("  - ID: ").append(topic.getId())
+                                    .append(", Title: \"").append(topic.getTitle()).append("\", ")
+                                    .append("Description: \"").append(topic.getDescription()).append("\", ")
+                                    .append("Duration: ").append(topic.getDurationMinutes()).append(" minutes, ")
+                                    .append("Order: ").append(topic.getOrderIndex()).append("\n");
+                    }
+                    promptBuilder.append("\n");
+                }
+            }
+            
+            promptBuilder.append("⚠️ IMPORTANT REMINDER: ALL of the locked topics above MUST appear in your schedule in their EXACT original location.\n")
+                       .append("Adjust other topics accordingly while keeping class session durations correct.\n\n");
+        }
+        
+        promptBuilder.append("\n");
     }
     
     /**
@@ -520,8 +638,9 @@ public class TeachingProjectService {
      *
      * @param project The teaching project entity.
      * @param responseNode The JsonNode containing the parsed response.
+     * @param lockedTopicTitles Map of topic titles that should remain locked
      */
-    private void processCourseStructure(TeachingProjectEntity project, JsonNode responseNode) {
+    private void processCourseStructure(TeachingProjectEntity project, JsonNode responseNode, Map<String, Boolean> lockedTopicTitles) {
         JsonNode weeksNode = responseNode.path("weeks");
         if (weeksNode.isArray()) {
             for (JsonNode weekNode : weeksNode) {
@@ -529,7 +648,7 @@ public class TeachingProjectService {
                 
                 JsonNode sessionsNode = weekNode.path("classSessions");
                 if (sessionsNode.isArray()) {
-                    processClassSessions(weekEntity, sessionsNode);
+                    processClassSessions(weekEntity, sessionsNode, lockedTopicTitles);
                 }
                 
                 project.getWeeks().add(weekEntity);
@@ -559,8 +678,9 @@ public class TeachingProjectService {
      * 
      * @param weekEntity The course week entity.
      * @param sessionsNode The JSON node containing class sessions.
+     * @param lockedTopicTitles Map of topic titles that should remain locked
      */
-    private void processClassSessions(CourseWeekEntity weekEntity, JsonNode sessionsNode) {
+    private void processClassSessions(CourseWeekEntity weekEntity, JsonNode sessionsNode, Map<String, Boolean> lockedTopicTitles) {
         for (JsonNode sessionNode : sessionsNode) {
             String dayOfWeekStr = sessionNode.path("dayOfWeek").asText();
             
@@ -570,7 +690,7 @@ public class TeachingProjectService {
                 
                 JsonNode topicsNode = sessionNode.path("topics");
                 if (topicsNode.isArray()) {
-                    processTopics(sessionEntity, topicsNode);
+                    processTopics(sessionEntity, topicsNode, lockedTopicTitles);
                 }
                 
                 weekEntity.getClassSessions().add(sessionEntity);
@@ -597,17 +717,133 @@ public class TeachingProjectService {
     }
     
     /**
+     * Validates that all locked topics were properly preserved in the new schedule.
+     * This acts as a safety net to ensure the AI didn't move or remove any locked topics.
+     * If validation fails, it throws an exception rather than saving an invalid schedule.
+     * 
+     * @param project The teaching project with the newly generated schedule
+     * @param originalLockedTopicsByWeekAndDay Map of original locked topics by week and day
+     * @param originalLockedTopics The complete list of original locked topics
+     * @throws ResponseStatusException if locked topics weren't properly preserved
+     */
+    private void validateLockedTopicsPreservation(TeachingProjectEntity project, 
+                                               Map<Integer, Map<DayOfWeek, List<CourseTopicEntity>>> originalLockedTopicsByWeekAndDay,
+                                               List<CourseTopicEntity> originalLockedTopics) {
+        // Track which original locked topics we've successfully found
+        Set<String> foundLockedTopicIds = new HashSet<>();
+        
+        // Get count of locked topics for validation
+        int originalLockedTopicCount = originalLockedTopics.size();
+        
+        // Check each week and day in the original locked topics map
+        for (Map.Entry<Integer, Map<DayOfWeek, List<CourseTopicEntity>>> weekEntry : originalLockedTopicsByWeekAndDay.entrySet()) {
+            int weekNumber = weekEntry.getKey();
+            
+            // Find the corresponding week in the new schedule
+            CourseWeekEntity newWeek = project.getWeeks().stream()
+                .filter(week -> week.getWeekNumber() == weekNumber)
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, 
+                    "Schedule generation failed to preserve week " + weekNumber + " which contains locked topics"));
+            
+            // Check each day in this week that had locked topics
+            for (Map.Entry<DayOfWeek, List<CourseTopicEntity>> dayEntry : weekEntry.getValue().entrySet()) {
+                DayOfWeek dayOfWeek = dayEntry.getKey();
+                List<CourseTopicEntity> originalTopicsForDay = dayEntry.getValue();
+                
+                // Find the corresponding session in the new schedule
+                ClassSessionEntity newSession = newWeek.getClassSessions().stream()
+                    .filter(session -> session.getDayOfWeek() == dayOfWeek)
+                    .findFirst()
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, 
+                        "Schedule generation failed to preserve " + dayOfWeek + " session in week " + weekNumber + 
+                        " which contains locked topics"));
+                
+                // Check if all original locked topics for this day are present in the new session
+                for (CourseTopicEntity originalTopic : originalTopicsForDay) {
+                    // Look for a topic with the same title in the new session
+                    boolean topicFound = newSession.getTopics().stream()
+                        .anyMatch(newTopic -> newTopic.getTitle().equals(originalTopic.getTitle()) && 
+                                              newTopic.getDurationMinutes() == originalTopic.getDurationMinutes() &&
+                                              newTopic.getTeacherLocked());
+                    
+                    if (!topicFound) {
+                        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, 
+                            "Schedule generation failed to preserve locked topic '" + originalTopic.getTitle() + 
+                            "' in " + dayOfWeek + " session of week " + weekNumber);
+                    }
+                    
+                    // Mark this original topic as found
+                    foundLockedTopicIds.add(originalTopic.getId());
+                }
+                
+                // Get the total minutes in this session and the minutes taken by locked topics
+                int totalSessionMinutes = newSession.getTopics().stream()
+                    .mapToInt(CourseTopicEntity::getDurationMinutes)
+                    .sum();
+                
+                int lockedTopicsMinutes = originalTopicsForDay.stream()
+                    .mapToInt(CourseTopicEntity::getDurationMinutes)
+                    .sum();
+                
+                int minutesPerSession = project.getDailyHours() * 60;
+                
+                // Special handling for when locked topics exceed the session duration
+                if (lockedTopicsMinutes > minutesPerSession) {
+                    // In this case, we allow the session to exceed the time limit, but we log a warning
+                    System.out.println("WARNING: Session on " + dayOfWeek + " of week " + weekNumber + 
+                        " has locked topics that exceed the session duration. " +
+                        "Locked topics take " + lockedTopicsMinutes + " minutes, but session limit is " + 
+                        minutesPerSession + " minutes.");
+                    
+                    // The only requirement is that all the locked topics are present
+                } else {
+                    // Normal case - session should match the expected duration exactly
+                    if (totalSessionMinutes != minutesPerSession) {
+                        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, 
+                            "Session duration mismatch in " + dayOfWeek + " of week " + weekNumber + 
+                            ". Expected " + minutesPerSession + " minutes, got " + totalSessionMinutes + " minutes.");
+                    }
+                }
+            }
+        }
+        
+        // Final check: ensure we found all original locked topics
+        if (foundLockedTopicIds.size() != originalLockedTopicCount) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, 
+                "Schedule generation failed to preserve all locked topics. Expected " + 
+                originalLockedTopicCount + " locked topics, found " + foundLockedTopicIds.size());
+        }
+        
+        // All validations passed - the schedule correctly preserves all locked topics
+        System.out.println("Validation successful: All " + originalLockedTopicCount + " locked topics were properly preserved");
+    }
+    
+    /**
      * Processes topics from the JSON response and adds them to the session entity.
+     * The AI has already incorporated locked topics in its response based on our prompt.
+     * We also check against original locked topics to ensure the locked status is preserved.
      * 
      * @param sessionEntity The class session entity.
      * @param topicsNode The JSON node containing topics.
+     * @param lockedTopicTitles Map of topic titles that were locked in the original schedule
      */
-    private void processTopics(ClassSessionEntity sessionEntity, JsonNode topicsNode) {
+    private void processTopics(ClassSessionEntity sessionEntity, JsonNode topicsNode, Map<String, Boolean> lockedTopicTitles) {
         for (JsonNode topicNode : topicsNode) {
             String title = topicNode.path("title").asText();
             String description = topicNode.path("description").asText();
             int orderIndex = topicNode.path("orderIndex").asInt();
             int durationMinutes = topicNode.path("durationMinutes").asInt();
+            
+            // Check if this is a locked topic by examining:
+            // 1. If it was locked in the original schedule (by title)
+            // 2. If the AI response has explicit teacherLocked value
+            boolean wasOriginallyLocked = lockedTopicTitles.containsKey(title);
+            boolean aiMarkedAsLocked = topicNode.has("teacherLocked") ? 
+                    topicNode.path("teacherLocked").asBoolean() : false;
+            
+            // A topic should remain locked if it was locked in the original schedule
+            boolean shouldBeLocked = wasOriginallyLocked || aiMarkedAsLocked;
             
             CourseTopicEntity topicEntity = CourseTopicEntity.builder()
                     .classSession(sessionEntity)
@@ -615,6 +851,7 @@ public class TeachingProjectService {
                     .description(description)
                     .orderIndex(orderIndex)
                     .durationMinutes(durationMinutes)
+                    .teacherLocked(shouldBeLocked) // Preserve the locked status
                     .build();
             
             sessionEntity.getTopics().add(topicEntity);

@@ -2,6 +2,8 @@ package com.cenfotec.p3.neuralforge_api.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Data
 @Entity
@@ -20,7 +22,8 @@ public class VirtualStudentEntity {
     private VirtualClassEntity virtualClass;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "FK_virtualstudent_user"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private UserEntity user;
 
     @Column
