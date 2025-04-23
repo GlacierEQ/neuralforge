@@ -1,0 +1,165 @@
+.quiz-take-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.loading-container, .error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+  
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 20px;
+  }
+}
+
+.loading-card, .error-card {
+  margin-top: 40px;
+}
+
+.quiz-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.quiz-header-card {
+  margin-bottom: 10px;
+}
+
+.quiz-progress {
+  margin-top: 15px;
+
+  p {
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+.question-card {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+mat-card-content {
+  flex: 1;
+}
+
+.question-text {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+.options-container {
+  margin: 20px 0;
+}
+
+.answer-option {
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+  position: relative; // Add relative positioning to properly contain the absolute elements
+
+  &:hover:not(.correct-answer):not(.incorrect-answer) {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  mat-radio-button {
+    flex: 1;
+  }
+}
+
+// Highlight for correct answer - increased visibility when showing the correct answer
+.correct-answer {
+  background-color: rgba(76, 175, 80, 0.15); // slightly more visible green
+  border-color: #4CAF50; // medium green border
+  border-left-width: 3px; // thicker left border for emphasis
+  border-left-style: solid;
+  box-shadow: 0 0 6px 0 rgba(76, 175, 80, 0.2); // slightly stronger shadow
+  transition: all 0.3s ease;
+  
+  // Add a subtle pulse animation when an incorrect answer is selected
+  &:after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    animation: pulse 1.5s infinite;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 5px rgba(76, 175, 80, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+  }
+}
+
+.incorrect-answer {
+  background-color: rgba(244, 67, 54, 0.1);
+  border-color: #F44336;
+}
+
+.answer-feedback {
+  margin-top: 20px;
+  padding-top: 20px;
+}
+
+.feedback-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+
+  mat-icon {
+    margin-right: 10px;
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
+  }
+
+  h3 {
+    margin: 0;
+  }
+}
+
+.correct-feedback {
+  color: #4CAF50;
+}
+
+.incorrect-feedback {
+  color: #F44336;
+}
+
+.explanation {
+  background-color: rgba(0, 0, 0, 0.04);
+  padding: 15px;
+  border-radius: 4px;
+  font-style: italic;
+  line-height: 1.5;
+}

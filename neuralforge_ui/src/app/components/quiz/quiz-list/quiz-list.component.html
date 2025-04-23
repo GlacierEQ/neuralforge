@@ -1,0 +1,61 @@
+<div class="quiz-list-container">
+  <div class="quiz-list-header">
+    <h2>Quizzes</h2>
+    <button mat-raised-button color="primary" (click)="openGenerateQuizDialog()">
+      <mat-icon>add</mat-icon> Generate Quiz
+    </button>
+  </div>
+
+  <div class="quiz-list-content">
+    <ng-container *ngIf="isLoading">
+      <div class="loading-spinner">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading quizzes...</p>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="!isLoading && error">
+      <div class="error-message">
+        <mat-icon color="warn">error</mat-icon>
+        <p>{{ error }}</p>
+        <button mat-button color="primary" (click)="loadQuizzes()">Try Again</button>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="!isLoading && !error">
+      <div *ngIf="quizzes.length === 0" class="empty-state">
+        <mat-icon class="empty-icon">quiz</mat-icon>
+        <p>No quizzes found for this project</p>
+        <p class="empty-subtitle">Generate your first quiz to test knowledge on project materials</p>
+        <button mat-raised-button color="primary" (click)="openGenerateQuizDialog()">
+          Generate Quiz
+        </button>
+      </div>
+
+      <div *ngIf="quizzes.length > 0" class="quiz-grid">
+        <mat-card *ngFor="let quiz of quizzes" class="quiz-card" (click)="navigateToQuiz(quiz)">
+          <mat-card-header>
+            <mat-card-title>{{ quiz.title }}</mat-card-title>
+            <mat-card-subtitle>Created on {{ formatDate(quiz.createdAt) }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <p class="quiz-description" *ngIf="quiz.description">{{ quiz.description }}</p>
+            <div class="quiz-details">
+              <span class="quiz-questions">
+                <mat-icon>question_answer</mat-icon>
+                {{ quiz.questions.length || 0 }} questions
+              </span>
+            </div>
+          </mat-card-content>
+          <mat-card-actions align="end">
+            <button mat-icon-button color="warn" 
+                    matTooltip="Delete Quiz" 
+                    (click)="deleteQuiz(quiz, $event)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </ng-container>
+  </div>
+</div>

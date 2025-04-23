@@ -1,0 +1,114 @@
+<div class="quiz-result-container">
+  <mat-card *ngIf="loading" class="loading-card">
+    <mat-card-content>
+      <div class="loading-container">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        <p>Loading quiz results...</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card *ngIf="error" class="error-card">
+    <mat-card-content>
+      <div class="error-container">
+        <mat-icon color="warn">error</mat-icon>
+        <p>Failed to load quiz results. Please try again later.</p>
+        <button mat-button color="primary" [routerLink]="['/quizzes', quizId]">
+          Back to Quiz
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div *ngIf="!loading && !error && attempt" class="result-content">
+    <mat-card class="result-header-card">
+      <mat-card-header>
+        <div mat-card-avatar>
+          <mat-icon>assessment</mat-icon>
+        </div>
+        <mat-card-title>Quiz Results</mat-card-title>
+        <mat-card-subtitle>{{ attempt.quizTitle }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="result-summary">
+          <div class="result-score" [ngClass]="getScoreColor()">
+            <h1>{{ attempt.score }}%</h1>
+            <p>{{ getScoreMessage() }}</p>
+          </div>
+          <div class="result-details">
+            <p>
+              <strong>Date completed:</strong>
+              {{ attempt.completedAt | date : "medium" }}
+            </p>
+            <p>
+              <strong>Questions answered:</strong>
+              {{ attempt.userAnswers.length }} / {{ attempt.totalQuestions }}
+            </p>
+            <p>
+              <strong>Correct answers:</strong>
+              {{ attempt.userAnswers | filterCorrect : "isCorrect" }} /
+              {{ attempt.userAnswers.length }}
+            </p>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button color="primary" (click)="retakeQuiz()">
+          Take Quiz Again
+        </button>
+        <button mat-button (click)="navigateToDashboard()">
+          Back to Dashboard
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card class="answers-card">
+      <mat-card-header>
+        <mat-card-title>Question Breakdown</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="question-breakdown">
+          <div
+            class="question-item"
+            *ngFor="let answer of attempt.userAnswers; let i = index"
+          >
+            <div class="answer-item">
+              <div class="answer-status">
+                <mat-icon *ngIf="answer.isCorrect" color="primary"
+                  >check_circle</mat-icon
+                >
+                <mat-icon *ngIf="!answer.isCorrect" color="warn"
+                  >cancel</mat-icon
+                >
+              </div>
+              <div class="answer-content">
+                <h3>{{ i + 1 }}. {{ answer.questionText }}</h3>
+                <p
+                  class="selected-answer"
+                  [ngClass]="{
+                    'correct-answer': answer.isCorrect,
+                    'incorrect-answer': !answer.isCorrect
+                  }"
+                >
+                  Your answer: {{ answer.selectedAnswerText }}
+                </p>
+                <!-- Display correct answer for incorrect responses -->
+                <p class="correct-answer-text" *ngIf="!answer.isCorrect">
+                  <strong>Correct answer:</strong>
+                  {{ getCorrectAnswer(answer) }}
+                </p>
+                <!-- Always show explanation if available -->
+                <p class="explanation" *ngIf="answer.explanation">
+                  <strong>Explanation:</strong> {{ answer.explanation }}
+                </p>
+              </div>
+            </div>
+            <mat-divider
+              *ngIf="i < attempt.userAnswers.length - 1"
+            ></mat-divider>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

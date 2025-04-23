@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 
 /**
  * Service class for managing project materials.
- * 
+ *
  * @author Enrique Alpízar
  * @version 1.0
  */
@@ -48,10 +48,11 @@ public class ProjectMaterialService {
 
     @Autowired
     private final ProjectRepository projectRepository;
-    
+
     @Autowired
     private final ProjectMaterialMapper materialMapper;
-    
+
+
     private final String baseUploadDir = "uploads";
     private final String materialsDir = "materials";
 
@@ -90,9 +91,15 @@ public class ProjectMaterialService {
         if (type == null || (!type.equals("file") && !type.equals("hyperlink"))) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid material type. Must be 'file' or 'hyperlink'");
         }
-        
+
         ProjectEntity project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found with id: " + projectId));
+
+        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (!user.getId().equals(project.getCreatorUserId()) && user.getRole().getName() != UserRoleEnum.ROLE_ADMINISTRATOR){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to modify this project");
+        }
 
         ProjectMaterialEntity material = ProjectMaterialEntity.builder()
                 .type(type)
@@ -105,10 +112,10 @@ public class ProjectMaterialService {
             if (file == null || file.isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is required for type 'file'");
             }
-            
+
             String originalFileName = file.getOriginalFilename();
             String uniqueFileName = UUID.randomUUID() + "." + getFileExtension(originalFileName);
-            
+
             try {
                 Path uploadPath = getUploadPath();
                 Files.createDirectories(uploadPath);
@@ -118,7 +125,7 @@ public class ProjectMaterialService {
                 material.setFileName(originalFileName);
                 material.setFileUrl("/api/neuralforge/v1/project-materials/files/" + uniqueFileName);
             } catch (IOException e) {
-                
+
                 System.err.println("Error storing file: " + e.getMessage());
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to store file");
             }
@@ -142,6 +149,12 @@ public class ProjectMaterialService {
         ProjectMaterialEntity material = materialRepository.findById(materialId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material not found with id: " + materialId));
 
+        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (!user.getId().equals(material.getProject().getCreatorUserId()) && user.getRole().getName() != UserRoleEnum.ROLE_ADMINISTRATOR){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to modify this project");
+        }
+
         if ("file".equals(material.getType()) && material.getFileUrl() != null) {
             try {
                 String fileName = material.getFileUrl().substring(material.getFileUrl().lastIndexOf("/") + 1);
@@ -158,41 +171,53 @@ public class ProjectMaterialService {
     public ProjectMaterialResource createProjectMaterial(ProjectMaterialResource material) {
         ProjectEntity project = projectRepository.findById(material.getProjectId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
-        
+
+        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (!user.getId().equals(project.getCreatorUserId()) && user.getRole().getName() != UserRoleEnum.ROLE_ADMINISTRATOR){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to modify this project");
+        }
+
         ProjectMaterialEntity entity = materialMapper.mapToEntity(material);
         ProjectMaterialEntity savedEntity = materialRepository.save(entity);
         return materialMapper.mapToResource(savedEntity);
     }
-    
+
     public ProjectMaterialResource updateProjectMaterial(String id, ProjectMaterialResource material) {
         ProjectMaterialEntity existingMaterial = materialRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material not found"));
-        
+
+        UserEntity user = (UserEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (!user.getId().equals(existingMaterial.getProject().getCreatorUserId()) && user.getRole().getName() != UserRoleEnum.ROLE_ADMINISTRATOR){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to modify this project");
+        }
+
         existingMaterial.setDescription(material.getDescription());
-        
+
         // Only update hyperlink for hyperlink type materials
         if ("hyperlink".equals(existingMaterial.getType()) && material.getHyperlink() != null) {
             existingMaterial.setHyperlink(material.getHyperlink());
         }
-        
+
         ProjectMaterialEntity updatedMaterial = materialRepository.save(existingMaterial);
         return materialMapper.mapToResource(updatedMaterial);
     }
-    
+
     public ProjectMaterialResource getProjectMaterial(String id) {
         ProjectMaterialEntity material = materialRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material not found"));
-        
+
         return materialMapper.mapToResource(material);
     }
-    
+
     public List<ProjectMaterialResource> getAllProjectMaterials() {
         return materialRepository.findAll()
                 .stream()
                 .map(materialMapper::mapToResource)
                 .collect(Collectors.toList());
     }
-    
+
     /**
      * Securely downloads a file by material ID, verifying the user has access rights.
      * Checks if the user is either an admin or the owner of the project.
@@ -204,62 +229,62 @@ public class ProjectMaterialService {
         // Get the material
         ProjectMaterialEntity material = materialRepository.findById(materialId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material not found with id: " + materialId));
-        
+
         // Verify material type is file
         if (!"file".equals(material.getType()) || material.getFileUrl() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Material is not a file");
         }
-        
+
         // Get current authenticated user
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserEntity currentUser = (UserEntity) authentication.getPrincipal();
-        
+
         // Check if user is admin
         boolean isAdmin = currentUser.getRole().getName() == UserRoleEnum.ROLE_ADMINISTRATOR;
-        
+
         // If not admin, check if user is the project owner
         if (!isAdmin) {
             // Get the project
             ProjectEntity project = material.getProject();
-            
+
             // Check if current user is the owner of the project
             if (!project.getCreatorUserId().equals(currentUser.getId())) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have permission to download this file");
             }
         }
-        
+
         // User is authorized to download the file
         try {
             // Extract the filename from the fileUrl
             String fileName = material.getFileUrl().substring(material.getFileUrl().lastIndexOf("/") + 1);
-            
+
             // First try default path
             Path filePath = getUploadPath().resolve(fileName);
             File fileObject = filePath.toFile();
-            
+
             if (!fileObject.exists()) {
                  throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found. It may have been deleted or moved.");
             }
-            
+
             // Create resource from the file object
             Resource resource = new UrlResource(fileObject.toURI());
-            
+
             if (resource.exists() && resource.isReadable()) {
                 return ResponseEntity.ok()
                         .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                        .header(HttpHeaders.CONTENT_DISPOSITION, 
+                        .header(HttpHeaders.CONTENT_DISPOSITION,
                                 "attachment; filename=\"" + material.getFileName() + "\"")
                         .body(resource);
             } else {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, 
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "File found but cannot be read. Please contact system administrator.");
             }
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, 
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Error accessing file. Please try again later.");
         }
     }
-    
+
     private String getFileExtension(String fileName) {
         if (fileName == null || fileName.lastIndexOf(".") == -1) {
             return "";

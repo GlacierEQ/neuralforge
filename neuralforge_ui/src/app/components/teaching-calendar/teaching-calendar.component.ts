@@ -23,6 +23,7 @@ import {
 import { AlertService } from "../../services/alert.service";
 import { ProjectMaterialService } from "../../services/project-material.service";
 import { TeachingProjectService } from "../../services/teaching-project.service";
+import { TopicManagementService } from "../../services/topic-management.service";
 import { MoveTopicDialogComponent } from "../dialogs/move-topic-dialog/move-topic-dialog.component";
 
 interface IWeek {
@@ -64,7 +65,8 @@ export class TeachingCalendarComponent implements OnInit, OnDestroy {
     private teachingProjectService: TeachingProjectService,
     private alertService: AlertService,
     private dialog: MatDialog,
-    private projectMaterialService: ProjectMaterialService
+    private projectMaterialService: ProjectMaterialService,
+    private topicManagementService: TopicManagementService
   ) {}
 
   ngOnInit() {
@@ -156,6 +158,17 @@ export class TeachingCalendarComponent implements OnInit, OnDestroy {
   ) {
     if (!this.project?.weeks) return;
 
+    if (topic.teacherLocked) {
+      this.alertService.displayAlert(
+        "warning",
+        "This topic is locked. Please unlock it before moving.",
+        "center",
+        "top",
+        ["warning-snackbar"]
+      );
+      return;
+    }
+
     const dialogRef = this.dialog.open(MoveTopicDialogComponent, {
       width: "450px",
       data: {
@@ -169,39 +182,222 @@ export class TeachingCalendarComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.alertService.displayAlert(
-          "info",
-          "Move topic to different day not implemented yet",
-          "center",
-          "top",
-          ["info-snackbar"]
-        );
+        this.isGeneratingSchedule = true; // Show loading
+
+        this.topicManagementService
+          .moveTopicToSession(
+            topicId,
+            result.targetWeekNumber,
+            result.targetSessionId
+          )
+          .subscribe({
+            next: (updatedProject) => {
+              if (this.project) {
+                this.project = updatedProject;
+              }
+              this.isGeneratingSchedule = false;
+              this.alertService.displayAlert(
+                "success",
+                "Topic moved successfully",
+                "center",
+                "top",
+                ["success-snackbar"]
+              );
+            },
+            error: (error) => {
+              console.error("Error moving topic:", error);
+              this.isGeneratingSchedule = false;
+              this.alertService.displayAlert(
+                "error",
+                error.error?.message ||
+                  "Failed to move topic. Please try again.",
+                "center",
+                "top",
+                ["error-snackbar"]
+              );
+            },
+          });
       }
     });
   }
 
   moveTopicUp(weekIndex: number, sessionIndex: number, topicIndex: number) {
-    this.alertService.displayAlert(
-      "info",
-      "Move topic up not implemented yet",
-      "center",
-      "top",
-      ["info-snackbar"]
-    );
+    if (!this.project?.weeks) return;
+
+    const sortedWeeks = this.getSortedWeeks();
+    const week = sortedWeeks[weekIndex];
+    if (!week) return;
+
+    const sortedSessions = this.getSortedClassSessions(week);
+    const session = sortedSessions[sessionIndex];
+    if (!session) return;
+
+    const sortedTopics = this.getSortedTopics(session);
+    const topic = sortedTopics[topicIndex];
+    if (!topic || !topic.id) return;
+
+    // Check if topic is locked
+    if (topic.teacherLocked) {
+      this.alertService.displayAlert(
+        "warning",
+        "This topic is locked. Please unlock it before moving.",
+        "center",
+        "top",
+        ["warning-snackbar"]
+      );
+      return;
+    }
+
+    // Check if topic above is locked
+    if (topicIndex > 0) {
+      const topicAbove = sortedTopics[topicIndex - 1];
+      if (topicAbove.teacherLocked) {
+        this.alertService.displayAlert(
+          "warning",
+          "Cannot move topic up because the topic above is locked.",
+          "center",
+          "top",
+          ["warning-snackbar"]
+        );
+        return;
+      }
+    }
+
+    this.isGeneratingSchedule = true; // Show loading
+
+    this.topicManagementService.moveTopicUp(topic.id).subscribe({
+      next: (updatedProject) => {
+        if (this.project) {
+          this.project = updatedProject;
+        }
+        this.isGeneratingSchedule = false;
+        this.alertService.displayAlert(
+          "success",
+          "Topic moved up successfully",
+          "center",
+          "top",
+          ["success-snackbar"]
+        );
+      },
+      error: (error) => {
+        console.error("Error moving topic up:", error);
+        this.isGeneratingSchedule = false;
+        this.alertService.displayAlert(
+          "error",
+          error.error?.message || "Failed to move topic up. Please try again.",
+          "center",
+          "top",
+          ["error-snackbar"]
+        );
+      },
+    });
   }
 
   moveTopicDown(weekIndex: number, sessionIndex: number, topicIndex: number) {
-    this.alertService.displayAlert(
-      "info",
-      "Move topic down not implemented yet",
-      "center",
-      "top",
-      ["info-snackbar"]
-    );
+    if (!this.project?.weeks) return;
+
+    const sortedWeeks = this.getSortedWeeks();
+    const week = sortedWeeks[weekIndex];
+    if (!week) return;
+
+    const sortedSessions = this.getSortedClassSessions(week);
+    const session = sortedSessions[sessionIndex];
+    if (!session) return;
+
+    const sortedTopics = this.getSortedTopics(session);
+    const topic = sortedTopics[topicIndex];
+    if (!topic || !topic.id) return;
+
+    // Check if topic is locked
+    if (topic.teacherLocked) {
+      this.alertService.displayAlert(
+        "warning",
+        "This topic is locked. Please unlock it before moving.",
+        "center",
+        "top",
+        ["warning-snackbar"]
+      );
+      return;
+    }
+
+    // Check if topic below is locked
+    if (topicIndex < sortedTopics.length - 1) {
+      const topicBelow = sortedTopics[topicIndex + 1];
+      if (topicBelow.teacherLocked) {
+        this.alertService.displayAlert(
+          "warning",
+          "Cannot move topic down because the topic below is locked.",
+          "center",
+          "top",
+          ["warning-snackbar"]
+        );
+        return;
+      }
+    }
+
+    this.isGeneratingSchedule = true; // Show loading
+
+    this.topicManagementService.moveTopicDown(topic.id).subscribe({
+      next: (updatedProject) => {
+        if (this.project) {
+          this.project = updatedProject;
+        }
+        this.isGeneratingSchedule = false;
+        this.alertService.displayAlert(
+          "success",
+          "Topic moved down successfully",
+          "center",
+          "top",
+          ["success-snackbar"]
+        );
+      },
+      error: (error) => {
+        console.error("Error moving topic down:", error);
+        this.isGeneratingSchedule = false;
+        this.alertService.displayAlert(
+          "error",
+          error.error?.message ||
+            "Failed to move topic down. Please try again.",
+          "center",
+          "top",
+          ["error-snackbar"]
+        );
+      },
+    });
   }
 
   toggleLock(topic: ICourseTopic) {
-    topic.teacherLocked = !topic.teacherLocked;
+    if (!topic.id) return;
+
+    this.isGeneratingSchedule = true; // Show loading
+
+    this.topicManagementService.toggleTopicLock(topic.id).subscribe({
+      next: (updatedTopic) => {
+        topic.teacherLocked = updatedTopic.teacherLocked;
+        this.isGeneratingSchedule = false;
+        this.alertService.displayAlert(
+          "success",
+          topic.teacherLocked
+            ? "Topic locked successfully"
+            : "Topic unlocked successfully",
+          "center",
+          "top",
+          ["success-snackbar"]
+        );
+      },
+      error: (error) => {
+        console.error("Error toggling topic lock:", error);
+        this.isGeneratingSchedule = false;
+        this.alertService.displayAlert(
+          "error",
+          error.error?.message ||
+            "Failed to toggle topic lock. Please try again.",
+          "center",
+          "top",
+          ["error-snackbar"]
+        );
+      },
+    });
   }
 
   private generateWeeks() {
@@ -301,6 +497,25 @@ export class TeachingCalendarComponent implements OnInit, OnDestroy {
     projectStartDate.setDate(projectStartDate.getDate() + daysToAdd);
 
     return projectStartDate;
+  }
+
+  getSortedWeeks(): ICourseWeek[] {
+    if (!this.project?.weeks || this.project.weeks.length === 0) {
+      return [];
+    }
+
+    return [...this.project.weeks].sort((a, b) => a.weekNumber - b.weekNumber);
+  }
+
+  /**
+   * Returns the sessions topics sorted by orderIndex
+   */
+  getSortedTopics(session: IClassSession): ICourseTopic[] {
+    if (!session.topics || session.topics.length === 0) {
+      return [];
+    }
+
+    return [...session.topics].sort((a, b) => a.orderIndex - b.orderIndex);
   }
 
   getSortedClassSessions(week: ICourseWeek): IClassSession[] {

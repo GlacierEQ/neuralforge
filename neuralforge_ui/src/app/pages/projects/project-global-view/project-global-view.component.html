@@ -1,0 +1,65 @@
+<div class="section-header">
+  <h2 class="section-title">Projects List</h2>
+</div>
+
+<div class="search-tabs-wrapper">
+  <mat-form-field class="search-field" appearance="outline">
+    <mat-label>Search Projects</mat-label>
+    <input matInput [(ngModel)]="searchTerm" placeholder="Enter project name or description" />
+  </mat-form-field>
+
+  <div class="tab-container">
+    <button mat-button (click)="selectedProjectType = IProjectType.Teaching; onTabChange()"
+            [class.active]="selectedProjectType === IProjectType.Teaching">Teaching</button>
+    <button mat-button (click)="selectedProjectType = IProjectType.Learning; onTabChange()"
+            [class.active]="selectedProjectType === IProjectType.Learning">Learning</button>
+    <button mat-button (click)="selectedProjectType = IProjectType.ProgrammedGoal; onTabChange()"
+            [class.active]="selectedProjectType === IProjectType.ProgrammedGoal">Goals</button>
+  </div>
+</div>
+
+<div *ngIf="allProjects[selectedProjectType].isLoading">
+  <mat-icon class="spin">refresh</mat-icon> Loading...
+</div>
+
+<div *ngIf="allProjects[selectedProjectType].hasError">
+  <mat-card>
+    <mat-icon>error</mat-icon> {{ allProjects[selectedProjectType].errorMessage }}
+    <button mat-button (click)="fetchAllProjects()">Retry</button>
+  </mat-card>
+</div>
+
+<div *ngIf="!allProjects[selectedProjectType].isLoading && !allProjects[selectedProjectType].hasError">
+  <div *ngIf="filteredProjects.length === 0" class="no-projects">
+    <mat-icon>folder_off</mat-icon>
+    <h3>No {{ selectedProjectType }} projects found</h3>
+    <p>Try adjusting your search or switch to another tab.</p>
+  </div>
+
+  <div class="project-list-scroll">
+    <mat-card *ngFor="let project of paginatedProjects" class="project-item">
+      <mat-card-title>{{ project.title }}</mat-card-title>
+      <mat-card-content>
+        {{ project.content.length > 50 ? (project.content | slice: 0:50) + '...' : project.content }}
+      </mat-card-content>
+      <mat-card-actions>
+        <button
+                [routerLink]="['/app/' + getRouteByProjectType(project.projectType), project.id]"
+                mat-button
+                color="primary"
+        >
+          Enter
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <div class="paginator-wrapper">
+    <mat-paginator
+            [length]="filteredProjects.length"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="[5, 10, 20]"
+            (page)="handlePageChange($event)">
+    </mat-paginator>
+  </div>
+</div>

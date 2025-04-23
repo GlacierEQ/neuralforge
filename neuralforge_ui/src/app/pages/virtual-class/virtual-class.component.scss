@@ -1,0 +1,119 @@
+@use "@angular/material" as mat;
+@use "sass:map";
+@use "../../../styles.scss" as theme;
+
+$primary-color: mat.get-color-from-palette(theme.$my-primary, 500);
+$accent-color: mat.get-color-from-palette(theme.$my-accent, 500);
+$primary-contrast: map.get(map.get(theme.$my-primary, contrast), 500);
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.virtual-class-header {
+  background: #ffffff;
+  color: $primary-contrast;
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+
+  h1 {
+    font-weight: 500;
+    margin: 0;
+  }
+}
+
+.virtual-class-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+
+  h1 {
+    color: #2b2b2b;
+  }
+}
+
+.virtual-class-description {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  color: #2b2b2b;
+}
+
+.days-left-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: $primary-color;
+  margin: 0;
+  text-align: center;
+}
+
+.deadline {
+  color: #666;
+  font-family: "Montserrat", sans-serif;
+  margin-top: 10px;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.deadline-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  margin-bottom: 1.5rem;
+}
+
+.overview-tab {
+  padding: 2rem;
+}
+
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+  font-style: italic;
+  font-family: "Poppins";
+  color: #aaa;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  color: #f44336;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .error-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+  }
+
+  .error-message {
+    font-size: 16px;
+    margin: 0;
+  }
+}

@@ -35,6 +35,10 @@
     ></app-generated-contents>
   </mat-tab>
 
+  <mat-tab label="Quizzes">
+    <app-quiz-list [projectId]="project.id"></app-quiz-list>
+  </mat-tab>
+
   <mat-tab label="Configuration">
     <div class="config-container">
       <div class="metadata-section">

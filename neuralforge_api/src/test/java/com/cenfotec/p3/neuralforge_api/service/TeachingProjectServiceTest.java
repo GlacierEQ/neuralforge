@@ -3,6 +3,7 @@ package com.cenfotec.p3.neuralforge_api.service;
 import com.cenfotec.p3.neuralforge_api.model.entity.SelectedDaysEntity;
 import com.cenfotec.p3.neuralforge_api.model.entity.TeachingProjectEntity;
 import com.cenfotec.p3.neuralforge_api.model.entity.UserEntity;
+import com.cenfotec.p3.neuralforge_api.model.entity.UserRoleEntity;
 import com.cenfotec.p3.neuralforge_api.model.enums.UserRoleEnum;
 import com.cenfotec.p3.neuralforge_api.model.mapper.SelectedDaysMapper;
 import com.cenfotec.p3.neuralforge_api.model.mapper.TeachingProjectMapper;
@@ -64,22 +65,19 @@ class TeachingProjectServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        
-        // Setup security context mock
+
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
-        
-        // Setup authentication mock
         when(authentication.getPrincipal()).thenReturn(mockUser);
-        
-        // Setup user mock
         when(mockUser.getId()).thenReturn("user-123");
-        
-        // Setup SelectedDaysService mock
+
+        // Mock role to avoid NullPointerException in getTeachingProject
+        var mockRole = mock(UserRoleEntity.class); // assuming Role is an inner class or similar
+        when(mockRole.getName()).thenReturn(UserRoleEnum.ROLE_STUDENT);
+        when(mockUser.getRole()).thenReturn(mockRole);
+
         SelectedDaysEntity savedSelectedDays = new SelectedDaysEntity();
         when(selectedDaysService.save(any(SelectedDaysResource.class))).thenReturn(savedSelectedDays);
-        
-        // Setup SelectedDaysMapper mock
         when(selectedDaysMapper.toResource(any(SelectedDaysEntity.class))).thenReturn(new SelectedDaysResource());
     }
     
@@ -139,21 +137,23 @@ class TeachingProjectServiceTest {
 
     @Test
     void getTeachingProject_Success() {
-        // Arrange
         String id = "1";
+
         TeachingProjectEntity entity = new TeachingProjectEntity();
+        entity.setCreatorUserId("user-123");
+
         TeachingProjectResource resource = new TeachingProjectResource();
+
         when(teachingProjectRepository.findById(id)).thenReturn(Optional.of(entity));
         when(teachingProjectMapper.mapToResource(entity)).thenReturn(resource);
 
-        // Act
         TeachingProjectResource result = teachingProjectService.getTeachingProject(id);
 
-        // Assert
         assertNotNull(result);
         verify(teachingProjectRepository).findById(id);
         verify(teachingProjectMapper).mapToResource(entity);
     }
+
 
     @Test
     void getAllTeachingProjects_Success() {

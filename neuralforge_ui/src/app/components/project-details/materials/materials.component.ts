@@ -189,6 +189,18 @@ export class MaterialsComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
+  getDefaultNameForHyperlink(material: ProjectMaterial): string {
+    if (material.type === 'hyperlink' && material.hyperlink) {
+      // Eliminar los parámetros de la URL si existen (todo después del ?)
+      const cleanUrl = material.hyperlink.split('?')[0];
+  
+      // Obtener el nombre del archivo, que es la última parte de la URL
+      const parts = cleanUrl.split('/');
+      return parts[parts.length - 1] || 'Unnamed Link';
+    }
+    return 'Unnamed';
+  }
+
   getMaterialIcon(type: string): string {
     return type === "file" ? "insert_drive_file" : "link";
   }

@@ -63,5 +63,7 @@
         [allNotifications]="allNotifications"
         (dismiss)="dismissNotification($event)"
         (close)="showNotifications = false"
+        (action)="onNotificationAction($event)"
 ></app-notification-overlay>
+
 

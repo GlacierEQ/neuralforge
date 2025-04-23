@@ -27,7 +27,9 @@
           >
             {{ getMaterialIcon(material.type) }}
           </mat-icon>
-          {{ material.fileName }}
+          
+          <!-- Use getDefaultNameForHyperlink to display a default name for hyperlinks -->
+          {{ material.type === 'hyperlink' ? getDefaultNameForHyperlink(material) : material.fileName }}
         </mat-card-title>
         <mat-card-subtitle>{{ material.type }}</mat-card-subtitle>
       </mat-card-header>

@@ -90,3 +90,17 @@ mat-dialog-actions {
 button[mat-raised-button] {
   margin-right: 0.5rem;
 }
+
+.label-with-icon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.label-with-icon mat-label {
+  margin-right: 8px; 
+}
+
+.label-with-icon mat-icon {
+  cursor: pointer;
+}

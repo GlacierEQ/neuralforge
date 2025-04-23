@@ -109,6 +109,20 @@ public class UserEntity implements UserDetails {
     private List<NotificationEntity> notifications;
 
     /**
+     * List of quiz attempts associated with this user.
+     * When this user is deleted, all quiz attempts will be automatically removed.
+     */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<QuizAttemptEntity> quizAttempts;
+
+    /**
+     * List of virtual student records associated with this user.
+     * When this user is deleted, all related virtual student records will be automatically removed.
+     */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VirtualStudentEntity> virtualStudents;
+
+    /**
      * Retrieves the authorities granted to the user.
      * 
      * @return A collection of {@link GrantedAuthority} representing the user's permissions.

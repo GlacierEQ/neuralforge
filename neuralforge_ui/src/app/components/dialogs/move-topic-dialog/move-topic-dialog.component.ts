@@ -8,6 +8,7 @@ import {
   MatDialogRef,
 } from "@angular/material/dialog";
 import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
 import { MatSelectModule } from "@angular/material/select";
 import { IClassSession, ICourseTopic, ICourseWeek } from "../../../interfaces";
 
@@ -21,6 +22,7 @@ import { IClassSession, ICourseTopic, ICourseWeek } from "../../../interfaces";
     MatFormFieldModule,
     MatSelectModule,
     FormsModule,
+    MatIconModule,
   ],
   templateUrl: "./move-topic-dialog.component.html",
   styleUrls: ["./move-topic-dialog.component.scss"],
@@ -118,7 +120,28 @@ export class MoveTopicDialogComponent {
     return projectStartDate;
   }
 
+  getCurrentSession(): IClassSession | undefined {
+    const currentWeek = this.data.weeks.find(
+      (week) => week.weekNumber === this.data.currentWeekNumber
+    );
+    
+    if (!currentWeek) return undefined;
+    
+    return currentWeek.classSessions.find(
+      (session) => session.id === this.data.currentSessionId
+    );
+  }
+
+  isSameLocation(): boolean {
+    return (
+      this.selectedWeekNumber === this.data.currentWeekNumber &&
+      this.selectedSessionId === this.data.currentSessionId
+    );
+  }
+
   onSubmit() {
+    if (this.isSameLocation()) return;
+    
     this.dialogRef.close({
       topic: this.data.topic,
       sourceWeekNumber: this.data.currentWeekNumber,

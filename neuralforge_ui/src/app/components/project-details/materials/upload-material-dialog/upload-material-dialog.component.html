@@ -4,7 +4,16 @@
   <mat-dialog-content>
     <div class="form-container">
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Material Type</mat-label>
+        <mat-label>Material Type
+          <mat-icon 
+          matTooltip="Choose the material use.Try to ensure the information is organized and understandable for more accurate content generation."
+          matTooltipClass="custom-tooltip"
+          matTooltipPosition="above"
+          class="inline-icon">
+          info
+        </mat-icon>
+        
+        </mat-label>
         <mat-select formControlName="type">
           <mat-option *ngFor="let type of materialTypes" [value]="type.value">
             {{ type.label }}
@@ -27,7 +36,15 @@
 
       <ng-container *ngIf="uploadForm.get('type')?.value === 'hyperlink'">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Hyperlink</mat-label>
+          <mat-label>Hyperlink
+            <mat-icon 
+            matTooltip="Enter a valid URL starting with http:// or https:// and ending in .pdf or .txt (e.g. https://example.com/file.pdf)"
+            matTooltipClass="custom-tooltip"
+            matTooltipPosition="above"
+            class="inline-icon">
+            info
+          </mat-icon>
+          </mat-label>
           <input
             matInput
             formControlName="hyperlink"
@@ -37,7 +54,7 @@
             Hyperlink is required
           </mat-error>
           <mat-error *ngIf="uploadForm.get('hyperlink')?.hasError('pattern')">
-            Please enter a valid URL starting with http:// or https://
+            Please enter a valid URL starting with http:// or https:// and ending in .pdf or .txt (e.g. https://example.com/file.pdf)
           </mat-error>
         </mat-form-field>
       </ng-container>

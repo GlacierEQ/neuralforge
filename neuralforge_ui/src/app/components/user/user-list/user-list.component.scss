@@ -1,51 +1,63 @@
 .user-list-container {
+  padding: 20px;
+  max-width: 100%;
+  box-sizing: border-box;
+  background: #f9fafc;
+  border-radius: 12px;
 }
 
 .user-list-header {
-  background-color: #456ae6; /* Blue background */
-  color: white;
-  padding: 5px;
+  background: linear-gradient(
+                  to right,
+                  #a9b9f6,
+                  #9cfcc4);
+  color: #3f51b5;
+  padding: 24px 16px;
   text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
+  gap: 10px;
   align-items: center;
-  box-shadow: 0 6px 15px rgba(10, 0, 0, 0.9);
 }
 
-h2 {
-  margin-bottom: 10px;
+.user-list-header h2 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 24px;
 }
 
-.filter-field {
-  width: 50%;
-
-}
-
-/* Smaller and Centered Search Bar */
-.small-filter {
-  width: 50%;
-  max-width: 300px;
+.search-field {
+  width: 100%;
+  max-width: 320px;
 }
 
 .table-container {
   overflow-x: auto;
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+mat-table {
+  width: 100%;
+}
+
+.mat-header-row {
+  background-color: #e8eaf6;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 mat-chip {
   font-weight: 500;
+  font-size: 13px;
+  text-transform: capitalize;
 }
 
-.mat-header-row {
-  background-color: #273875; /* Dark blue header background */
-  color: white !important;
-  font-weight: bold;
+mat-icon {
+  font-size: 20px;
 }
-
-.small-filter {
-  width: 50%;
-  max-width: 300px;
-}
-
-
-
-

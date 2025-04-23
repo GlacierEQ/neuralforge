@@ -11,7 +11,10 @@ $primary-contrast: map.get(map.get(theme.$my-primary, contrast), 500);
   margin: 10px;
   align-items: center;
   gap: 1rem;
-  background: linear-gradient(to right, $primary-color, $accent-color);
+  background: linear-gradient(
+                  to right,
+                  #a9b9f6,
+                  #9cfcc4);
   color: $primary-contrast;
   padding: 1.2rem 2rem;
   border-radius: 1.5rem;
@@ -23,11 +26,12 @@ $primary-contrast: map.get(map.get(theme.$my-primary, contrast), 500);
 
   .welcome-icon {
     font-size: 1.8rem;
-    color: $primary-contrast;
+    color: #3f51b5;
   }
 
   .welcome-text {
     flex: 1;
+    color: #3f51b5;
   }
 }
 

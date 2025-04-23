@@ -31,4 +31,6 @@ public class GenerateContentRequest {
      * The type of content to generate, corresponding to values in {@link com.cenfotec.p3.neuralforge_api.model.enums.DynamicContentTypeEnum}.
      */
     private String type;
+
+    private String language;
 }
